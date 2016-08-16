@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\accessors.cpp" />
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\action.transpose.cpp" />
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\dllmain.cpp" />
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\enqueue.cpp" />
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\fft_binary_lookup.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\generator.copy.cpp" />
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\generator.stockham.cpp" />
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\generator.transpose.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\generator.transpose.gcn.cpp" />
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\lifetime.cpp" />
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\md5sum.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\plan.cpp" />
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\repo.cpp" />
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\clFFT-master\src\library\transform.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\clFFT-master\src\library\action.h" />
+    <ClInclude Include="..\..\..\src\clFFT-master\src\library\action.transpose.h" />
+    <ClInclude Include="..\..\..\src\clFFT-master\src\library\fft_binary_lookup.h" />
+    <ClInclude Include="..\..\..\src\clFFT-master\src\library\generator.h" />
+    <ClInclude Include="..\..\..\src\clFFT-master\src\library\generator.stockham.h" />
+    <ClInclude Include="..\..\..\src\clFFT-master\src\library\generator.transpose.gcn.h" />
+    <ClInclude Include="..\..\..\src\clFFT-master\src\library\generator.transpose.h" />
+    <ClInclude Include="..\..\..\src\clFFT-master\src\library\lock.h" />
+    <ClInclude Include="..\..\..\src\clFFT-master\src\library\mainpage.h" />
+    <ClInclude Include="..\..\..\src\clFFT-master\src\library\md5sum.h" />
+    <ClInclude Include="..\..\..\src\clFFT-master\src\library\plan.h" />
+    <ClInclude Include="..\..\..\src\clFFT-master\src\library\private.h" />
+    <ClInclude Include="..\..\..\src\clFFT-master\src\library\repo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\clFFT-master\src\library\clFFT.pc.in" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\src\clFFT-master\src\library\CMakeLists.txt" />
+    <Text Include="..\..\..\src\clFFT-master\src\library\ReadMe.txt" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D8BA577C-D0D0-48C3-B4DD-4EA5A1E791B1}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>clFFT</RootNamespace>
+    <ProjectName>clFFT-master</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\..\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
+    <IncludePath>$(AMDAPPSDKROOT)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(AMDAPPSDKROOT)\lib\x86_64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\..\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
+    <IncludePath>$(AMDAPPSDKROOT)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(AMDAPPSDKROOT)\lib\x86_64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\src\clFFT-master\src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\src\clFFT-master\src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

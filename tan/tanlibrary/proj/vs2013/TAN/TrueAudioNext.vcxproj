@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EAF65C4F-E431-4D63-96CF-F9B39256DDFB}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>TrueAudioNext</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)..\..\bin\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\..\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>tanrt$(PlatformArchitecture)</TargetName>
+    <IncludePath>$(AMDAPPSDKROOT)\include;$(SolutionDir)../../;$(SolutionDir)../../../AMF/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\;$(AMDAPPSDKROOT)\lib\x86_64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)..\..\bin\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\..\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>tanrt$(PlatformArchitecture)</TargetName>
+    <IncludePath>$(AMDAPPSDKROOT)\include;$(SolutionDir)../../;$(SolutionDir)../../../AMF/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\;$(AMDAPPSDKROOT)\lib\x86_64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>CONVOLUTION_EXPORTS;LEGACY_COPYING=1;TRUEAUDIONEXT_EXPORTS;TAN_SDK_EXPORTS;_WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>clFFT-master$(PlatformArchitecture).lib;Graal$(PlatformArchitecture).lib;OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\$(TargetName).lib</ImportLibrary>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>CONVOLUTION_EXPORTS;LEGACY_COPYING=1;TRUEAUDIONEXT_EXPORTS;TAN_SDK_EXPORTS;_WIN32;NDEBUG;_WINDOWS;_USRDLL%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>clFFT-master$(PlatformArchitecture).lib;Graal$(PlatformArchitecture).lib;OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\$(TargetName).lib</ImportLibrary>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\AMFSTL.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\InterfaceImpl.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\ObservableImpl.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\PropertyStorageExImpl.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\PropertyStorageImpl.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\TraceAdapter.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\AudioBuffer.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Buffer.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Compute.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\ComputeFactory.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Context.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Data.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Debug.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Factory.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Interface.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Plane.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Platform.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\PropertyStorage.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\PropertyStorageEx.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Result.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Surface.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Trace.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Variant.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Version.h" />
+    <ClInclude Include="..\..\..\include\TrueAudioNext.h" />
+    <ClInclude Include="..\..\..\src\TrueAudioNext\converter\ConverterImpl.h" />
+    <ClInclude Include="..\..\..\src\TrueAudioNext\convolution\ConvolutionImpl.h" />
+    <ClInclude Include="..\..\..\src\TrueAudioNext\core\TANContextImpl.h" />
+    <ClInclude Include="..\..\..\src\TrueAudioNext\core\TANTraceAndDebug.h" />
+    <ClInclude Include="..\..\..\src\TrueAudioNext\fft\FFTImpl.h" />
+    <ClInclude Include="..\..\..\src\TrueAudioNext\math\MathImpl.h" />
+    <ClInclude Include="..\..\..\src\TrueAudioNext\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\TrueAudioNext\version.rc">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(AMDAPPSDKROOT)include;$(SolutionDir)../../;$(SolutionDir)../../../AMF/;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(AMDAPPSDKROOT)include;$(SolutionDir)../../;$(SolutionDir)../../../AMF/;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_WIN32;_MSC_VER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_WIN32;_MSC_VER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\AMFFactory.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\AMFSTL.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\PropertyStorageExImpl.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\Thread.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\TraceAdapter.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\Windows\ThreadWindows.cpp" />
+    <ClCompile Include="..\..\..\src\TrueAudioNext\converter\ConverterImpl.cpp" />
+    <ClCompile Include="..\..\..\src\TrueAudioNext\convolution\ConvolutionImpl.cpp" />
+    <ClCompile Include="..\..\..\src\TrueAudioNext\core\TANContextImpl.cpp" />
+    <ClCompile Include="..\..\..\src\TrueAudioNext\core\TANTraceAndDebug.cpp" />
+    <ClCompile Include="..\..\..\src\TrueAudioNext\core\windows\dll.cpp" />
+    <ClCompile Include="..\..\..\src\TrueAudioNext\fft\FFTImpl.cpp" />
+    <ClCompile Include="..\..\..\src\TrueAudioNext\math\MathImpl.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\src\TrueAudioNext\converter\Converter.cl">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(FullPath).h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(FullPath).h</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\TrueAudioNext\convolution\Crossfading.cl">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(FullPath).h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(FullPath).h</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\src\TrueAudioNext\math\VectorComplexDivision.cl">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(FullPath).h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(FullPath).h</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\TrueAudioNext\math\VectorComplexMultiply.cl">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(FullPath).h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(FullPath).h</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

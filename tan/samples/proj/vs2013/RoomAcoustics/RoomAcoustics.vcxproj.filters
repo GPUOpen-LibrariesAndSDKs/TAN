@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\common\WASAPIUtils.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\SimpleVRaudio.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\GpuUtils.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\fifo.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\wav.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\AMFFactory.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\Windows\ThreadWindows.cpp">
+      <Filter>amf\public\common\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RoomAcoustics\RoomAcoustics.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RoomAcoustics\RoomAcousticsDlg.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RoomAcoustics\RoomWindow.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RoomAcoustics\stdafx.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\common\WASAPIUtils.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\SimpleVRaudio.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\GpuUtils.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\fifo.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\wav.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\AudioBuffer.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Buffer.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Compute.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\ComputeFactory.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Context.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Data.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Debug.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Factory.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Interface.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Plane.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Platform.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\PropertyStorage.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\PropertyStorageEx.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Result.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Surface.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Trace.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Variant.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Version.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcoustics\maxlimits.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcoustics\Resource.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcoustics\RoomAcoustics.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcoustics\RoomAcousticsDlg.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcoustics\RoomWindow.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcoustics\stdafx.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcoustics\targetver.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\public\include\TrueAudioNext.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="amf">
+      <UniqueIdentifier>{7ab7865a-db60-41e0-add5-8599571245e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public">
+      <UniqueIdentifier>{a1ee6de5-d654-473c-a0ce-95078b60cd4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\include">
+      <UniqueIdentifier>{1354835e-2ca0-4709-a96f-ffe3d1f0350d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\include\core">
+      <UniqueIdentifier>{d77d9227-89f2-4089-aa06-39f52e655cd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\common">
+      <UniqueIdentifier>{8c28dedf-8e13-4403-a870-ed895e658b51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\common\Windows">
+      <UniqueIdentifier>{1233056d-c1aa-4ae2-986f-38b964fcbfb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{cef949d6-b0ad-46c3-bd82-0cb31ecb980b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\res">
+      <UniqueIdentifier>{c9168c44-e770-48d9-920e-1e45b3e0de0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{404b4a6c-9d5a-4b46-b890-157e7b8b4677}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{1f0cf146-9ff7-4498-84d6-a0336ee9af93}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\src\RoomAcoustics\res\RoomAcoustics.ico">
+      <Filter>src\res</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\RoomAcoustics\RoomAcoustics.rc">
+      <Filter>src</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\..\..\src\RoomAcoustics\RoomAcousticsRun.wav">
+      <Filter>src</Filter>
+    </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\RoomAcoustics\res\RoomAcoustics.rc2">
+      <Filter>src\res</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="amf">
+      <UniqueIdentifier>{710214d8-3e4a-4d21-aa4d-a4ca64f83f6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public">
+      <UniqueIdentifier>{a10ea87b-2eef-415d-8c36-80639e8cc602}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\include">
+      <UniqueIdentifier>{b90e5ea3-561b-4689-b72f-4352e5739878}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\include\core">
+      <UniqueIdentifier>{85786487-008a-4a58-acc6-d0aae49287a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\common">
+      <UniqueIdentifier>{dff7eb40-f251-4441-ac8b-edfe8a2dd4c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\common\Windows">
+      <UniqueIdentifier>{990472c9-5af0-407f-aa2f-e5dcf9657dd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{b0ee08c3-75ed-4841-9885-27efde3111ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\converter">
+      <UniqueIdentifier>{58b44260-8ff8-4ce0-bb58-50f5e22d74e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\convolution">
+      <UniqueIdentifier>{3d9d3856-4663-4944-a300-2b37b1a2c81f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core">
+      <UniqueIdentifier>{83bf682b-e3c5-4725-9674-3ff3c5768cca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core\windows">
+      <UniqueIdentifier>{746aaef6-be4e-441d-958c-134f36835aea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\fft">
+      <UniqueIdentifier>{47fec9e8-9d18-4afc-9d73-2d170861276d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\math">
+      <UniqueIdentifier>{1d5b703c-7878-41b0-8982-bcd688f5a094}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{c223acb6-80e3-465f-bd4a-adb815e68777}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\TrueAudioNext\core\TANContextImpl.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\AudioBuffer.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Buffer.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Compute.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\ComputeFactory.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Context.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Data.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Debug.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Factory.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Interface.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Plane.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Platform.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\PropertyStorage.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\PropertyStorageEx.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Result.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Surface.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Trace.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Variant.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Version.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\AMFSTL.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\ObservableImpl.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\InterfaceImpl.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\PropertyStorageExImpl.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\PropertyStorageImpl.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TrueAudioNext\fft\FFTImpl.h">
+      <Filter>src\fft</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TrueAudioNext\converter\ConverterImpl.h">
+      <Filter>src\converter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TrueAudioNext\convolution\ConvolutionImpl.h">
+      <Filter>src\convolution</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TrueAudioNext\core\TANTraceAndDebug.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\TraceAdapter.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TrueAudioNext\resource.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\TrueAudioNext.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TrueAudioNext\math\MathImpl.h">
+      <Filter>src\math</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\TrueAudioNext\core\TANContextImpl.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\AMFSTL.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\TrueAudioNext\core\windows\dll.cpp">
+      <Filter>src\core\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\AMFFactory.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\Windows\ThreadWindows.cpp">
+      <Filter>amf\public\common\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\PropertyStorageExImpl.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\Thread.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\TrueAudioNext\fft\FFTImpl.cpp">
+      <Filter>src\fft</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\TrueAudioNext\converter\ConverterImpl.cpp">
+      <Filter>src\converter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\TrueAudioNext\convolution\ConvolutionImpl.cpp">
+      <Filter>src\convolution</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\TrueAudioNext\core\TANTraceAndDebug.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\TraceAdapter.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\TrueAudioNext\math\MathImpl.cpp">
+      <Filter>src\math</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\src\TrueAudioNext\convolution\Crossfading.cl">
+      <Filter>src\convolution</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\TrueAudioNext\converter\Converter.cl">
+      <Filter>src\converter</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\TrueAudioNext\math\VectorComplexDivision.cl">
+      <Filter>src\math</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\TrueAudioNext\math\VectorComplexMultiply.cl">
+      <Filter>src\math</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\TrueAudioNext\version.rc">
+      <Filter>src</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

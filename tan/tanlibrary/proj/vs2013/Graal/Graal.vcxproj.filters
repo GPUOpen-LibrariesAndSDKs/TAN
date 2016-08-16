@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="kernels">
+      <UniqueIdentifier>{078d8c4c-f038-42e6-a7b6-d4222960fcf4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OclKernels">
+      <UniqueIdentifier>{8b0c67fc-8551-4326-8f99-208af7da26d4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\src\Graal\amdFFT_conv_kernels.cl">
+      <Filter>kernels</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Graal\amdFIR_kernels.cl">
+      <Filter>kernels</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Graal\GraalFHT.cl">
+      <Filter>kernels</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Graal\GraalUtil.cl">
+      <Filter>kernels</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\Graal\amdFHT.cpp" />
+    <ClCompile Include="..\..\..\src\Graal\GraalConv.cpp" />
+    <ClCompile Include="..\..\..\src\Graal\GraalConv_clFFT.cpp" />
+    <ClCompile Include="..\..\..\src\Graal\GraalConvOCL.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\Graal\amdFHT.h" />
+    <ClInclude Include="..\..\..\src\Graal\GraalConv.hpp" />
+    <ClInclude Include="..\..\..\src\Graal\GraalConv_clFFT.hpp" />
+    <ClInclude Include="..\..\..\src\Graal\GraalConvOCL.hpp" />
+    <ClInclude Include="..\..\..\src\Graal\GraalInternal.h" />
+    <ClInclude Include="..\..\..\src\Graal\OclKernels\amdFFT_conv_kernels.cl.h">
+      <Filter>OclKernels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graal\OclKernels\amdFIR_kernels.cl.h">
+      <Filter>OclKernels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graal\OclKernels\GraalFHT.cl.h">
+      <Filter>OclKernels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graal\OclKernels\GraalUtil.cl.h">
+      <Filter>OclKernels</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

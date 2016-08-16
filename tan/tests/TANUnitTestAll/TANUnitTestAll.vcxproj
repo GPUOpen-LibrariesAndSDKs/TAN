@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7F86370C-604A-4F33-B543-408B3D0B1DA7}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>TANUnitTestAll</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)..\..\bin\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\..\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
+    <IncludePath>$(AMDAPPSDKROOT)include;$(SolutionDir)../../;$(SolutionDir)../../../AMF/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(AMDAPPSDKROOT)\lib\x86_64;$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)..\..\bin\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\..\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
+    <IncludePath>$(AMDAPPSDKROOT)include;$(SolutionDir)../../;$(SolutionDir)../../../AMF/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(AMDAPPSDKROOT)\lib\x86_64;$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>tanrt$(PlatformArchitecture).lib;OpenCL.lib;%(AdditionalDependencies);GPUUtilities.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>tanrt$(PlatformArchitecture).lib;OpenCL.lib;%(AdditionalDependencies);GPUUtilities.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AudioBuffer.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="common\anyoption.h" />
+    <ClInclude Include="common\UnitTest.h" />
+    <ClInclude Include="Converter_Test.h" />
+    <ClInclude Include="ConvolutionTest.h" />
+    <ClInclude Include="FFTTest.h" />
+    <ClInclude Include="MathTest.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TANTestSuitsParam.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="TestList.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AudioBuffer.cpp" />
+    <ClCompile Include="common.cpp" />
+    <ClCompile Include="common\anyoption.cpp" />
+    <ClCompile Include="common\UnitTest.cpp" />
+    <ClCompile Include="Converter_Test_Impl.cpp" />
+    <ClCompile Include="ConvolutionTestImpl.cpp" />
+    <ClCompile Include="FFTTestImpl.cpp" />
+    <ClCompile Include="MathTestImpl.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="TANTestSuitsParam.cpp" />
+    <ClCompile Include="TANUnitTestAll.cpp" />
+    <ClCompile Include="TestList.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,275 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\RoomAcoustics.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""     // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\RoomAcoustics.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About RoomAcoustics"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
+    LTEXT           "RoomAcoustics, Version 1.1.0.4",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "Copyright (c) 2014,2015,2016",IDC_STATIC,42,26,114,8
+    DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
+END
+
+IDD_RoomAcoustics_DIALOG DIALOGEX 0, 0, 417, 468
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "AMD TrueAudioNext Room Acoustics Demo"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Run",IDOK,187,447,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,360,447,50,14
+    GROUPBOX        "Listener",IDC_STATIC,7,140,403,55
+    EDITTEXT        IDC_EDIT_HEAD_X,105,155,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_HEAD_Y,169,155,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_HEAD_Z,233,155,40,14,ES_AUTOHSCROLL
+    LTEXT           "Head Position:",IDC_STATIC,50,157,47,8,0,WS_EX_RIGHT
+    LTEXT           "X",IDC_STATIC,153,157,8,8
+    LTEXT           "Y",IDC_STATIC,217,157,8,8
+    LTEXT           "Z",IDC_STATIC,281,157,8,8
+    EDITTEXT        IDC_EDIT_EARSPACING,169,176,40,14,ES_AUTOHSCROLL
+    LTEXT           "Ear Spacing:",IDC_STATIC,118,178,41,8,0,WS_EX_RIGHT
+    GROUPBOX        "Room",IDC_STATIC,7,204,403,161
+    LTEXT           "meters",IDC_STATIC,305,157,23,8
+    EDITTEXT        IDC_EDIT_ROOM_WIDTH,111,236,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ROOM_HEIGHT,170,236,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ROOM_LENGTH,229,236,40,14,ES_AUTOHSCROLL
+    LTEXT           "Width",IDC_STATIC,124,225,20,8,0,WS_EX_RIGHT
+    LTEXT           "Height",IDC_STATIC,179,225,22,8,0,WS_EX_RIGHT
+    LTEXT           "Length",IDC_STATIC,237,225,23,8,0,WS_EX_RIGHT
+    LTEXT           "meters",IDC_STATIC,282,238,23,8
+    GROUPBOX        "Dimensions",IDC_STATIC,22,215,379,41
+    EDITTEXT        IDC_EDIT_ROOM_DAMP_RIGHT,111,315,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ROOM_DAMP_BACK,169,315,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ROOM_DAMP_BOTTOM,229,315,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ROOM_DAMP_LEFT,111,286,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ROOM_DAMP_FRONT,170,286,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ROOM_DAMP_TOP,229,286,40,14,ES_AUTOHSCROLL
+    LTEXT           "Left",IDC_STATIC,123,275,14,8,0,WS_EX_RIGHT
+    LTEXT           "Front",IDC_STATIC,179,275,18,8,0,WS_EX_RIGHT
+    LTEXT           "Top",IDC_STATIC,243,275,13,8,0,WS_EX_RIGHT
+    LTEXT           "Right",IDC_STATIC,122,304,18,8,0,WS_EX_RIGHT
+    LTEXT           "Back",IDC_STATIC,180,304,16,8,0,WS_EX_RIGHT
+    LTEXT           "Bottom",IDC_STATIC,236,304,24,8,0,WS_EX_RIGHT
+    LTEXT           "dB",IDC_STATIC,285,302,9,8
+    GROUPBOX        "Wall Damping factors",IDC_STATIC,21,264,380,74
+    GROUPBOX        "Convolution",IDC_STATIC,7,372,403,69
+    EDITTEXT        IDC_EDIT_CONV_LENGTH,83,383,40,14,ES_AUTOHSCROLL
+    LTEXT           "convolution length",IDC_STATIC,7,385,72,8,0,WS_EX_RIGHT
+    LTEXT           "samples",IDC_STATIC,127,385,26,8
+    CONTROL         "Time Domain",IDC_RADIO_TD,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,263,383,56,10
+    CONTROL         "Frequency Domain",IDC_RADIO_FD,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,320,383,75,10
+    CONTROL         "CPU",IDC_RADIO_CPU,"Button",BS_AUTORADIOBUTTON,22,420,29,10
+    CONTROL         "GPU",IDC_RADIO_GPU,"Button",BS_AUTORADIOBUTTON,53,420,29,10
+    EDITTEXT        IDC_EDIT_BUFFER_SIZE,83,400,40,14,ES_AUTOHSCROLL
+    LTEXT           "buffer size",IDC_STATIC,35,401,44,8,0,WS_EX_RIGHT
+    LTEXT           "samples",IDC_STATIC,127,401,26,8
+    LTEXT           "@ 48kHz",IDC_CONV_TIME,169,385,35,8
+    LTEXT           "-",IDC_ROOM_INFO,314,272,84,63
+    LTEXT           "@ 48kHz",IDC_BUF_TIME,169,401,37,8
+    PUSHBUTTON      "LOAD",IDC_LOAD,7,7,50,14
+    PUSHBUTTON      "SAVE",IDC_SAVE,63,7,50,14
+    PUSHBUTTON      "Export Response",IDC_EXPORT,338,7,72,14
+    GROUPBOX        "Source",IDC_STATIC,7,68,403,62
+    CONTROL         "Use microphone source",IDC_CHECK_EN_SRCMIC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,39,90,10
+    PUSHBUTTON      "Browse",IDC_BUTTONOPEN,362,86,43,14
+    EDITTEXT        IDC_EDITFILE,54,86,305,14,ES_AUTOHSCROLL
+    LTEXT           ".WAV file:",IDC_STATIC,10,88,39,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_EDIT_SRC_X,106,107,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SRC_Y,170,107,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SRC_Z,234,107,40,14,ES_AUTOHSCROLL
+    LTEXT           "Source Position:",IDC_STATIC,46,108,52,8,0,WS_EX_RIGHT
+    LTEXT           "X",IDC_STATIC,154,108,8,8
+    LTEXT           "Y",IDC_STATIC,218,108,8,8
+    LTEXT           "Z",IDC_STATIC,282,108,8,8
+    LTEXT           "meters",IDC_STATIC,306,108,23,8
+    CONTROL         "Track head position",IDC_CHECK_SRC_TRACK_HEAD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,185,39,93,10
+    CONTROL         "Enable",IDC_CHECK_EN_SRC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,373,108,37,10
+    CONTROL         "CPU",IDC_RADIO_RG_CPU,"Button",BS_AUTORADIOBUTTON,22,346,29,10
+    CONTROL         "GPU",IDC_RADIO_RG_GPU,"Button",BS_AUTORADIOBUTTON,53,346,29,10
+    CONTROL         "Auto Spin",IDC_HEADSPIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,363,176,47,10
+    LISTBOX         IDC_LIST_DEVICES_ROOM,92,346,109,17,LBS_DISABLENOSCROLL | WS_TABSTOP,WS_EX_CLIENTEDGE
+    LISTBOX         IDC_LIST_DEVICES_CONV,92,420,109,17,LBS_DISABLENOSCROLL | WS_TABSTOP,WS_EX_CLIENTEDGE
+    LISTBOX         IDC_LIST_SOURCES,42,66,22,18,LBS_DISABLENOSCROLL | WS_TABSTOP,WS_EX_CLIENTEDGE | WS_EX_RIGHT | WS_EX_STATICEDGE
+    LTEXT           "of",IDC_STATIC,69,66,8,8
+    EDITTEXT        IDC_EDIT_NFILES,81,65,24,14,ES_AUTOHSCROLL
+    GROUPBOX        "Source 1 special options",IDC_STATIC,7,27,403,28
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,1,1,7
+ PRODUCTVERSION 1,1,1,7
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "AMD"
+            VALUE "FileDescription", "AMD TrueAudio Room Acoustics Demo"
+            VALUE "FileVersion", "1.1.1.7"
+            VALUE "InternalName", "RoomAcousticsDemo.exe"
+            VALUE "LegalCopyright", "(c) AMD.  All rights reserved."
+            VALUE "OriginalFilename", "RoomAcousticsDemo.exe"
+            VALUE "ProductName", "AMD TrueAudio Room Acoustics Demo"
+            VALUE "ProductVersion", "1.1.1.7"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 163
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 55
+    END
+
+    "IDD_RoomAcoustics_DIALOG", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 410
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 461
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_ABOUTBOX            "&About Room Acoustics Demo..."
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\RoomAcoustics.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"     // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
