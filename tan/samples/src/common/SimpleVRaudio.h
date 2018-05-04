@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "wav.h"
 #include "fifo.h"
 #include "wasapiutils.h"
 #include "tanlibrary/include/TrueAudioNext.h"       //TAN
@@ -50,6 +49,8 @@ public:
     virtual ~Audio3D();
 
 private:
+    static bool useIntrinsics;
+    static const int IR_UPDATE_MODE = 1; // 0: Non-Blocking 1: Blocking
     static unsigned _stdcall processThreadProc(void *ptr);
     static unsigned _stdcall updateThreadProc(void *ptr);
     HANDLE m_hProcessThread;
@@ -58,9 +59,11 @@ private:
     int process(short *pOut, short *pChan[MAX_SOURCES], int sampleCount);
 
     bool running = false;
+    bool updated = false;
     bool stop = false;
-
-	// Microsoft WASAPI based audio player:
+    bool updateParams = true;
+    bool m_useOCLOutputPipeline;
+    // Microsoft WASAPI based audio player:
     WASAPIUtils Player;
 
 	int m_nFiles;
@@ -72,6 +75,7 @@ private:
 	TANContextPtr m_spTANContext2;
 	TANConvolutionPtr m_spConvolution;
 	TANConverterPtr m_spConverter;
+    TANMixerPtr m_spMixer;
 	TANFFTPtr m_spFft;
 	AmdTrueAudioVR *m_pTAVR = NULL;
 
@@ -91,6 +95,11 @@ private:
 
     float *inputFloatBufs[MAX_SOURCES*2];
 	float *outputFloatBufs[MAX_SOURCES * 2];
+    float* outputMixFloatBufs[2];
+	cl_mem outputCLBufs[MAX_SOURCES * 2];
+	cl_mem outputMainCLbuf;
+	cl_mem outputMixCLBufs[2];
+	cl_mem outputShortBuf;
 
 	// current position in each stream:
 	__int64 m_samplePos[MAX_SOURCES];
@@ -115,9 +124,27 @@ private:
 
 
 public:
+    /*
+    m_pAudioVR->init(room, dlg.nFiles, dlg.waveFileNames, dlg.convolutionLength, dlg.bufferSize,
+    dlg.useGPU4Conv, dlg.convDevIdx, dlg.useRTQ4Conv, dlg.cuCountConv,
+    dlg.useGPU4Room, dlg.roomDevIdx, dlg.useRTQ4Room, dlg.cuCountRoom);
+    */
+	// Initialize room acoustics model, WASAPI audio, and TAN convolution:
+    //int init(RoomDefinition roomDef, int nFiles, char **inFiles, int fftLen, int bufSize, bool useGPU_Conv = true);
+
+    static amf::TAN_CONVOLUTION_METHOD m_convMethod;// = amf::TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD;
 
     int init(char * dllPath, RoomDefinition roomDef, int nFiles, char **inFiles, int fftLen, int bufSize,
-        bool useGPU_Conv = true, int devIdx_Conv=0, bool useGPU_IRGen = true, int devIdx_IRGen=0);
+        bool useGPU_Conv = true, int devIdx_Conv=0, 
+#ifdef RTQ_ENABLED
+		bool useHPr_Conv = false, bool useRTQ_Conv = false, int cuRes_Conv = 0,
+#endif // RTQ_ENABLED
+        bool useGPU_IRGen = true, int devIdx_IRGen=0,  
+#ifdef RTQ_ENABLED
+		bool useHPr_IRGen = false, bool useRTQ_IRGen = false, int cuRes_IRGen = 0,
+#endif
+        amf::TAN_CONVOLUTION_METHOD &convMethod = m_convMethod, //amf::TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD,
+       bool useCPU_Conv = false, bool useCPU_IRGen = false);
 
 	// Set transform to translate game coordinates to room audio coordinates:
 	int setWorldToRoomCoordTransform(float translationX, float translationY, float translationZ, 
@@ -144,4 +171,14 @@ public:
 	//update a source position:
     int updateSourcePosition(int srcNumber, float x, float y, float z);
 
+	//update a room's dimension:
+	int updateRoomDimension(float _width, float _height, float _length);
+
+	//update a room's damping factor
+	int updateRoomDamping(float _left, float _right, float _top, float _buttom, float _front, float _back);
+
+    // export impulse response for source  + current listener and room:
+    int exportImpulseResponse(int srcNumber, char * fname);
+	AmdTrueAudioVR* getAMDTrueAudioVR();
+	TANConverterPtr getTANConverter();
 };

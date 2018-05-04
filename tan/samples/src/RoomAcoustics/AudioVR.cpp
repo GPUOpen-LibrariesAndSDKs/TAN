@@ -289,7 +289,8 @@ int Audio3D::init(  RoomDefinition roomDef, int nFiles, char **inFiles, int fftL
             nFiles * 2));
     }
     else {
-        RETURN_IF_FAILED(m_spConvolution->InitGpu(TAN_CONVOLUTION_METHOD_FHT_UNIFORM_PARTITIONED,//TAN_CONVOLUTION_METHOD_FHT_UINFORM_HEAD_TAIL
+        //RETURN_IF_FAILED(m_spConvolution->InitGpu(TAN_CONVOLUTION_METHOD_FHT_UNIFORM_PARTITIONED,//TAN_CONVOLUTION_METHOD_FHT_UINFORM_HEAD_TAIL
+        RETURN_IF_FAILED(m_spConvolution->InitGpu(TAN_CONVOLUTION_METHOD_FHT_UNIFORM_HEAD_TAIL,
             m_fftLen, bufSize,
             nFiles * 2));
     }

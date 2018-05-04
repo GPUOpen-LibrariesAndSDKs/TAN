@@ -1,0 +1,2 @@
+============================clFFT Setup Instruction=====================
+1.Contents in this folder are downloaded from revision 2.12.2 from https://github.com/clMathLibraries/clFFT

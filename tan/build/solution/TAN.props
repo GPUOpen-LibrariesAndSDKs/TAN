@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <OCL_Path>$(OCL_ROOT)</OCL_Path>
+    <OCL_Lib_X32>$(OCL_Path)\lib\x86</OCL_Lib_X32>
+    <OCL_Lib_X64>$(OCL_Path)\lib\x86_64</OCL_Lib_X64>
+    <OCL_Include>$(OCL_Path)\include</OCL_Include>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="OCL_Path">
+      <Value>$(OCL_Path)</Value>
+    </BuildMacro>
+    <BuildMacro Include="OCL_Lib_X32">
+      <Value>$(OCL_Lib_X32)</Value>
+    </BuildMacro>
+    <BuildMacro Include="OCL_Lib_X64">
+      <Value>$(OCL_Lib_X64)</Value>
+    </BuildMacro>
+    <BuildMacro Include="OCL_Include">
+      <Value>$(OCL_Include)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

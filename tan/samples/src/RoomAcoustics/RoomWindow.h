@@ -85,4 +85,5 @@ public:
 	static int srcTrackHead[MAX_SOURCES];
 	static int activeSource;
 	static int nSources;
+    static int timerPeriodMS;
 };

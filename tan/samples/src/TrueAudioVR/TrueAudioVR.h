@@ -145,7 +145,10 @@ public:
     virtual void generateRoomResponse(RoomDefinition room, MonoSource source, StereoListener ear,
         int inSampRate, int responseLength, void *responseL, void *responseR,
         int flags = 0, int maxBounces = 0) = 0;
-    
+
+    virtual void generateDirectResponse(RoomDefinition room, MonoSource source, StereoListener ear,
+        int inSampRate, int responseLength, void *responseL, void *responseR, int *pFirstNonZero, int *pLastNonZero) = 0;
+
 #ifdef DOORWAY_TRANSFORM
     virtual void generateDoorwayResponse(RoomDefinition room1, RoomDefinition room2,
         MonoSource source, Door door, StereoListener ear, int inSampRate, int responseLength, float *responseLeft, float *responseRight, int flags, int maxBounces) = 0;

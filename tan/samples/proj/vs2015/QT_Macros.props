@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <QT_DIR>..\..\..\..\..\Thirdparty\QT5.6\msvc2015_64</QT_DIR>
+    <QT_MOC>$(QT_DIR)\bin\moc.exe</QT_MOC>
+    <QT_RCC>$(QT_DIR)\bin\rcc.exe</QT_RCC>
+    <QT_UIC>$(QT_DIR)\bin\uic.exe</QT_UIC>
+    <QT_GENERATE>..\..\..\..\bin\vs2015x$(PlatformArchitecture)$(Configuration)\GeneratedFiles</QT_GENERATE>
+  </PropertyGroup>
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="QT_DIR">
+      <Value>$(QT_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="QT_MOC">
+      <Value>$(QT_MOC)</Value>
+    </BuildMacro>
+    <BuildMacro Include="QT_RCC">
+      <Value>$(QT_RCC)</Value>
+    </BuildMacro>
+    <BuildMacro Include="QT_UIC">
+      <Value>$(QT_UIC)</Value>
+    </BuildMacro>
+    <BuildMacro Include="QT_GENERATE">
+      <Value>$(QT_GENERATE)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

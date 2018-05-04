@@ -28,6 +28,9 @@
 #include "public/include/components/Component.h"//AMF
 #include "public/common/PropertyStorageExImpl.h"//AMF
 
+
+#define USE_SSE2 1
+
 namespace amf
 {
     class TANConverterImpl
@@ -56,7 +59,7 @@ namespace amf
         AMF_RESULT  AMF_STD_CALL    Convert(float* inputBuffer, amf_size inputStep,
                                             amf_size numOfSamplesToProcess,
                                             short* outputBuffer, amf_size outputStep, 
-                                            float conversionGain) override;
+                                            float conversionGain, bool* outputClipped = NULL) override;
 
         AMF_RESULT  AMF_STD_CALL    Convert(short** inputBuffers, amf_size inputStep,
                                             amf_size numOfSamplesToProcess,
@@ -66,7 +69,7 @@ namespace amf
         AMF_RESULT  AMF_STD_CALL    Convert(float** inputBuffers, amf_size inputStep,
                                             amf_size numOfSamplesToProcess,
                                             short** outputBuffers, amf_size outputStep,
-                                            float conversionGain, int count) override;
+                                            float conversionGain, int count, bool* outputClipped = NULL) override;
 
 		AMF_RESULT  AMF_STD_CALL    Convert(cl_mem inputBuffer, amf_size inputStep,
 											amf_size inputOffset,TAN_SAMPLE_TYPE inputType, 
@@ -75,7 +78,7 @@ namespace amf
                                             amf_size outputStep, TAN_SAMPLE_TYPE outputType,
                                             
                                             amf_size numOfSamplesToProcess,
-                                            float conversionGain) override;
+                                            float conversionGain, bool* outputClipped = NULL) override;
 
 		AMF_RESULT  AMF_STD_CALL    Convert(cl_mem* inputBuffers, amf_size inputStep,
 											amf_size* inputOffsets, TAN_SAMPLE_TYPE inputType,
@@ -86,7 +89,7 @@ namespace amf
                                             amf_size numOfSamplesToProcess,
                                             float conversionGain,
 
-                                            int count) override;
+                                            int count, bool* outputClipped = NULL) override;
 
     protected:
         TANContextPtr               m_pContextTAN;
@@ -104,7 +107,13 @@ namespace amf
         cl_program					m_program;
         cl_kernel					m_kernel;
 
+		cl_kernel					m_clkFloat2Short = nullptr;
+		cl_kernel					m_clkShort2Short = nullptr;
+		cl_kernel					m_clkFloat2Float = nullptr;
+		cl_kernel					m_clkShort2Float = nullptr;
+        cl_mem                      m_overflowBuffer = NULL;
     private:
+        static bool useSSE2;
         AMF_RESULT	AMF_STD_CALL InitCpu();
         AMF_RESULT	AMF_STD_CALL InitGpu();
         AMF_RESULT	AMF_STD_CALL ConvertGpu(amf_handle inputBuffer,
@@ -118,7 +127,7 @@ namespace amf
                                             TAN_SAMPLE_TYPE outputType,
 
                                             amf_size numOfSamplesToProcess,
-                                            float conversionGain);
-
+                                            float conversionGain,
+                                            bool* outputClipped = NULL);
     };
 } //amf

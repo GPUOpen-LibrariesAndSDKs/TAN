@@ -67,10 +67,19 @@ void SetupWaveHeader(RiffWave *fhd,
 	/* set up the sample rate, etc...	*/
 	fhd->wave.fmt.info.nChannels = (short)channels;
 	fhd->wave.fmt.info.nSamplesPerSec = sampleRate;
-	fhd->wave.fmt.info.nAvgBytesPerSec = (sampleRate << (channels - 1)) <<
-		((bitsPerSample == 8) ? 0 : 1);
-	fhd->wave.fmt.info.nBlockAlign = (1 + ((bitsPerSample == 8) ? 0 : 1))
-		<< (channels - 1);
+
+	//fhd->wave.fmt.info.nAvgBytesPerSec = (sampleRate << (channels - 1)) <<
+	//	((bitsPerSample == 8) ? 0 : 1);
+	//fhd->wave.fmt.info.nBlockAlign = (1 + ((bitsPerSample == 8) ? 0 : 1))
+	//	<< (channels - 1);
+
+    fhd->wave.fmt.info.nAvgBytesPerSec = (sampleRate*channels*bitsPerSample) / 8;
+    fhd->wave.fmt.info.nBlockAlign = (channels*bitsPerSample) / 8;
+
+    if (bitsPerSample == 32) {
+        fhd->wave.fmt.info.formatTag = 3;
+    }
+
 	fhd->wave.fmt.info.nBitsPerSample = (short)bitsPerSample;
 }
 
@@ -141,7 +150,7 @@ bool ReadWaveFile(char *fileName, int *pSamplesPerSec, int *pBitsPerSample, int 
 
 	printf("ReadWaveFile: File %s has %ld %dbit samples\n", fileName, nSamples, bitsPerSam);
 	printf("ReadWaveFile: recorded at %ld samples per second, ", samplesPerSec);
-	printf((nChannels == 2) ? "in Stereo.\n" : "in Mono.\n");
+	printf((nChannels == 2) ? "in Stereo.\n" : "%d channels.\n",nChannels);
 	printf("ReadWaveFile: Play duration: %6.2f seconds.\n",
 		(float)nSamples / (float)samplesPerSec);
 
@@ -213,7 +222,7 @@ bool ReadWaveFile(char *fileName, int *pSamplesPerSec, int *pBitsPerSample, int 
 
 }
 
-bool WriteWaveFileF(char *fileName, int samplesPerSec, int nChannels, int bitsPerSample, long nSamples, float **pSamples)
+bool WriteWaveFileF(const char *fileName, int samplesPerSec, int nChannels, int bitsPerSample, long nSamples, float **pSamples)
 {
 	/* write wave samples: */
 	RiffWave fhd;
@@ -275,7 +284,7 @@ bool WriteWaveFileF(char *fileName, int samplesPerSec, int nChannels, int bitsPe
 
 }
 
-bool WriteWaveFileS(char *fileName, int samplesPerSec, int nChannels, int bitsPerSample, long nSamples, short *pSamples)
+bool WriteWaveFileS(const char *fileName, int samplesPerSec, int nChannels, int bitsPerSample, long nSamples, short *pSamples)
 {
 	/* write wave samples: */
 	RiffWave fhd;

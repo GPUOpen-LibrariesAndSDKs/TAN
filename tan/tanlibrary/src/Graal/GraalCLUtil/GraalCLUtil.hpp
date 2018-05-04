@@ -18,7 +18,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #ifndef GRAAL_CLUTIL_H_
 #define GRAAL_CLUTIL_H_
 
-#include <CL/opencl.h>
+#include <CL/cl.h>
 
 #include "GraalUtil.hpp"
 #include "GraalFile.hpp"

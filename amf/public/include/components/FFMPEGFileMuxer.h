@@ -3,7 +3,7 @@
 // any Intellectual Property Rights relating to any standards, including but not
 // limited to any audio and/or video codec technologies such as MPEG-2, MPEG-4;
 // AVC/H.264; HEVC/H.265; AAC decode/FFMPEG; AAC encode/FFMPEG; VC-1; and MP3
-// (collectively, the “Media Technologies”). For clarity, you will pay any
+// (collectively, the "Media Technologies"). For clarity, you will pay any
 // royalties due for such third party technologies, which may include the Media
 // Technologies that are owed as a result of AMD providing the Software to you.
 // 
@@ -51,6 +51,8 @@ enum FFMPEG_MUXER_STREAM_TYPE_ENUM
 
 // component properties
 #define FFMPEG_MUXER_PATH                     L"Path"                     // string - the file to open
+#define FFMPEG_MUXER_URL                      L"Url"                      // string - the stream url to open
+#define FFMPEG_MUXER_LISTEN                   L"Listen"                   // bool (default = false)
 #define FFMPEG_MUXER_ENABLE_VIDEO             L"EnableVideo"              // bool (default = true)
 #define FFMPEG_MUXER_ENABLE_AUDIO             L"EnableAudio"              // bool (default = false)
 

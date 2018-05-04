@@ -46,6 +46,14 @@
 // See TALibVRDemo.cpp for the implementation of this class
 //
 
+enum execMode {
+    C_MODEL = 0,
+    OCL_GPU = 0x04,
+    OCL_GPU_MPQ = 0x05,
+    OCL_GPU_RTQ = 0x06,
+    OCL_CPU = 0x10
+};
+
 class CTALibVRDemoApp : public CWinApp
 {
 public:
@@ -59,25 +67,16 @@ protected:
     void updatePositions();
     static void _cdecl updatePositionsThreadProc(void * p);
 
-    //void process(short *pOut, short *pChan1, short *pChan2, int sampleCount);
-    //void playback();
-    //static void _cdecl updateThreadProc(void * p);
-
 protected:
     WASAPIUtils Player;
 
     long nSamples[MAXFILES];
     unsigned char *pBuffers[MAXFILES];
     unsigned char *pProcessed;
-    //AmdTrueAudio *g_Ata;
-    //AmdTrueAudioVR *m_pTAVR = NULL;
-    //AmdTrueAudio::Convolution *g_AtaConvolution;
 
     RoomDefinition room;
 
     MonoSource sources[MAX_SOURCES];
-    //MonoSource source2;
-	//MonoSource source3;
 	StereoListener ears;
     int srcEnables[MAX_SOURCES];
 	bool headSpin = false;

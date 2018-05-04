@@ -3,7 +3,7 @@
 // any Intellectual Property Rights relating to any standards, including but not
 // limited to any audio and/or video codec technologies such as MPEG-2, MPEG-4;
 // AVC/H.264; HEVC/H.265; AAC decode/FFMPEG; AAC encode/FFMPEG; VC-1; and MP3
-// (collectively, the “Media Technologies”). For clarity, you will pay any
+// (collectively, the "Media Technologies"). For clarity, you will pay any
 // royalties due for such third party technologies, which may include the Media
 // Technologies that are owed as a result of AMD providing the Software to you.
 // 
@@ -51,12 +51,14 @@ enum FFMPEG_DEMUXER_STREAM_TYPE_ENUM
 
 // component properties
 #define FFMPEG_DEMUXER_PATH                     L"Path"                     // string - the file to open
+#define FFMPEG_DEMUXER_URL                      L"Url"                      // string - the stream url to open
 #define FFMPEG_DEMUXER_START_FRAME              L"StartFrame"               // amf_int64 (default = 0)
 #define FFMPEG_DEMUXER_FRAME_COUNT              L"FramesNumber"             // amf_int64 (default = 0)
 #define FFMPEG_DEMUXER_DURATION                 L"Duration"                 // amf_int64 (default = 0)
 #define FFMPEG_DEMUXER_CHECK_MVC                L"CheckMVC"                 // bool (default = true)
 //#define FFMPEG_DEMUXER_SYNC_AV                  L"SyncAV"                   // bool (default = false)
 #define FFMPEG_DEMUXER_INDIVIDUAL_STREAM_MODE   L"StreamMode"               // bool (default = true)
+#define FFMPEG_DEMUXER_LISTEN                   L"Listen"                   // bool (default = false)
 
 //common stream properties
 #define FFMPEG_DEMUXER_STREAM_TYPE              L"StreamType"               // amf_int64( FFMPEG_DEMUXER_STREAM_TYPE_ENUM )

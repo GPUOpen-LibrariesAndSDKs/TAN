@@ -61,13 +61,35 @@ TAN_SDK_LINK AMF_RESULT        AMF_CDECL_CALL TANCreateContext(
     amf::TANContext** ppContext
 )
 {
-    amf::AMFSetCustomTracer(GetTANTracer());
-    amf::AMFSetCustomDebugger(GetTANDebugger());
+    // initialize AMF
+    AMF_RESULT res = g_AMFFactory.Init();
+    if (AMF_OK != res){
+        amf::AMFSetCustomTracer(GetTANTracer());
+        amf::AMFSetCustomDebugger(GetTANDebugger());
+    }
+    else {
+        g_AMFFactory.GetDebug()->AssertsEnable(true);
+        g_AMFFactory.GetTrace()->EnableWriter(AMF_TRACE_WRITER_FILE, true);
+#ifdef _DEBUG
+        g_AMFFactory.GetTrace()->SetWriterLevel(AMF_TRACE_WRITER_FILE, AMF_TRACE_TEST);
+#else
+        g_AMFFactory.GetTrace()->SetWriterLevel(AMF_TRACE_WRITER_FILE, AMF_TRACE_ERROR);
+#endif
+    }
 
-    //TOD when new version is needed vesion chacing should be extended
+    AMF_ASSERT_OK(res, L"AMF Factory Failed to initialize");
+
+
+    //TOD when new version is needed version checking should be extended
     AMF_RETURN_IF_FALSE(
         GET_MAJOR_VERSION(version) == 1, AMF_TAN_UNSUPPORTED_VERSION, 
         L"unsupported version %d.%d.%d.%d",
+        (int)GET_MAJOR_VERSION(version),
+        (int)GET_MINOR_VERSION(version),
+        (int)GET_SUBMINOR_VERSION(version),
+        (int)GET_BUILD_VERSION(version));
+
+    AMFTraceInfo(L"TANContext", L"TAN SDK version %d.%d.%d.%d\n",
         (int)GET_MAJOR_VERSION(version),
         (int)GET_MINOR_VERSION(version),
         (int)GET_SUBMINOR_VERSION(version),
@@ -105,27 +127,29 @@ TAN_SDK_LINK const wchar_t*    AMF_CDECL_CALL TANGetCacheFolder()
 
 TANContextImpl::TANContextImpl(void)
     : m_clfftInitialized(false),
-      m_oclContext(0),
-      m_oclDeviceId(0),
+      m_oclGeneralContext(0),
+      m_oclGeneralDeviceId(0),
+      m_oclConvContext(0),
+      m_oclConvDeviceId(0),
       m_oclGeneralQueue(nullptr),
       m_oclConvQueue(nullptr),
-      m_pContextAMF(nullptr)
+      m_pContextGeneralAMF(nullptr),
+      m_pContextConvolutionAMF(nullptr)
 {
-    // initialize AMF
-    AMF_RESULT res = g_AMFFactory.Init();
-    AMF_ASSERT_OK(res, L"AMF Factory Failed to initialize");
-    if (AMF_OK != res)
-        return;
-
+    AMF_RESULT res;
+ 
     // Create default CPU AMF context.
-    res = g_AMFFactory.GetFactory()->CreateContext(&m_pContextAMF);
-    AMF_ASSERT_OK(res, L"CreateContext() failed");
+    if (g_AMFFactory.GetFactory() != NULL) {
+        AMF_ASSERT_OK(g_AMFFactory.GetFactory()->CreateContext(&m_pContextGeneralAMF), L"CreateContext() failed");
+        AMF_ASSERT_OK(g_AMFFactory.GetFactory()->CreateContext(&m_pContextConvolutionAMF), L"CreateContext() failed");
+    }
 }
 //-------------------------------------------------------------------------------------------------
 TANContextImpl::~TANContextImpl(void)
 {
     Terminate();
-    m_pContextAMF.Release();
+    m_pContextGeneralAMF.Release();
+    m_pContextConvolutionAMF.Release();
     g_AMFFactory.Terminate();
 }
 //-------------------------------------------------------------------------------------------------
@@ -138,51 +162,112 @@ AMF_RESULT AMF_STD_CALL TANContextImpl::Terminate()
     }
     m_clfftInitialized = false;
 
+
+
     // Terminate AMF contexts.
     m_pComputeGeneral.Release();
     m_pComputeConvolution.Release();
-    m_pDeviceAMF.Release();
 
-    m_oclContext = 0;
-    m_oclDeviceId = 0;
+    m_oclGeneralContext = 0;
+    m_oclConvContext = 0;
+    m_oclGeneralDeviceId = 0;
+    m_oclConvDeviceId = 0;
+
+    if (m_oclGeneralQueue) {
+        clReleaseCommandQueue(m_oclGeneralQueue);
+    }
+    if (m_oclConvQueue) {
+        clReleaseCommandQueue(m_oclConvQueue);
+    }
+
+    m_oclGeneralQueue = NULL;
+    m_oclConvQueue = NULL;
+
+    if (m_oclGeneralContext != 0)
+    {
+        clReleaseContext(m_oclGeneralContext);
+    }
+    if (m_oclConvContext != 0)
+    {
+        clReleaseContext(m_oclConvContext);
+    }
     return AMF_OK;
 }
+
+bool TANContextImpl::checkOpenCL2_XCompatibility(cl_command_queue cmdQueue)
+{
+    cl_device_id device_id = 0;
+    clGetCommandQueueInfo(cmdQueue, CL_QUEUE_DEVICE, sizeof(device_id), &device_id, NULL);
+
+    char deviceVersion[256];
+    memset(deviceVersion, 0, 256);
+    clGetDeviceInfo(device_id, CL_DEVICE_VERSION, 256, deviceVersion, NULL);
+    cl_device_type clDeviceType  = CL_DEVICE_TYPE_GPU;
+    clGetDeviceInfo(device_id, CL_DEVICE_TYPE, sizeof(clDeviceType), &clDeviceType, NULL);
+
+    bool isOpenCL2_XSupported = false;
+
+    int majorRev, minorRev;
+    if (sscanf_s(deviceVersion, "OpenCL %d.%d", &majorRev, &minorRev) == 2)
+    {
+        if (majorRev >= 2) {
+            isOpenCL2_XSupported = true;
+        }
+    }
+
+    // we only care about GPU devices:
+    return isOpenCL2_XSupported || (clDeviceType != CL_DEVICE_TYPE_GPU);
+}
+
+
 //-------------------------------------------------------------------------------------------------
 AMF_RESULT AMF_STD_CALL TANContextImpl::InitOpenCL(
     cl_context pClContext)
 {
-    AMF_RETURN_IF_FALSE(m_oclContext == 0, AMF_ALREADY_INITIALIZED);
+    AMF_RETURN_IF_FALSE(m_oclConvContext == 0, AMF_ALREADY_INITIALIZED);
     AMF_RETURN_IF_FALSE(pClContext != nullptr, AMF_INVALID_ARG, L"pClContext == nullptr");
 
     // Remove default CPU AMF context.
     m_pComputeGeneral.Release();
 
     // Check context for correctness.
+    cl_int deviceCount = 0;
     {
-        cl_int deviceCount = 0;
+        
         AMF_RETURN_IF_CL_FAILED(clGetContextInfo(static_cast<cl_context>(pClContext),
-            CL_CONTEXT_NUM_DEVICES,
-            sizeof(deviceCount), &deviceCount, nullptr),
-            L"pContext is not a valid cl_context");
+                                                 CL_CONTEXT_NUM_DEVICES,
+                                                 sizeof(deviceCount), &deviceCount, nullptr),
+                                L"pContext is not a valid cl_context");
         AMF_RETURN_IF_FALSE(deviceCount > 0, AMF_INVALID_ARG,
-            L"pContext is not a valid cl_context");
+                            L"pContext is not a valid cl_context");
     }
 
-    AMF_RETURN_IF_FAILED(CreateCompute(&m_pComputeGeneral,
-        nullptr));
-    m_oclDeviceId = static_cast<cl_device_id>(m_pComputeGeneral->GetNativeDeviceID());
+    cl_device_id* devices = new cl_device_id[deviceCount];
 
-    AMF_RETURN_IF_FAILED(CreateCompute(&m_pComputeConvolution,
-        nullptr));
+    AMF_RETURN_IF_CL_FAILED(clGetContextInfo(static_cast<cl_context>(pClContext),
+                                             CL_CONTEXT_DEVICES, 
+                                             sizeof(cl_device_id)*deviceCount, devices, nullptr),
+                            L"could not retrieve the device ids from context");
+    cl_int error;
+    m_oclConvQueue = clCreateCommandQueue(pClContext, devices[0], NULL, &error);
+    AMF_RETURN_IF_FALSE(error == CL_SUCCESS, AMF_FAIL,
+                        L"cannot create the conv command queue");
 
-    // Initialize clFft library here.
-    AMF_RETURN_IF_FAILED(InitClfft(), L"Cannot initialize CLFFT");
+    m_oclGeneralQueue = clCreateCommandQueue(pClContext, devices[0], NULL, &error);
+    AMF_RETURN_IF_FALSE(error == CL_SUCCESS, AMF_FAIL,
+                        L"cannot create the general command queue");
 
-    // Finish initialization (used as flag).
+    for (int idx = 0; idx < deviceCount; idx++)
+    {
+        if (NULL != devices[idx])
+            clReleaseDevice(devices[idx]);
+    }
+    
+    delete [] devices;
 
-    m_oclContext = static_cast<cl_context>(m_pContextAMF->GetOpenCLContext());
-    m_oclGeneralQueue = static_cast<cl_command_queue>(m_pComputeGeneral->GetNativeCommandQueue());
-    m_oclConvQueue = static_cast<cl_command_queue>(m_pComputeConvolution->GetNativeCommandQueue());
+    AMF_RETURN_IF_FALSE(((NULL != m_oclGeneralQueue) && (NULL != m_oclConvQueue)), AMF_FAIL, L"Cannot create the queues");
+    InitOpenCL(m_oclGeneralQueue, m_oclConvQueue);
+    
     return AMF_OK;
 }
 //-------------------------------------------------------------------------------------------------
@@ -190,58 +275,20 @@ AMF_RESULT AMF_STD_CALL TANContextImpl::InitOpenCL(
     cl_command_queue pConvolutionQueue,
     cl_command_queue pGeneralQueue)
 {
-    AMF_RETURN_IF_FALSE(m_oclContext == 0, AMF_ALREADY_INITIALIZED);
-
-    // Remove default CPU AMF context and OpenCL queue.
-    m_pComputeGeneral.Release();
-
-    // Keep provided queue.
-    m_oclGeneralQueue = pGeneralQueue;
-    m_oclConvQueue = pConvolutionQueue;
-
-    // Create AMFContexts.
-    cl_context pClContext = nullptr;
-    cl_device_id pClDeviceId = nullptr;
-    if (m_oclGeneralQueue)
-    {
-        AMF_RETURN_IF_FAILED(CreateCompute(&m_pComputeGeneral,
-            static_cast<cl_command_queue>(m_oclGeneralQueue)));
-        pClContext = static_cast<cl_context>(m_pComputeGeneral->GetNativeContext());
-        m_oclDeviceId = static_cast<cl_device_id>(m_pComputeGeneral->GetNativeDeviceID());
-
-        AMF_RETURN_IF_FAILED(CreateCompute(&m_pComputeConvolution,
-            static_cast<cl_command_queue>(m_oclConvQueue)));
-    }
-    else {
-        AMF_RETURN_IF_FAILED(CreateCompute(&m_pComputeConvolution,
-            static_cast<cl_command_queue>(m_oclConvQueue)));
-        pClContext = static_cast<cl_context>(m_pComputeConvolution->GetNativeContext());
-        m_oclDeviceId = static_cast<cl_device_id>(m_pComputeConvolution->GetNativeDeviceID());
-
-        AMF_RETURN_IF_FAILED(CreateCompute(&m_pComputeGeneral,
-            static_cast<cl_command_queue>(m_oclGeneralQueue)));
-    }
+    AMF_RETURN_IF_FALSE(m_oclConvContext == 0, AMF_ALREADY_INITIALIZED);
+    AMF_RETURN_IF_FALSE(InitOpenCLInt(pConvolutionQueue,QueueType::eConvQueue) == AMF_OK, AMF_FAIL, L"Could not initialize using the convolution queue");
+    AMF_RETURN_IF_FALSE(InitOpenCLInt(pGeneralQueue, QueueType::eGeneralQueue) == AMF_OK, AMF_FAIL, L"Could not initialize using the general queue")
 
     // Initialize clFft library here.
     AMF_RETURN_IF_FAILED(InitClfft(), L"Cannot initialize CLFFT");
-
-    // Finish initialization (used as flag).
-    m_oclContext = static_cast<cl_context>(pClContext);
-
-#define FULL_VERSION(VERSION_MAJOR, VERSION_MINOR, VERSION_RELEASE, VERSION_BUILD_NUM) ( (amf_uint64(VERSION_MAJOR) << 48ull) | (amf_uint64(VERSION_MINOR) << 32ull) | (amf_uint64(VERSION_RELEASE) << 16ull)  | amf_uint64(VERSION_BUILD_NUM))
-
-    if (g_AMFFactory.AMFQueryVersion() <= FULL_VERSION(1,3,0,4) )
-    {
-        clRetainCommandQueue(m_oclGeneralQueue);
-        clRetainCommandQueue(m_oclConvQueue);
-    }
-
+    
     return AMF_OK;
 }
 //-------------------------------------------------------------------------------------------------
 cl_context AMF_STD_CALL TANContextImpl::GetOpenCLContext()
 {
-    return m_oclContext;
+    // to do: return both??
+    return m_oclConvContext;
 }
 //-------------------------------------------------------------------------------------------------
 cl_command_queue AMF_STD_CALL TANContextImpl::GetOpenCLGeneralQueue()
@@ -255,219 +302,43 @@ cl_command_queue AMF_STD_CALL TANContextImpl::GetOpenCLConvQueue()
 }
 
 //-------------------------------------------------------------------------------------------------
-AMF_RESULT amf::TANContextImpl::InitOpenCLInt(cl_command_queue pClCommandQueue)
+AMF_RESULT amf::TANContextImpl::InitOpenCLInt(cl_command_queue pQueue, QueueType queueType)
 {
-    if (nullptr == m_pContextAMF)
-    {
-        return AMF_NO_INTERFACE;
-    }
-    if (m_pContextAMF->GetOpenCLCommandQueue() != NULL)
-    {
+    if (!pQueue)
         return AMF_OK;
-    }
-    AMF_RESULT res = AMF_FAIL;
 
+    AMFContextPtr& pAMFContext = (queueType == eConvQueue) ? m_pContextConvolutionAMF : m_pContextGeneralAMF;
+    cl_context& clContext = (queueType == eConvQueue) ? m_oclConvContext : m_oclGeneralContext;
+    cl_device_id& device = (queueType == eConvQueue) ? m_oclConvDeviceId : m_oclGeneralDeviceId;
+    cl_command_queue& queue = (queueType == eConvQueue) ? m_oclConvQueue : m_oclGeneralQueue;
+    AMFComputePtr& pCompute = (queueType == eConvQueue) ? m_pComputeConvolution : m_pComputeGeneral;
+    queue = pQueue;
 
-    if (pClCommandQueue != NULL)
+    clGetCommandQueueInfo(queue, CL_QUEUE_DEVICE, sizeof(device), &device, NULL);
+    cl_device_type clDeviceType = CL_DEVICE_TYPE_GPU;
+    clGetDeviceInfo(device, CL_DEVICE_TYPE, sizeof(clDeviceType), &clDeviceType, NULL);
+    clGetCommandQueueInfo(queue, CL_QUEUE_CONTEXT, sizeof(clContext), &clContext, NULL);
+    AMF_RETURN_IF_FALSE(checkOpenCL2_XCompatibility(queue), AMF_NO_DEVICE, L"Device has no OpenCL 2.0 support.");
+
+    // Setting the AMFContext device type
+    if (pAMFContext != nullptr)
     {
-        res = m_pContextAMF->InitOpenCL(pClCommandQueue);
-        AMF_RETURN_IF_FAILED(res, L"InitOpenCL() failed");
-        AMFComputeFactoryPtr pOCLFactory;
-        res = m_pContextAMF->GetOpenCLComputeFactory(&pOCLFactory);
-        AMF_RETURN_IF_FAILED(res, L"GetOpenCLComputeFactory() failed");
-
-        amf_int32 deviceCount = pOCLFactory->GetDeviceCount();
-        for (amf_int32 i = 0; i < deviceCount; i++)
-        {
-            AMFComputeDevicePtr         pDeviceAMF;
-            res = pOCLFactory->GetDeviceAt(i, &pDeviceAMF);
-            if (m_pContextAMF->GetOpenCLDeviceID() == pDeviceAMF->GetNativeDeviceID())
-            {
-                m_pDeviceAMF = pDeviceAMF;
-                int streams = 0;
-                m_pDeviceAMF->GetProperty(AMF_AUDIO_CONVOLUTION_MAX_STREAMS, &streams);
-                break; //TODO:AA
-            }
-        }
+        int amfDeviceType = (clDeviceType == CL_DEVICE_TYPE_GPU) ? AMF_CONTEXT_DEVICE_TYPE_GPU : AMF_CONTEXT_DEVICE_TYPE_CPU;
+        pAMFContext->SetProperty(AMF_CONTEXT_DEVICE_TYPE, amfDeviceType);
     }
-    else
-    {
-        AMFComputeFactoryPtr pOCLFactory;
-        res = m_pContextAMF->GetOpenCLComputeFactory(&pOCLFactory);
-        AMF_RETURN_IF_FAILED(res, L"GetOpenCLComputeFactory() failed");
-
-        amf_int32 deviceCount = pOCLFactory->GetDeviceCount();
-        for (amf_int32 i = 0; i < deviceCount; i++)
-        {
-            res = pOCLFactory->GetDeviceAt(i, &m_pDeviceAMF);
-            int streams = 0;
-            m_pDeviceAMF->GetProperty(AMF_AUDIO_CONVOLUTION_MAX_STREAMS, &streams);
-            break; //TODO:AA
-        }
-        m_pContextAMF->InitOpenCLEx(m_pDeviceAMF);
-    }
-
-    // Check for the device to be OpenCL 2.x compatible.
-    if (!m_oclDeviceId)
-    {
-        cl_device_id oclDeviceId = static_cast<cl_device_id>(m_pDeviceAMF->GetNativeDeviceID());
-        size_t paramSize;
-        cl_int status = clGetDeviceInfo(
-            oclDeviceId,
-            CL_DEVICE_VERSION,
-            0,
-            NULL,
-            &paramSize);
-        AMF_RETURN_IF_CL_FAILED(status, L"clGetDeviceInfo(CL_DRIVER_VERSION) failed");
-
-        char *clVersionStr = static_cast<char*>(_alloca(paramSize));
-        status = clGetDeviceInfo(
-            oclDeviceId,
-            CL_DEVICE_VERSION,
-            paramSize,
-            clVersionStr,
-            &paramSize);
-        AMF_RETURN_IF_CL_FAILED(status, L"clGetDeviceInfo(CL_DRIVER_VERSION) failed");
-
-        int majorRev, minorRev;
-        AMF_RETURN_IF_FALSE(sscanf_s(clVersionStr, "OpenCL %d.%d", &majorRev, &minorRev) == 2,
-            AMF_UNEXPECTED, L"OpenCL version string has unexpected format");
-        AMF_RETURN_IF_FALSE(majorRev >= 2, AMF_OPENCL_FAILED,
-            L"Unsupported graphics device. "
-            L"Required CL_DEVICE_OPENCL_C_VERSION 2.0 or higher");
-    }
-    return AMF_OK;
-}
-
-//-------------------------------------------------------------------------------------------------
-AMF_RESULT amf::TANContextImpl::CreateCompute(
-    AMFCompute** pCompute,
-    cl_command_queue pClCommandQueue,
-    amf_uint32 reservedCuCount
-    )
-{
-    AMF_RESULT res = AMF_FAIL;
-    res = InitOpenCLInt(pClCommandQueue);
-    AMF_RETURN_IF_FAILED(res, L"InitOpenCLInt() failed");
-
-    if (pClCommandQueue == NULL)
-    {
-        res = m_pDeviceAMF->CreateCompute(NULL, pCompute); // reserved
-    }
-    else
-    {
-        res = m_pDeviceAMF->CreateComputeEx(pClCommandQueue, pCompute); // reserved
-    }
-    AMF_RETURN_IF_FAILED(res, L"GetCompute() failed");
-    return AMF_OK;
-}
-//-------------------------------------------------------------------------------------------------
-#if 0
-    if (pClContext && !pClCommandQueue)
-    {
-        cl_device_id pClDevice = m_oclDeviceId;
-        if (!m_oclDeviceId)
-        {
-            cl_uint devicesCnt;
-            AMF_RETURN_IF_CL_FAILED(clGetContextInfo(pClContext, CL_CONTEXT_NUM_DEVICES,
-                                                     sizeof(devicesCnt), &devicesCnt, nullptr),
-                                    L"clGetContextInfo() failed");
-
-            amf_vector<cl_device_id> devices(devicesCnt);
-            AMF_RETURN_IF_CL_FAILED(clGetContextInfo(pClContext, CL_CONTEXT_DEVICES,
-                                                     devices.size() * sizeof(cl_device_id),
-                                                     &devices[0], nullptr),
-                                    L"clGetContextInfo() failed");
-
-            pClDevice = devices[0];
-        }
-
-        auto profileEvents = 0; //TODO:AA AMFPerformanceMonitorLogger::Get().IsMonitoring();
-        cl_command_queue_properties clQueueProp = profileEvents ? CL_QUEUE_PROFILING_ENABLE : 0;
-        cl_int status = CL_SUCCESS;
-        pClCommandQueue = clCreateCommandQueue(pClContext, pClDevice, clQueueProp, &status);
-        AMF_RETURN_IF_CL_FAILED(status, L"CreateOpenCLCommandQueue::clCreateCommandQueue failed");
-    }
-
-    //////////////////////////////
-    // TODO need to change interface and provide queue
-
-    AMF_RESULT res = AMF_FAIL;
-    //    m_pContextAMF->InitOpenCL(NULL);
-    AMFComputeFactoryPtr pOCLFactory;
-    res = m_pContextAMF->GetOpenCLComputeFactory(&pOCLFactory);
-    AMF_RETURN_IF_FAILED(res, L"GetOpenCLComputeFactory() failed");
-
-    amf_int32 deviceCount = pOCLFactory->GetDeviceCount();
-    AMFComputeDevicePtr pDeviceAMF;
-    for (amf_int32 i = 0; i < deviceCount; i++)
-    {
-        res = pOCLFactory->GetDeviceAt(i, &pDeviceAMF);
-        int streams = 0;
-        pDeviceAMF->GetProperty(AMF_AUDIO_CONVOLUTION_MAX_STREAMS, &streams);
-        break; //TODO:AA
-    }
-
-#if 1   //TODO:AA init opencl by given command queue
-    res = m_pContextAMF->InitOpenCL(pClCommandQueue);
+    // Initializing the AMFContexts, and getting the AMFCompute from it
+    AMFCompute* pAMFCompute = NULL;
+    AMF_RESULT res = pAMFContext->InitOpenCL(queue);
     AMF_RETURN_IF_FAILED(res, L"InitOpenCL() failed");
-#else   //TODO:AA init opencl by special device
-    res = m_pContextAMF->InitOpenCLEx(pDeviceAMF);
-    AMF_RETURN_IF_FAILED(res, L"InitOpenCLEx() failed");
-#endif
-
-    res = pDeviceAMF->CreateCompute(NULL, &pCompute); // reserved
-    AMF_RETURN_IF_FAILED(res, L"GetCompute() failed");
-    /*  //TODO:AA 
-    // Create context on its base.
-    AMF_RETURN_IF_FAILED(AMFCreateContext(&pContext), L"Cannot create context");
-    AMF_RETURN_IF_FAILED(pContext->InitOpenCL(pClCommandQueue), L"AMFContext::InitOpenCL failed");
-    */
-
-    // Check if new cl_command_queue belongs to the same cl_context.
-    AMF_RETURN_IF_FALSE(!pClContext || !pClCommandQueue ||
-                        pClContext == pCompute->GetNativeContext(), AMF_INVALID_ARG,
-                        L"cl_command_queue provided belongs to different cl_context");
-
-    if (pClContext && !pClCommandQueue)
-    {
-        AMF_RETURN_IF_CL_FAILED(clReleaseCommandQueue(pClCommandQueue),
-                                 L"clReleaseCommandQueue() failed");
-    }
-
-    // Check for the device to be OpenCL 2.x compatible.
-    if (!m_oclDeviceId)
-    {
-        cl_device_id oclDeviceId = static_cast<cl_device_id>(pCompute->GetNativeDeviceID());
-        size_t paramSize;
-        cl_int status = clGetDeviceInfo(
-            oclDeviceId,
-            CL_DEVICE_VERSION,
-            0,
-            NULL,
-            &paramSize);
-        AMF_RETURN_IF_CL_FAILED(status, L"clGetDeviceInfo(CL_DRIVER_VERSION) failed");
-
-        char *clVersionStr = static_cast<char*>(_alloca(paramSize));
-        status = clGetDeviceInfo(
-            oclDeviceId,
-            CL_DEVICE_VERSION,
-            paramSize,
-            clVersionStr,
-            &paramSize);
-        AMF_RETURN_IF_CL_FAILED(status, L"clGetDeviceInfo(CL_DRIVER_VERSION) failed");
-
-        int majorRev, minorRev;
-        AMF_RETURN_IF_FALSE(sscanf_s(clVersionStr, "OpenCL %d.%d", &majorRev, &minorRev) == 2,
-                            AMF_UNEXPECTED, L"OpenCL version string has unexpected format");
-        AMF_RETURN_IF_FALSE(majorRev >= 2, AMF_OPENCL_FAILED,
-                            L"Unsupported graphics device. "
-                            L"Required CL_DEVICE_OPENCL_C_VERSION 2.0 or higher");
-    }
-
+    pAMFContext->GetCompute(AMF_MEMORY_OPENCL, &pAMFCompute);
+    AMF_RETURN_IF_FALSE(pAMFCompute != NULL, AMF_FAIL, L"Could not get the AMFCompute.");
+    pCompute = pAMFCompute;
+    
     return AMF_OK;
 }
-#endif
+
+//-------------------------------------------------------------------------------------------------
+
 //-------------------------------------------------------------------------------------------------
 AMF_RESULT amf::TANContextImpl::InitClfft()
 {

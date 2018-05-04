@@ -60,24 +60,27 @@ namespace amf
         AMFComputePtr GetConvolutionCompute() const   { return m_pComputeConvolution; }
 
     protected:
-        virtual AMF_RESULT CreateCompute(AMFCompute **pCompute,
-                                         cl_command_queue pClCommandQueue,
-                                         amf_uint32 reservedCuCount = 0);
-
-        virtual AMF_RESULT InitOpenCLInt(cl_command_queue pClCommandQueue);
+        enum QueueType { eConvQueue, eGeneralQueue };
+        virtual AMF_RESULT InitOpenCLInt(cl_command_queue pClCommandQueue, QueueType queueType);
 
         virtual AMF_RESULT InitClfft();
 
+        bool checkOpenCL2_XCompatibility(cl_command_queue cmdQueue);
+
     private:
-        cl_context                  m_oclContext;
+        cl_context                  m_oclGeneralContext;
+        cl_context                  m_oclConvContext;
         cl_command_queue			m_oclGeneralQueue;
         cl_command_queue			m_oclConvQueue;
-        cl_device_id                m_oclDeviceId;
+        cl_device_id                m_oclGeneralDeviceId;
+        cl_device_id                m_oclConvDeviceId;
 
-        AMFContextPtr               m_pContextAMF;
+        AMFContextPtr               m_pContextGeneralAMF;
+        AMFContextPtr               m_pContextConvolutionAMF;
         AMFComputePtr               m_pComputeGeneral;
         AMFComputePtr               m_pComputeConvolution;
-        AMFComputeDevicePtr         m_pDeviceAMF;
+        AMFComputeDevicePtr         m_pGeneralDeviceAMF;
+        AMFComputeDevicePtr         m_pConvolutionDeviceAMF;
 
 
 

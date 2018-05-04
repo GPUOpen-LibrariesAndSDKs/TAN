@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="common">
+      <UniqueIdentifier>{b523bb43-27f0-41e4-b31c-7dfbfd4d5fe5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\samples\src\common\wav.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\TALibVRTest\stdafx.cpp" />
+    <ClCompile Include="..\..\..\src\TALibVRTest\TALibVRTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\samples\src\common\wav.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TALibVRTest\stdafx.h" />
+    <ClInclude Include="..\..\..\src\TALibVRTest\targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\..\..\src\TALibVRTest\room1.xml" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,10 @@
+TrueAudio Next 1.2 release notes
+New features in this release:
+
+•	GPU accelerated Mixer
+•	10 Band EQ filter and sample 
+•	Infinite Impulse Response (IIR) filter
+•	Time domain convolution and Doppler sample
+•	GPU utility function to list TAN enabled devices and their capabilities
+•	TAN is now integrated in Steam Audio
+https://gpuopen.com/trueaudio-next-now-integrated-steam-audio/

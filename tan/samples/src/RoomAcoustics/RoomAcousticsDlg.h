@@ -85,8 +85,10 @@ public:
 
 	float srcX[MAX_SOURCES], srcY[MAX_SOURCES], srcZ[MAX_SOURCES];
 	int srcEnable[MAX_SOURCES];
+    char exportName[MAX_PATH * 2];
 
 	int nFiles;
+    int timerPeriodMS;
 
 	int src1EnableMic;
 	int src1TrackHeadPos;
@@ -95,19 +97,34 @@ public:
 	float yaw, pitch, roll;
 	float earSpacing;
 	int autoSpinHead;
+    int periodicUpdates;
 	float roomWidth, roomHeight, roomLength;
 	float roomDampLeft, roomDampRight, roomDampFront, roomDampBack, roomDampTop, roomDampBottom;
 	int convolutionLength;
 	int bufferSize;
-    int useGPU4Conv;
-    int useGPU4Room;
+
+    execMode exModeConv, exModeRoom;
+
+    //int useCPU4Conv;
+    //int useGPU4Conv;
+	//int useRTQ4Conv;
+    //int useMPr4Conv;
+    int cuCountConv;
+    //int useCPU4Room;
+    //int useGPU4Room;
+	//int useRTQ4Room;
+    //int useMPr4Room;
+    int cuCountRoom;
 
     char *waveFileNames[MAX_SOURCES];
 
-	char *deviceNames[MAX_DEVICES];
-	int roomDevIdx;
+	char *deviceGPUNames[MAX_DEVICES];
+    char *deviceCPUNames[MAX_DEVICES];
+
+    int roomDevIdx;
 	int convDevIdx;
 	int sourceIdx;
+    amf::TAN_CONVOLUTION_METHOD convMethod;
 
 	afx_msg void OnBnClickedButtonopen();
 	afx_msg void OnEnKillfocusEditfile();
@@ -146,11 +163,23 @@ public:
 	afx_msg void OnBnClickedCheckEnSrc1mic();
 	afx_msg void OnBnClickedButtonopen2();
     afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedRadioGpuRTQ();
 	afx_msg void OnBnClickedRadioRgCpu();
 	afx_msg void OnBnClickedRadioRgGpu();
+	afx_msg void OnBnClickedRadioRgGpuRTQ();
 	afx_msg void OnBnClickedHeadspin();
+	afx_msg void OnEnChangeEditRoomCuCount();
+	afx_msg void OnEnChangeEditConvCuCount();
 	afx_msg void OnLbnSelchangeListDevicesRoom();
 	afx_msg void OnLbnSelchangeListDevicesConv();
 	afx_msg void OnLbnSelchangeListSources();
 	afx_msg void OnEnChangeEditNfiles();
+    afx_msg void OnBnClickedRadioRgGpumpri();
+    afx_msg void OnBnClickedRadioGpumpri();
+    afx_msg void OnBnClickedRadioRgCmodel();
+    afx_msg void OnBnClickedRadioCmodel();
+    afx_msg void OnLbnSelchangeList1();
+    afx_msg void OnLbnSelchangeListConvMethod();
+    afx_msg void OnBnClickedUpdateTimerEn();
+    afx_msg void OnEnChangeEditUpdTimer();
 };

@@ -10,24 +10,24 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <PropertyGroup Label="UserMacros">
+    <TAN_ROOT>$(ProjectDir)..\..\..\..</TAN_ROOT>
+  </PropertyGroup>
+  <Import Project="$(TAN_ROOT)\build\solution\TAN.props" />
   <ItemGroup>
     <CustomBuild Include="..\..\..\src\Graal\amdFFT_conv_kernels.cl">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)
-move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)
-move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)/OclKernels/%(Filename)%(Extension).h</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)/OclKernels/%(Filename)%(Extension).h</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(TAN_ROOT)\bin\vs2013x$(PlatformArchitecture)$(Configuration)\CLKernelPreprocessor.exe" "%(FullPath)" "%(RelativeDir)/OclKernels/CLKernel_%(Filename).h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(TAN_ROOT)\bin\vs2013x$(PlatformArchitecture)$(Configuration)\CLKernelPreprocessor.exe" "%(FullPath)" "%(RelativeDir)OclKernels\CLKernel_%(Filename).h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)OclKernels\CLKernel_%(Filename).h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)OclKernels\CLKernel_%(Filename).h</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Graal\amdFIR_kernels.cl">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)
-move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)
-move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(TAN_ROOT)\bin\vs2013x$(PlatformArchitecture)$(Configuration)\CLKernelPreprocessor.exe" "%(FullPath)" "%(RelativeDir)/OclKernels/CLKernel_%(Filename).h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(TAN_ROOT)\bin\vs2013x$(PlatformArchitecture)$(Configuration)\CLKernelPreprocessor.exe" "%(FullPath)" "%(RelativeDir)/OclKernels/CLKernel_%(Filename).h"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)/OclKernels/%(Filename)%(Extension).h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)/OclKernels/%(Filename)%(Extension).h</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
@@ -35,10 +35,8 @@ move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Graal\GraalFHT.cl">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)
-move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)
-move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(TAN_ROOT)\bin\vs2013x$(PlatformArchitecture)$(Configuration)\CLKernelPreprocessor.exe" "%(FullPath)" "%(RelativeDir)/OclKernels/CLKernel_%(Filename).h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(TAN_ROOT)\bin\vs2013x$(PlatformArchitecture)$(Configuration)\CLKernelPreprocessor.exe" "%(FullPath)" "%(RelativeDir)/OclKernels/CLKernel_%(Filename).h"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)/OclKernels/%(Filename)%(Extension).h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)/OclKernels/%(Filename)%(Extension).h</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
@@ -46,10 +44,8 @@ move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Graal\GraalUtil.cl">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)
-move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)
-move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(TAN_ROOT)\bin\vs2013x$(PlatformArchitecture)$(Configuration)\CLKernelPreprocessor.exe" "%(FullPath)" "%(RelativeDir)/OclKernels/CLKernel_%(Filename).h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(TAN_ROOT)\bin\vs2013x$(PlatformArchitecture)$(Configuration)\CLKernelPreprocessor.exe" "%(FullPath)" "%(RelativeDir)/OclKernels/CLKernel_%(Filename).h"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)/OclKernels/%(Filename)%(Extension).h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)/OclKernels/%(Filename)%(Extension).h</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
@@ -57,29 +53,26 @@ move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\src\common\OCLHelper.cpp" />
     <ClCompile Include="..\..\..\src\Graal\amdFHT.cpp" />
     <ClCompile Include="..\..\..\src\Graal\GraalConv.cpp" />
     <ClCompile Include="..\..\..\src\Graal\GraalConvOCL.cpp" />
     <ClCompile Include="..\..\..\src\Graal\GraalConv_clFFT.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\src\common\OCLHelper.h" />
     <ClInclude Include="..\..\..\src\Graal\amdFHT.h" />
+    <ClInclude Include="..\..\..\src\Graal\GraalCLUtil\GraalCLUtil.hpp" />
+    <ClInclude Include="..\..\..\src\Graal\GraalCLUtil\GraalFile.hpp" />
+    <ClInclude Include="..\..\..\src\Graal\GraalCLUtil\GraalUtil.hpp" />
     <ClInclude Include="..\..\..\src\Graal\GraalConv.hpp" />
     <ClInclude Include="..\..\..\src\Graal\GraalConvOCL.hpp" />
     <ClInclude Include="..\..\..\src\Graal\GraalConv_clFFT.hpp" />
     <ClInclude Include="..\..\..\src\Graal\GraalInternal.h" />
-    <ClInclude Include="..\..\..\src\Graal\OclKernels\amdFFT_conv_kernels.cl.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Graal\OclKernels\amdFIR_kernels.cl.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Graal\OclKernels\GraalFHT.cl.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Graal\OclKernels\GraalUtil.cl.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graal\OclKernels\CLKernel_amdFFT_conv_kernels.h" />
+    <ClInclude Include="..\..\..\src\Graal\OclKernels\CLKernel_amdFIR_kernels.h" />
+    <ClInclude Include="..\..\..\src\Graal\OclKernels\CLKernel_GraalFHT.h" />
+    <ClInclude Include="..\..\..\src\Graal\OclKernels\CLKernel_GraalUtil.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{70534C86-F758-43AC-9D1E-C937B418DB7E}</ProjectGuid>
@@ -106,25 +99,25 @@ move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\..\build\solution\TAN.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\..\build\solution\TAN.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
-    <OutDir>$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
-    <IncludePath>$(AMDAPPSDKROOT)\include;$(SolutionDir)../../;$(SolutionDir)../../../AMF/;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\Thirdparty\clFFT-2.2.0-static\lib64\import\Release;$(AMDAPPSDKROOT)\lib\x86_64;$(AMDAPPSDKSAMPLESROOT)\lib\x86_64;</LibraryPath>
-    <IntDir>$(SolutionDir)..\..\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(TAN_ROOT)\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IncludePath>$(TAN_ROOT);$(TAN_ROOT)\..\AMF\;$(IncludePath)</IncludePath>
+    <IntDir>$(TAN_ROOT)\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
     <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
-    <IncludePath>$(AMDAPPSDKROOT)\include;$(SolutionDir)../../;$(SolutionDir)../../../AMF/;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\Thirdparty\clFFT-2.2.0-static\lib64\import\Debug;$(AMDAPPSDKROOT)\lib\x86_64;$(AMDAPPSDKSAMPLESROOT)\lib\x86_64;</LibraryPath>
-    <OutDir>$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)..\..\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(TAN_ROOT);$(TAN_ROOT)\..\AMF\;$(IncludePath)</IncludePath>
+    <OutDir>$(TAN_ROOT)\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IntDir>$(TAN_ROOT)\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
     <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -133,8 +126,7 @@ move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>TAN_SDK_EXPORTS;CLFFT_EXPORTS;WIN32;_DEBUG;_LIB;_DEBUG_WRITE_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OCL_Include)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -157,7 +149,7 @@ move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
     </PreBuildEvent>
     <Lib>
       <AdditionalDependencies>OpenCL.lib;clFFT-master$(PlatformArchitecture).lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OCL_Lib_X64);$(TAN_ROOT)\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -168,8 +160,7 @@ move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>TAN_SDK_EXPORTS;CLFFT_EXPORTS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OCL_Include)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -183,7 +174,7 @@ move "%(FullPath).h" %(RelativeDir)/OclKernels/</Command>
     </PostBuildEvent>
     <Lib>
       <AdditionalDependencies>OpenCL.lib;clFFT-master$(PlatformArchitecture).lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OCL_Lib_X64);$(TAN_ROOT)\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>

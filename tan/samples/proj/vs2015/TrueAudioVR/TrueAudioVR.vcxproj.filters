@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Kernels">
+      <UniqueIdentifier>{db4463c3-0350-4b05-8ac4-0f3eabec9022}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf">
+      <UniqueIdentifier>{dc7838b6-fe47-4321-8390-e6e9ed524640}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public">
+      <UniqueIdentifier>{b3830c0d-a788-4dc2-b9b4-ff0b12aed9a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\include">
+      <UniqueIdentifier>{76287fb5-3f9c-455b-a380-602770e6ca15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\include\core">
+      <UniqueIdentifier>{16afb80d-4eac-4104-a7fb-911cf660ef70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\common">
+      <UniqueIdentifier>{9fadc0fe-aa23-488c-ad90-efa5734a5bc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\common\Windows">
+      <UniqueIdentifier>{03204eb2-0cdc-4e15-9980-9b3f6684913c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\TrueAudioVR\cpucaps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TrueAudioVR\Header.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TrueAudioVR\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TrueAudioVR\resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TrueAudioVR\stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TrueAudioVR\targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\TrueAudioVR\TrueAudioVR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\AudioBuffer.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Buffer.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Compute.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\ComputeFactory.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Context.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Data.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Debug.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Factory.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Interface.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Plane.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Platform.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\PropertyStorage.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\PropertyStorageEx.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Result.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Surface.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Trace.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Variant.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Version.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\TraceAdapter.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\TrueAudioVR\dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\TrueAudioVR\stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\TrueAudioVR\TrueAudioVR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\Windows\ThreadWindows.cpp">
+      <Filter>amf\public\common\Windows</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\TrueAudioVR\TrueAudioVR.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\src\TrueAudioVR\Kernels\Fill.cl">
+      <Filter>Kernels</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\TrueAudioVR\Kernels\GenerateRoomResponse.cl">
+      <Filter>Kernels</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

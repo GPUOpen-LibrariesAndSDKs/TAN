@@ -206,6 +206,8 @@ void WASAPIUtils::wasapiRelease()
     SAFE_RELEASE(devRender);
     SAFE_RELEASE(devCapture);
     SAFE_RELEASE(devEnum);
+	initializedRender = false;
+	initializedCapture = false;
 }
 
 int WASAPIUtils::QueueWaveFile(char *inFile,long *pNsamples, unsigned char **ppOutBuffer)
@@ -237,7 +239,6 @@ int WASAPIUtils::QueueWaveFile(char *inFile,long *pNsamples, unsigned char **ppO
             }
         }
     }
-     
     //don't need floats;
     for (int i = 0; i < nChannels; i++){
         delete pSamples[i];
@@ -322,7 +323,7 @@ INT WASAPIUtils::wasapiPlay(unsigned char *pOutputBuffer, unsigned int size, boo
 */
 INT WASAPIUtils::wasapiRecord( unsigned char *pOutputBuffer, unsigned int size)
 {
-    if (audioClient == NULL || captureClient == NULL)
+    if (captureClient == NULL)
         return 0;
 
     HRESULT hr;

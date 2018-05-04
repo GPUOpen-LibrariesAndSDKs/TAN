@@ -46,6 +46,7 @@ int RoomWin::enableSrc[MAX_SOURCES];
 int RoomWin::srcTrackHead[MAX_SOURCES];
 int RoomWin::activeSource=1;
 int RoomWin::nSources = 1;
+int RoomWin::timerPeriodMS = 0;
 
 RoomWin *g_RoomSimWindow;
 
@@ -137,7 +138,6 @@ RoomWin::RoomWin(int width, int height, char *title)
     height += height - caRect.bottom;
     SetWindowPos(hwndMain,HWND_TOP,0,0,width,height,SWP_SHOWWINDOW);
 
-    //int timerID = SetTimer(hwndMain, 1, 500, NULL);
 
     //SetGraphicsMode(hdcMain,GM_ADVANCED);
 
@@ -156,6 +156,11 @@ RoomWin::RoomWin(int width, int height, char *title)
 	RoomWin::xFormSourcesPos[0].eM22 = 1.0;
 
     RoomWin::activeSource = 1;
+    //timer 1s to force periodic updates:
+    if (timerPeriodMS > 0){
+        SetTimer(hwndMain, 1, timerPeriodMS, NULL);
+    }
+
 };
 
 void RoomWin::Close()
@@ -217,20 +222,34 @@ bool RoomWin::Update()
     BOOL bRet;
     //while( (bRet = PeekMessage( &msg, NULL, 0, 0, PM_REMOVE )) != 0)
     //while ((bRet = GetMessage(&msg, NULL, 0, WM_KEYLAST)) != 0)
+    MSG lastMouseMove;
+    lastMouseMove.message = 0;
     while (RoomWin::running)
     { 
         bRet = PeekMessage(&msg, NULL, 0, 0, PM_REMOVE);
+        if (msg.message == WM_MOUSEMOVE && bRet != 0){
+            lastMouseMove = msg;
+            continue;
+        }
+        else if (lastMouseMove.message == WM_MOUSEMOVE){
+            TranslateMessage(&lastMouseMove);
+            DispatchMessage(&lastMouseMove);
+
+            lastMouseMove.message = 0;
+        }
 
         if (bRet != -1 )
         {
-            TranslateMessage(&msg); 
+            TranslateMessage(&msg);
             DispatchMessage(&msg); 
         }
         if(msg.message == WM_QUIT){
 			RoomWin::running = false;
             return true;
         }
-        Sleep(5);
+        if (bRet == 0){
+            Sleep(5);
+        }
     }
     return false;
 };
@@ -369,6 +388,7 @@ LRESULT CALLBACK RoomWin::MainWndProc(
     //static int activeSource = 1;
 
     angle = RoomWin::headAngle;
+    static float shake = 0.00001;
 
     for(idxWin= 0; idxWin < MAXWINDOWS; idxWin++)
     {
@@ -587,6 +607,10 @@ LRESULT CALLBACK RoomWin::MainWndProc(
 
         case WM_MOVE:
             return 0;
+            break;
+        case WM_TIMER:
+            shake = -shake;
+            RoomWin::headAngle += shake;
             break;
         case WM_MOUSEMOVE:
             if (wParam & MK_LBUTTON){

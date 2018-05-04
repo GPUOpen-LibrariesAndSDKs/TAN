@@ -1,0 +1,3 @@
+============================AMF Instruction=====================
+1. Get zipped files from https://github.com/GPUOpen-LibrariesAndSDKs/AMF
+2. unzip content and copy “public” folder to TAN_x.x.x.x\amf\public

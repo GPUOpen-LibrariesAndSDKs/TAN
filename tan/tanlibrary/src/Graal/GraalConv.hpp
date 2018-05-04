@@ -25,7 +25,7 @@
 #define GRAALCONV_H_
 
 //Header Files
-#include <CL/opencl.h>
+#include <CL/cl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -33,21 +33,22 @@
 #include <vector>
 #include <map>
 
-
 #ifdef WIN32
 
 #include <io.h>
 #include <windows.h>
 #include <BaseTsd.h>
 
+#include "public/common/thread.h"
+
 #  include "tanlibrary/include/TrueAudioNext.h"
-#ifdef TAN_SDK_EXPORTS
+
 #  include "public/include/core/Compute.h"
 #  include "public/include/core/Context.h"
 
 #  include "public/common/TraceAdapter.h"
 #  define AMF_FACILITY L"GraalConv"
-#endif
+
 
 typedef unsigned int uint;
 
@@ -113,7 +114,7 @@ double subtractTimes(double endTime, double startTime)
 namespace graal
 {
 // implemented pipelines
-    typedef enum {
+    enum {
 // selected by Graal
         ALG_ANY,
 // uniform "classical" pipeline:
@@ -325,8 +326,12 @@ class CGraalConv
       */
      virtual AMF_RESULT finishProcess(void)
      {
-         AMF_RETURN_IF_FAILED(m_pComputeEngineConvolution->FinishQueue(), L"FinishQueue() failed");
-         return AMF_OK;
+        cl_int status = CL_SUCCESS;
+        status = clFlush(m_pContextTAN->GetOpenCLConvQueue());
+        AMF_RETURN_IF_CL_FAILED(status, L"failed: finishProcess clFlush" );
+        status = clFinish(m_pContextTAN->GetOpenCLConvQueue());
+        AMF_RETURN_IF_CL_FAILED(status, L"failed: finishProcess clFinish" );
+        return AMF_OK;
      }
 
      /**
@@ -377,7 +382,33 @@ class CGraalConv
         float** outputs,
         int prev_input = 0,
         int advance_time = 1,
-        int skip_stage = 0
+        int skip_stage = 0,
+        int _crossfade_state = 0
+        );
+
+    /**
+    *
+    * @param n_channels				number of channels in the request
+    * @param *uploadIDs				version id
+    * @param *convIDs				channel id
+    * @param inputs					input pointers (size of buffers must be eaqual to max_proc_buffer_sz)
+    * @param outputBuf				pointers to the client-managed OCL buffers.
+    * @param prev_input				1 - reuse previous input, 0 - process curent input (used in "mix")
+    * @param advance_time			1 - advance internal round counter, 0 - do not advance (used in "mix")
+    * @param skip_stage				1 - skip the 1st stager, 2 - skipo 2nd stage, 0 - full algorithm (used in "mix")
+    *
+    * @return GRAAL_SUCCESS on success and GRAAL_FAILURE on failure
+    */
+    virtual int process(
+        int n_channels,
+        const int *uploadID,     // upload set IDs
+        const int *convIDs,       // kernel IDs
+        float** inputs,
+        cl_mem* outputBuf,
+        int prev_input = 0,
+        int advance_time = 1,
+        int skip_stage = 0,
+        int _crossfade_state = 0
         );
 
 
@@ -458,17 +489,6 @@ class CGraalConv
 protected:
 #ifdef TAN_SDK_EXPORTS
     amf::TANContextPtr          m_pContextTAN;
-    amf::AMFComputePtr          m_pComputeEngineConvolution;
-    amf::AMFComputePtr          m_pComputeEngineUpdate;
-
-    AMF_RESULT getOclKernel(
-        amf::AMFComputeKernelPtr &pResultKernel,
-        amf::AMFComputePtr &pDevice,
-        std::string kernel_id,
-        std::string kernel_src,
-        size_t kernel_src_size,
-        std::string kernel_name,
-        std::string comp_options);
 
     virtual AMF_RESULT zeroMemory(CABuf<float> *pBuf, amf_uint offset, amf_uint amount);
 #endif
@@ -479,13 +499,7 @@ protected:
      * OpenCL related initialisations. 
      * @return GRAAL_SUCCESS on success and GRAAL_FAILURE on failure
      */
-    int setupCL(
-#ifndef TAN_SDK_EXPORTS
-        cl_context clientContext = 0,
-        cl_device_id clientDevice = 0,
-        cl_command_queue clientQ = 0
-#endif
-        );
+    int setupCL( amf::AMFComputePtr pComputeConvolution,  amf::AMFComputePtr pComputeUpdate );
 
 
 
@@ -515,7 +529,7 @@ protected:
     */
 
     int resetConvState(
-                int n_channels,
+                size_t n_channels,
                 const int *uploadIDs,
                 const int *convIDs,
                 int time_step
@@ -557,6 +571,21 @@ protected:
         const float** _conv_ptrs,  // arbitrary host ptrs
         const int * _conv_lens
         );
+    
+    enum GRAAL_MEMORY_TYPE
+    {
+        GRAAL_MEMORY_UNKNOWN = 0,
+        GRAAL_MEMORY_HOST = 1,
+        GRAAL_MEMORY_OPENCL = 2
+    };
+
+    struct GraalSampleBuffer {
+        union {
+            float ** host;
+            cl_mem* clmem;
+        } buffer;
+        GRAAL_MEMORY_TYPE mType;
+    };
 
     /**
     * internal processing routine
@@ -569,10 +598,11 @@ protected:
         const int *uploadIDs,     // upload set IDs
         const int *convIDs,       // kernel IDs
         float** inputs,
-        float** outputs,
+        GraalSampleBuffer& output,
         int prev_input = 0,
         int advance_time = 1,
-        int skip_stage = 0
+        int skip_stage = 0,
+        int _crossfade_state = 0
         );
 
     /*
@@ -584,7 +614,8 @@ protected:
         const int *_uploadIDs,     // upload set IDs
         const int *_convIDs,       // kernel IDs
         int prev_input = 0,
-        int advance_time = 1
+        int advance_time = 1,
+        bool _use_xf_buff = false
         );
 
     /*
@@ -608,7 +639,8 @@ protected:
     */
     int processAccum(int n_channels,
         int IR_bin_shift = 0,
-        int _STR_bin_shift = 0
+        int _STR_bin_shift = 0,
+        bool _use_xf_buff = false
 #ifndef TAN_SDK_EXPORTS
         ,
         cl_command_queue graalQ = NULL
@@ -625,6 +657,13 @@ protected:
 
     int sincUpload( void );
 
+
+    template<typename T>
+    void initBuffer(CABuf<T> *buf, cl_command_queue queue)
+    {
+        buf->setValue2(queue, 0);
+        return;
+    }
     //   alg config
     int n_sets_;             // number of kerenl sets to implement double-buffering
     int n_components_;      // real = 1, complex = 2
@@ -682,26 +721,16 @@ protected:
     void * kernel_trasformed_union_;  // base union store
 
 private:
-#ifdef TAN_SDK_EXPORTS
-// upload in a single run
-    amf::AMFComputeKernelPtr uploadKernel_;
-// upload per stream
-    amf::AMFComputeKernelPtr uploadKernel2_;
-
-    amf::AMFComputeKernelPtr resetKernel_;
-
-protected:
-    amf::AMFComputeKernelPtr m_copyWithPaddingKernel;
-#else
 // upload in a single run
     cl_kernel uploadKernel_;
 // upload per stream
     cl_kernel uploadKernel2_;
 
     cl_kernel resetKernel_;
-#endif
 
 protected:
+    cl_kernel m_copyWithPaddingKernel;
+
     __int64 round_counter_;
 
     std::vector<void*> host_input_staging_;
@@ -723,31 +752,24 @@ protected:
 
 // cmad accumulator
     void* cmad_accum_;
+    void* cmad_accum_xf_;// used to store data needed for crossfade
+    void * copy_response_in_offset_;
+    void * copy_response_out_offset_;
+    int* host_copy_resp_in_offset;
+    int* host_copy_resp_out_offset;
 
-
-
-#ifdef TAN_SDK_EXPORTS
-    amf::AMFComputeKernelPtr inputKernel_;
-    amf::AMFComputeKernelPtr inputStageKernel_;
-    amf::AMFComputeKernelPtr directTransformKernel_;
-    amf::AMFComputeKernelPtr inverseTransformKernel_;
-    std::vector<amf::AMFComputeKernelPtr> CMADKernels_;
-    amf::AMFComputeKernelPtr convHead1_;
-#else
     cl_kernel inputKernel_;
     cl_kernel inputStageKernel_;
     cl_kernel directTransformKernel_;
     cl_kernel inverseTransformKernel_;
     std::vector<cl_kernel> CMADKernels_;
     cl_kernel convHead1_;
-#endif
-
-
-     
+    cl_event m_headTailKernelEvent;
+    cl_event m_pullKernelEvent;
     void * FHT_transformCPU_;
+    float m_dataBuff[32];
 // verification/log 
     int verify;
-
 };
 
 };

@@ -11,6 +11,7 @@
 #define IDC_EDIT_HEAD_Y                 1006
 #define IDC_EDIT_HEAD_Z                 1007
 #define IDC_EDIT_EARSPACING             1008
+#define IDC_EDIT_UPD_TIMER              1009
 #define IDC_EDIT_CONV_LENGTH            1010
 #define IDC_RADIO_TD                    1011
 #define IDC_EDIT_ROOM_WIDTH             1012
@@ -30,6 +31,7 @@
 #define IDC_BUF_TIME                    1027
 #define IDC_LOAD                        1028
 #define IDC_SAVE                        1029
+#define IDC_BUTTON3                     1030
 #define IDC_EXPORT                      1030
 #define IDC_CHECK_EN_SRCMIC             1031
 #define IDC_CHECK_SRC_TRACK_HEAD        1032
@@ -37,19 +39,28 @@
 #define IDC_CHECK_EN_SRC                1034
 #define IDC_BUTTONOPEN                  1036
 #define IDC_EDITFILE                    1037
+#define IDC_RADIO_CMODEL                1040
 #define IDC_RADIO_CPU                   1041
 #define IDC_RADIO_GPU                   1042
-#define IDC_RADIO_RG_CPU                1045
-#define IDC_RADIO_RG_GPU                1046
-#define IDC_HEADSPIN                    1049
-#define IDC_LIST_DEVICES_ROOM           1052
-#define IDC_LIST_DEVICES_CONV           1053
-#define IDC_LIST_SOURCES                1054
-#define IDC_EDIT_NFILES                 1055
-#define IDC_EDIT_SRC_X                  1056
-#define IDC_EDIT_SRC_Y                  1057
-#define IDC_EDIT_SRC_Z                  1058
-#define IDC_EDIT1                       1059
+#define IDC_RADIO_GPURTQ                1043
+#define IDC_RADIO_GPUMPRI               1044
+#define IDC_RADIO_RG_CMODEL             1045
+#define IDC_RADIO_RG_CPU                1046
+#define IDC_RADIO_RG_GPU                1047
+#define IDC_RADIO_RG_GPURTQ             1048
+#define IDC_RADIO_RG_GPUMPRI            1049
+#define IDC_HEADSPIN                    1050
+#define IDC_EDIT_ROOM_CU_COUNT          1051
+#define IDC_EDIT_CONV_CU_COUNT          1052
+#define IDC_LIST_DEVICES_ROOM           1053
+#define IDC_LIST_DEVICES_CONV           1054
+#define IDC_LIST_SOURCES                1055
+#define IDC_EDIT_NFILES                 1056
+#define IDC_EDIT_SRC_X                  1057
+#define IDC_EDIT_SRC_Y                  1058
+#define IDC_EDIT_SRC_Z                  1059
+#define IDC_LIST_CONV_METHOD            1060
+#define IDC_UPDATE_TIMER_EN             1061
 
 // Next default values for new objects
 // 
@@ -57,7 +68,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        129
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1059
+#define _APS_NEXT_CONTROL_VALUE         1061
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

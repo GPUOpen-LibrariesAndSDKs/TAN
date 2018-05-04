@@ -24,7 +24,7 @@
 #ifndef GRAALCONV_CLFFT_H_
 #define GRAALCONF_CLFFT_H_
 
-#include <CL/opencl.h>
+#include <CL/cl.h>
 #include "tanlibrary/src/clFFT-master/src/include/clFFT.h"
 #include "GraalConv.hpp"
 #include "GraalConvOCL.hpp"
@@ -180,6 +180,16 @@ class CGraalConv_clFFT : public CGraalConv
      * 
      * @return GRAAL_SUCCESS on success and GRAAL_FAILURE on failure
      */
+
+	int uploadConvGpuPtrs(
+		int n_channels,
+		const int *_uploadIDs,
+		const int *_convIDs,
+		const cl_mem * _conv_ptrs,
+		const int * _conv_lens,
+		bool synchronous	
+		) override;
+
     int updateConv(
         int n_channels,
         const int *uploadIDs,     // upload set IDs
@@ -282,7 +292,8 @@ class CGraalConv_clFFT : public CGraalConv
         float** outputs,
         int prev_input = 0,
         int advance_time = 1,
-        int skip_stage = 0
+        int skip_stage = 0,
+        int crossfade_state = 0
         ) override;
     
     /**
@@ -291,13 +302,7 @@ class CGraalConv_clFFT : public CGraalConv
     int flush(amf_uint channelId, const bool synchronous = true) override;
 
 private:
-    int	CGraalConv_clFFT::setupCL(
-#ifndef TAN_SDK_EXPORTS
-        cl_context _clientContext,
-        cl_device_id _clientDevice,
-        cl_command_queue _clientQ
-#endif
-        );
+    int	CGraalConv_clFFT::setupCL( amf::AMFComputePtr pComputeConvolution, amf::AMFComputePtr pComputeUpdate );
 
     int	CGraalConv_clFFT::setupCLFFT();
 
@@ -356,21 +361,15 @@ private:
 
     std::vector<std::vector<int>> roundCounter_;
 
-#ifdef TAN_SDK_EXPORTS
-    amf::AMFComputeKernelPtr padKernel_;
-    amf::AMFComputeKernelPtr interleaveKernel_;
-    amf::AMFComputeKernelPtr deinterleaveKernel_;
-    amf::AMFComputeKernelPtr madaccMultiChanKernel_;
-    amf::AMFComputeKernelPtr interleaveMultiChanKernel_;
-    amf::AMFComputeKernelPtr sigHistInsertMultiChanKernel_;
-#else
+    cl_command_queue    m_commandqueue_Update;
+
     cl_kernel padKernel_;
     cl_kernel interleaveKernel_;
     cl_kernel deinterleaveKernel_;
     cl_kernel madaccMultiChanKernel_;
     cl_kernel interleaveMultiChanKernel_;
     cl_kernel sigHistInsertMultiChanKernel_;
-
+#ifndef TAN_SDK_EXPORTS
     cl_context clientContext_;
     cl_command_queue clientQ_;
 #endif

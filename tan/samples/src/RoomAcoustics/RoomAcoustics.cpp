@@ -290,10 +290,12 @@ BOOL CTALibVRDemoApp::InitInstance()
 
     ///reset deviceName buffers
     for (int i = 0; i < MAX_DEVICES; i++){
-        dlg.deviceNames[i][0] = '\0';
+        dlg.deviceGPUNames[i][0] = '\0';
+        dlg.deviceCPUNames[i][0] = '\0';
     }
     SetDllDirectory(dllPath); 
-    int nDevices = listGpuDeviceNames(dlg.deviceNames, MAX_DEVICES);
+    int nGPUDevices = listGpuDeviceNames(dlg.deviceGPUNames, MAX_DEVICES);
+    int nCPUDevices = listCpuDeviceNames(dlg.deviceCPUNames, MAX_DEVICES);
     SetDllDirectory(NULL);
 
     dlg.LoadParameters(configPath);
@@ -334,6 +336,7 @@ BOOL CTALibVRDemoApp::InitInstance()
             }
 
             RoomWin::nSources = dlg.nFiles;
+            RoomWin::timerPeriodMS = dlg.timerPeriodMS;
 
             ears.earSpacing = dlg.earSpacing;
 
@@ -345,6 +348,7 @@ BOOL CTALibVRDemoApp::InitInstance()
             ears.yaw = dlg.yaw;
 
             headSpin = (dlg.autoSpinHead != 0);
+            
 
             room.mFront.damp = DBTODAMP(dlg.roomDampFront);
             room.mBack.damp = DBTODAMP(dlg.roomDampBack);
@@ -357,7 +361,21 @@ BOOL CTALibVRDemoApp::InitInstance()
             m_pAudioVR = new Audio3D();
 
             int err = m_pAudioVR->init(dllPath, room, dlg.nFiles, dlg.waveFileNames, dlg.convolutionLength, dlg.bufferSize,
-                dlg.useGPU4Conv, dlg.convDevIdx, dlg.useGPU4Room, dlg.roomDevIdx);
+                //dlg.useGPU4Conv, dlg.convDevIdx, 
+                (dlg.exModeConv & OCL_GPU), dlg.convDevIdx,
+#ifdef RTQ_ENABLED
+				//dlg.useMPr4Conv, dlg.useRTQ4Conv, dlg.cuCountConv,
+                (dlg.exModeConv == OCL_GPU_MPQ), dlg.exModeConv == OCL_GPU_RTQ, dlg.cuCountConv,
+#endif // 0
+                //dlg.useGPU4Room, dlg.roomDevIdx, 
+                (dlg.exModeRoom & OCL_GPU), dlg.roomDevIdx,
+#ifdef RTQ_ENABLED
+                //dlg.useMPr4Room, dlg.useRTQ4Room, dlg.cuCountRoom,
+                (dlg.exModeRoom == OCL_GPU_MPQ), (dlg.exModeRoom == OCL_GPU_RTQ), dlg.cuCountRoom,
+#endif
+                //amf::TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD, dlg.useCPU4Conv,dlg.useCPU4Room);
+                //amf::TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD,
+                dlg.convMethod, (dlg.exModeConv == OCL_CPU), (dlg.exModeRoom == OCL_CPU));
 
             if (err != 0) {
                 continue;
@@ -398,13 +416,14 @@ BOOL CTALibVRDemoApp::InitInstance()
             RoomWin::headAngle = ears.yaw;
             RoomWin::srcTrackHead[0] = dlg.src1TrackHeadPos;
             m_pAudioVR->setSrc1Options(dlg.src1EnableMic, dlg.src1TrackHeadPos);
-
+            m_pAudioVR->updateHeadPosition(ears.headX, ears.headY, ears.headZ, ears.yaw, 0.0, 0.0);
 
             // log run data:
             puts("Run:");
             printf(" audio file=%s\n", dlg.waveFileNames[0]);
-            printf(" convolution: length=%d buffersize =%d ",
-                dlg.convolutionLength, dlg.bufferSize);
+            printf(" convolution: length=%d buffersize =%d exMode=%d\n",
+                //dlg.convolutionLength, dlg.bufferSize, dlg.useGPU4Conv);
+                dlg.convolutionLength, dlg.bufferSize, dlg.exModeConv);
             printf(" source: x=%f y=%f z=%f\n", dlg.srcX[0], dlg.srcY[0], dlg.srcZ[0]);
             printf(" source2: on=%d enableMic=%d\n", dlg.srcEnable[1], dlg.src1EnableMic);
             printf(" head: x=%f y=%f z=%f\n", dlg.headX, dlg.headY, dlg.headZ);
@@ -430,6 +449,10 @@ BOOL CTALibVRDemoApp::InitInstance()
             pMyWindow->Update();
 
             m_pAudioVR->Stop();
+
+            if (strnlen(dlg.exportName, MAX_PATH) > 0){
+                m_pAudioVR->exportImpulseResponse(0, dlg.exportName);
+            }
 
             pMyWindow->Close();
             delete pMyWindow;

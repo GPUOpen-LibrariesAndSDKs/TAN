@@ -157,6 +157,24 @@ private:
         int nL,
         int flag = 0);
 
+    void generateDirectResponseCPU(
+        RoomDefinition room,
+        MonoSource sound,
+        float earSpacing,
+        HeadModel *pHrtf,
+        float* response,
+        float headX,
+        float headY,
+        float headZ,
+        float earVX,
+        float earVY,
+        float earVZ,
+        int inSampRate,
+        int responseLength,
+        int *firstNonZero,
+        int *lastNonZero
+        );
+
     /*void generateRoomResponseCPU(RoomDefinition room, MonoSource source, StereoListener ear,
     int inSampRate, int responseLength, float *responseLeft, float *responseRight, int flags = 0, int maxBounces = 0);*/
 
@@ -178,6 +196,9 @@ public:
 
     void generateRoomResponse(RoomDefinition room, MonoSource source, StereoListener ear,
         int inSampRate, int responseLength, void *responseLeft, void *responseRight, int flags = 0, int maxBounces = 0);
+
+    void generateDirectResponse(RoomDefinition room, MonoSource source, StereoListener ear,
+        int inSampRate, int responseLength, void *responseLeft, void *responseRight, int *firstNZ, int *lastNZ);
 
     void generateDoorwayResponse(RoomDefinition room1, RoomDefinition room2,
         MonoSource source, Door door, StereoListener ear, int inSampRate, int responseLength, float *responseLeft, float *responseRight, int flags, int maxBounces);
@@ -241,18 +262,17 @@ TrueAudioVRimpl::TrueAudioVRimpl(
     m_length = convolutionLength;
     m_samplesPerSecond = samplesPerSecond;
 
-    //TANCreateFFT(NULL, NULL);
-    //TANCreateMath(m_pContext, &m_pMath);
-    //m_pMath->Init();
+
+    if (cmdQueue != 0){
+        clRetainCommandQueue(cmdQueue);
+    }
 
     return;
 }
 
 TrueAudioVRimpl::~TrueAudioVRimpl(){
 
-#ifdef GPU
-    Release();
-#endif
+
     return;
 }
 
@@ -700,7 +720,6 @@ void TrueAudioVRimpl::generateRoomResponse(RoomDefinition room, MonoSource sound
             }
             else {
                 generateRoomResponseGPU(sound, room, response, headX, headY, headZ, earVX, earVY, earVZ, earV, maxGain, dMin, inSampRate, responseLength, hrtfResponseLength, filterLength, 2 * nW, 2 * nH, 2 * nL);
-
             }
         }
         else
@@ -709,10 +728,94 @@ void TrueAudioVRimpl::generateRoomResponse(RoomDefinition room, MonoSource sound
         }
     }
 
-    printf("done.\n");
+    //printf(".");
     return;
 
 }
+
+
+/**************************************************************************************************
+AmdTrueAudio::generateRoomResponse:
+
+Generates an impulse response for a rectangular room, given room dimensions, damping factors for
+each of the six walls, source and microphone positions in the room.
+
+**************************************************************************************************/
+void TrueAudioVRimpl::generateDirectResponse(RoomDefinition room, MonoSource sound, StereoListener ears,
+    int inSampRate, int responseLength, void *responseL, void *responseR, int *pFirstNZ, int *pLastNZ)
+{
+
+    if (sound.speakerX > room.width) sound.speakerX = room.width;
+    if (sound.speakerX < 0) sound.speakerX = 0;
+    if (sound.speakerY > room.height) sound.speakerY = room.height;
+    if (sound.speakerY < 0) sound.speakerY = 0;
+    if (sound.speakerZ > room.length) sound.speakerZ = room.length;
+    if (sound.speakerZ < 0) sound.speakerZ = 0;
+
+    //rotate head:
+    float earDxL = ears.earSpacing / 2;
+    float earDyL = 0.0;
+    float earDzL = 0.0;
+    float earDxR = -ears.earSpacing / 2;
+    float earDyR = 0.0;
+    float earDzR = 0.0;
+    float earVxL = earDxL;
+    float earVyL = 0.0;
+    float earVzL = -earDxL;
+    float earVxR = earDxR;
+    float earVyR = 0.0;
+    float earVzR = earDxR;
+
+    rotMtx rotM;
+    rotM.setAngles(ears.yaw, ears.pitch, ears.roll);
+    rotM.rotate(earDxL, earDyL, earDzL);
+    rotM.rotate(earDxR, earDyR, earDzR);
+    rotM.rotate(earVxL, earVyL, earVzL);
+    rotM.rotate(earVxR, earVyR, earVzR);
+
+    for (int chan = 0; chan < 2; chan++)
+    {
+        float *response = (float *)responseL;
+
+        float headX, headY, headZ;
+        float earVX, earVY, earVZ;
+        earVY = 0.0;
+        headY = ears.headY;
+        float vx = 0.0;
+
+        switch (chan){
+        case 0:
+            response = (float *)responseL;
+            headX = ears.headX + earDxL;
+            headY = ears.headY + earDyL;
+            headZ = ears.headZ + earDzL;
+            earVX = earVxL;
+            earVY = earVyL;
+            earVZ = earVzL;
+            break;
+        case 1:
+            response = (float *)responseR;
+            headX = ears.headX + earDxR;
+            headY = ears.headY + earDyR;
+            headZ = ears.headZ + earDzR;
+            earVX = earVxR;
+            earVY = earVyR;
+            earVZ = earVzR;
+
+            break;
+        }
+
+     
+
+        generateDirectResponseCPU(room, sound, ears.earSpacing, &ears.hrtf, response, headX, headY, headZ, earVX, earVY, earVZ, inSampRate, responseLength, pFirstNZ, pLastNZ);
+
+    }
+
+    //printf(".");
+    return;
+
+}
+
 
 void TrueAudioVRimpl::Initialize(StereoListener ears, int nW, int nH, int nL, int responseLength)
 {
@@ -853,6 +956,8 @@ void TrueAudioVRimpl::InitializeCL(StereoListener ears, int nW, int nH, int nL, 
     float fill = 0.0;
     status = clEnqueueFillBuffer(m_cmdQueue, m_pResponse, &fill, sizeof(float), 0, responseLength * sizeof(float), 0, NULL, NULL);
     status = clEnqueueFillBuffer(m_cmdQueue, m_pFloatResponse, &fill, sizeof(float), 0, responseLength * sizeof(float), 0, NULL, NULL);
+   
+    //void *frMap = clEnqueueMapBuffer(m_cmdQueue, m_pFloatResponse, CL_TRUE, CL_MAP_READ, 0, responseLength * sizeof(float), 0, NULL, NULL, &status);
 
     // TODO: log errors
     if (status != CL_SUCCESS)
@@ -971,6 +1076,7 @@ void TrueAudioVRimpl::generateRoomResponseGPU(
         return;
     }
     */
+    //void *frMap = clEnqueueMapBuffer(m_cmdQueue, floatResponse, CL_TRUE, CL_MAP_READ, 0, responseLength * sizeof(float), 0, NULL, NULL, &status);
 
 }
 
@@ -1004,7 +1110,13 @@ void TrueAudioVRimpl::generateRoomResponseGPU(
         inSampRate,responseLength,hrtfResponseLength,filterLength,
         nW,nH,nL);
 
-    status = clEnqueueReadBuffer(m_cmdQueue, m_pFloatResponse, CL_TRUE, 0, responseLength * sizeof(float), response, NULL, NULL, NULL);
+    //ToDO fix this case -- returns empty buffer:
+    status = clEnqueueReadBuffer(m_cmdQueue, m_pFloatResponse, CL_TRUE, 0, responseLength * sizeof(float), response, 0, nullptr, nullptr);
+
+    clFinish(m_cmdQueue);
+
+    //hack ..
+    //void *frMap = clEnqueueMapBuffer(m_cmdQueue, m_pFloatResponse, CL_TRUE, CL_MAP_READ, 0, responseLength * sizeof(float),0, NULL, NULL, &status);
 
     if (status != CL_SUCCESS)
     {
@@ -1216,3 +1328,431 @@ void TrueAudioVRimpl::generateRoomResponseCPU(
     }
 }
 
+
+
+void TrueAudioVRimpl::generateDirectResponseCPU(
+    RoomDefinition room, 
+    MonoSource sound, 
+    float earSpacing,
+    HeadModel *pHrtf,
+    float* response,
+    float headX,
+    float headY,
+    float headZ,
+    float earVX,
+    float earVY,
+    float earVZ,
+    int inSampRate, 
+    int responseLength,
+    int *firstNonZero,
+    int *lastNonZero
+    )
+{
+
+    float dx = sound.speakerX - headX;
+    float dy = sound.speakerY - headY;
+    float dz = sound.speakerZ - headZ;
+
+    float maxGain = 2.0;
+    float d0 = sqrtf(dx*dx + dy*dy + dz*dz);
+    float dMin = 2 * earSpacing;
+    int r0 = 1 + (int)((d0 / S) * inSampRate);
+    float dr;
+    if (d0 <= dMin)
+        dr = maxGain;
+    else
+        dr = maxGain*dMin / d0;
+
+
+    float W = room.width;
+    float H = room.height;
+    float L = room.length;
+    float Sx = sound.speakerX;
+    float Sy = sound.speakerY;
+    float Sz = sound.speakerZ;
+    float dampRight = room.mRight.damp;
+    float dampLeft = room.mLeft.damp;
+    float dampTop = room.mTop.damp;
+    float dampBottom = room.mBottom.damp;
+    float dampFront = room.mFront.damp;
+    float dampBack = room.mBack.damp;
+
+    float x, y, z;
+    //float dx, dy, dz;
+
+
+    x = Sx;
+    y = Sy;
+    z = Sz;
+
+
+    dx = x - headX;
+    dy = y - headY;
+    dz = z - headZ;
+
+    float d = sqrtf(dx*dx + dy*dy + dz*dz);
+    int ridx = 1 + (int)((d / S) * inSampRate);
+
+    if (d <= dMin)
+        dr = maxGain;
+    else
+        dr = maxGain*(dMin / d);
+
+    float nP, nN;
+    nP = nN = 0.0;
+
+    if (ridx < *firstNonZero)
+        *firstNonZero = ridx;
+    if (ridx + pHrtf->filterLength > *lastNonZero)
+        *lastNonZero = ridx + pHrtf->filterLength;
+
+    if (ridx < responseLength){
+        applyHRTF(pHrtf, dr, &response[ridx], responseLength - ridx, earVX, earVY, earVZ, dx, dy, dz);
+    }
+}
+
+
+
+// ToDo remove for distro
+#ifdef DOORWAY_TRANSFORM 
+void TrueAudioVRimpl::generateDoorwayResponse(RoomDefinition room1, RoomDefinition room2,
+    MonoSource source, Door door, StereoListener ear, int inSampRate, int responseLength, float *responseLeft, float *responseRight, int flags, int maxBounces)
+{
+    int nSamplesW = int((room1.width / S) * inSampRate);
+    int nSamplesH = int((room1.height / S) * inSampRate);
+    int nSamplesL = int((room1.length / S) * inSampRate);
+
+    int nW = (1 + responseLength / nSamplesW);
+    int nH = (1 + responseLength / nSamplesH);
+    int nL = (1 + responseLength / nSamplesL);
+
+    if (GENROOM_LIMIT_BOUNCES & flags) {
+        nW = (nW > maxBounces) ? maxBounces : nW;
+        nH = (nH > maxBounces) ? maxBounces : nH;
+        nL = (nL > maxBounces) ? maxBounces : nL;
+    }
+
+    if (responseLength > m_responseLength)
+        responseLength = m_responseLength;
+
+    memset(m_pResponseBuffer, 0, m_responseLength*sizeof(float));
+
+    // no hrtf for virtual source, so hrtfResponseLength = 0. :
+    //ToDo: apply doorway specific filter ???
+    generateRoomResponseCPU(room1, source, ear.earSpacing, &ear.hrtf, m_pResponseBuffer, door.r1cX, door.r1cY, door.r1cZ, 0., 0., 0., inSampRate, responseLength, 0., nW, nH, nL, GENROOM_SUPPRESS_DIRECT);
+
+    // ToDo: attenuation factor ???
+    generateDoorwayDirectResponse(room1, room2, source, door, ear, inSampRate, responseLength, m_pResponseBuffer, responseLeft, responseRight, 0);
+
+    // HRTF stereo:
+    float *hrtfbuf = m_pResponseBuffer; 
+
+    
+    //rotate head:
+    float earDxL = ear.earSpacing / 2;
+    float earDyL = 0.0;
+    float earDzL = 0.0;
+    float earDxR = -ear.earSpacing / 2;
+    float earDyR = 0.0;
+    float earDzR = 0.0;
+    float earVxL = earDxL;
+    float earVyL = 0.0;
+    float earVzL = -earDxL;
+    float earVxR = earDxR;
+    float earVyR = 0.0;
+    float earVzR = earDxR;
+
+    rotMtx rotM;
+    rotM.setAngles(ear.yaw, ear.pitch, ear.roll);
+    rotM.rotate(earDxL, earDyL, earDzL);
+    rotM.rotate(earDxR, earDyR, earDzR);
+    rotM.rotate(earVxL, earVyL, earVzL);
+    rotM.rotate(earVxR, earVyR, earVzR);
+
+    float dx = door.r1cX - ear.headX;
+    float dy = door.r1cY - ear.headY;
+    float dz = door.r1cZ - ear.headZ;
+
+     int len = 1;
+    int log2len = 0;
+    // use next bigger power of 2:
+    while (len < responseLength){
+        len <<= 1;
+        ++log2len;
+    }
+
+   // HRTF left
+    float dxL = dx + earDxL;
+    float dyL = dy + earDyL;
+    float dzL = dz + earDzL;
+    float dxR = dx + earDxR;
+    float dyR = dy + earDyR;
+    float dzR = dz + earDzR;
+
+    memset(hrtfbuf, 0, responseLength*sizeof(float));
+    applyHRTF(&ear.hrtf, 1.0, m_pResponseBuffer, responseLength, earVxL, earVyL, earVzL, dxL, dyL, dzL);
+    // combine responses:
+    m_pFft->Transform(TAN_FFT_TRANSFORM_DIRECTION_FORWARD, log2len, 1, &m_pResponseBuffer, &m_pResponseBuffer);
+    m_pFft->Transform(TAN_FFT_TRANSFORM_DIRECTION_FORWARD, log2len, 1, &responseLeft, &responseLeft);
+
+    m_pMath->ComplexMultiplication(&m_pResponseBuffer, &responseLeft, &responseLeft, 1, responseLength);
+
+    m_pFft->Transform(TAN_FFT_TRANSFORM_DIRECTION_BACKWARD, log2len, 1, &responseLeft, &responseLeft);
+
+    // HRTF right
+    memset(hrtfbuf, 0, responseLength*sizeof(float));
+    applyHRTF(&ear.hrtf, 1.0, m_pResponseBuffer, responseLength, earVxR, earVyR, earVzR, dxR, dyR, dzR);
+    // combine responses:
+    m_pFft->Transform(TAN_FFT_TRANSFORM_DIRECTION_FORWARD, log2len, 1, &m_pResponseBuffer, &m_pResponseBuffer);
+    m_pFft->Transform(TAN_FFT_TRANSFORM_DIRECTION_FORWARD, log2len, 1, &responseRight, &responseRight);
+
+    m_pMath->ComplexMultiplication(&m_pResponseBuffer, &responseRight, &responseRight, 1, responseLength);
+
+    m_pFft->Transform(TAN_FFT_TRANSFORM_DIRECTION_BACKWARD, log2len, 1, &responseRight, &responseRight);
+
+
+     /* 
+    MonoSource vSource;
+    vSource.speakerX = door.r2cX;
+    vSource.speakerY = door.r2cY;
+    vSource.speakerZ = door.r2cZ;
+
+    generateRoomResponseCPU(room1, vSource, ear.earSpacing, &ear.hrtf, response2, ear.headX, ear.headY, ear.headZ, 0., 0., 0., inSampRate, responseLength, 0., nW, nH, nL, GENROOM_SUPPRESS_DIRECT);
+
+    // combine responses:
+    int log2len = 0;
+    int len = 1;
+    // use next bigger power of 2:
+    while (len < responseLength){
+        len <<= 1;
+        ++log2len;
+    }
+    m_pFft->Transform(TAN_FFT_TRANSFORM_DIRECTION_FORWARD, log2len, 1, &response1, &response1);
+    m_pFft->Transform(TAN_FFT_TRANSFORM_DIRECTION_FORWARD, log2len, 1, &response2, &response2);
+
+    m_pMath->ComplexMultiplication( &response1, &response2, &response2, 1, responseLength);
+   
+    m_pFft->Transform(TAN_FFT_TRANSFORM_DIRECTION_BACKWARD, log2len, 1, &response2, &response2);
+    */
+}
+
+
+// source in room1, ear in room2, door in both:
+void  TrueAudioVRimpl::generateDoorwayDirectResponse(RoomDefinition room1, RoomDefinition room2, MonoSource source, Door door, StereoListener ear, int inSampRate,
+    int responseLength, 
+    float *responseIn, float *responseLeft, float *responseRight, int flags)
+{
+    float maxGain = 1.0;
+    float dMin = 1.0;
+
+    //rotate head:
+    float earDxL = ear.earSpacing / 2;
+    float earDyL = 0.0;
+    float earDzL = 0.0;
+    float earDxR = -ear.earSpacing / 2;
+    float earDyR = 0.0;
+    float earDzR = 0.0;
+
+    rotMtx rotM;
+    rotM.setAngles(ear.yaw, ear.pitch, ear.roll);
+    rotM.rotate(earDxL, earDyL, earDzL);
+    rotM.rotate(earDxR, earDyR, earDzR);
+
+    float dxL = ear.headX - door.r2cX + earDxL;
+    float dyL = ear.headY - door.r2cY + earDyL;
+    float dzL = ear.headZ - door.r2cZ + earDzL;
+
+    float dxR = ear.headX - door.r2cX + earDxR;
+    float dyR = ear.headY - door.r2cY + earDyR;
+    float dzR = ear.headZ - door.r2cZ + earDzR;
+
+    // add room1 one reverb to room2 shifted by distance to ear in room2 coords:
+    {
+
+        float dL = sqrt((dxL*dxL) + (dyL*dyL) + (dzL*dzL));
+        float dR = sqrt((dxR*dxR) + (dyR*dyR) + (dzR*dzR));
+
+        int shiftL = 1 + (int)((dL / S) * inSampRate);
+        int shiftR = 1 + (int)((dR / S) * inSampRate);
+
+        float dr;
+        if (dL <= dMin)
+            dr = maxGain;
+        else
+            dr = maxGain*(dMin / dL);
+
+        for (int ridx = shiftL; ridx < responseLength; ridx++){
+            responseLeft[ridx] += dr*responseIn[ridx - shiftL];
+        }
+        if (dR <= dMin)
+            dr = maxGain;
+        else
+            dr = maxGain*(dMin / dR);
+
+        for (int ridx = shiftR; ridx < responseLength; ridx++){
+            responseRight[ridx] += dr*responseIn[ridx - shiftR];
+        }
+    }
+
+    // add in direct path 
+    // planar rectangular doorway defined by center and two bottom corners:
+
+    //
+    // doorway definition in room 1:
+    float r1blX = door.r1blX; // bottom left corner
+    float r1blY = door.r1blY;
+    float r1blZ = door.r1blZ;
+
+    float r1brX = door.r1brX; // bottom right corner
+    float r1brY = door.r1brY;
+    float r1brZ = door.r1brZ;
+
+    float r1tlX = r1brX + 2 * (door.r1cX - r1brX); // top left corner
+    float r1tlY = r1brY + 2 * (door.r1cY - r1brY);
+    float r1tlZ = r1brZ + 2 * (door.r1cZ - r1brZ);
+
+    float r1trX = r1blX + 2 * (door.r1cX - r1blX); //top right corner
+    float r1trY = r1blY + 2 * (door.r1cY - r1blY);
+    float r1trZ = r1blZ + 2 * (door.r1cZ - r1blZ);
+
+    // number of virtual sources vertically:
+    float vx1 = r1tlX - r1blX;
+    float vy1 = r1tlY - r1blY;
+    float vz1 = r1tlZ - r1blZ;
+
+    float v1 = sqrt(vx1*vx1 + vy1*vy1 + vz1*vz1);
+    int nv = v1 / DOOR_VS_SPACING;
+    float dxv1 = vx1 / nv;
+    float dyv1 = vy1 / nv;
+    float dzv1 = vz1 / nv;
+
+    // number of virtual sources horizontally:
+    float hx1 = r1brX - r1blX;
+    float hy1 = r1brY - r1blY;
+    float hz1 = r1brZ - r1blZ;
+
+    float h1 = sqrt(hx1*hx1 + hy1*hy1 + hz1*hz1);
+    int nh = h1 / DOOR_VS_SPACING;
+    float dxh1 = hx1 / nv;
+    float dyh1 = hy1 / nv;
+    float dzh1 = hz1 / nv;
+
+    float sx = source.speakerX;
+    float sy = source.speakerY;
+    float sz = source.speakerZ;
+
+    float scale = 1.0 / (nv * nh);
+    maxGain *= scale; // ??? 
+
+    //
+    // doorway definition in room 2:
+    float r2blX = door.r2blX; // bottom left corner
+    float r2blY = door.r2blY;
+    float r2blZ = door.r2blZ;
+
+    float r2brX = door.r2brX; // bottom right corner
+    float r2brY = door.r2brY;
+    float r2brZ = door.r2brZ;
+
+    float r2tlX = r2brX + 2 * (door.r2cX - r2brX); // top left corner
+    float r2tlY = r2brY + 2 * (door.r2cY - r2brY);
+    float r2tlZ = r2brZ + 2 * (door.r2cZ - r2brZ);
+
+    float r2trX = r2blX + 2 * (door.r2cX - r2blX); //top right corner
+    float r2trY = r2blY + 2 * (door.r2cY - r2blY);
+    float r2trZ = r2blZ + 2 * (door.r2cZ - r2blZ);
+
+    // number of virtual sources vertically:
+    float vx2 = r2tlX - r2blX;
+    float vy2 = r2tlY - r2blY;
+    float vz2 = r2tlZ - r2blZ;
+
+    float v2 = sqrt(vx2*vx2 + vy2*vy2 + vz2*vz2);
+    int nv2 = v2 / DOOR_VS_SPACING;
+    float dxv2 = vx2 / nv;
+    float dyv2 = vy2 / nv;
+    float dzv2 = vz2 / nv;
+
+    // number of virtual sources horizontally:
+    float hx2 = r2brX - r2blX;
+    float hy2 = r2brY - r2blY;
+    float hz2 = r2brZ - r2blZ;
+
+    float h2 = sqrt(hx2*hx2 + hy2*hy2 + hz2*hz2);
+    int nh2 = h2 / DOOR_VS_SPACING;
+    float dxh2 = hx2 / nv;
+    float dyh2 = hy2 / nv;
+    float dzh2 = hz2 / nv;
+
+    float lx = ear.headX;
+    float ly = ear.headY;
+    float lz = ear.headZ;
+
+    for (int j = 0; j < nv; j++){
+        float x1 = r1blX + j*dxv1;
+        float y1 = r1blY + j*dyv1;
+        float z1 = r1blZ + j*dzv1;
+
+        float x2 = r2blX + j*dxv2;
+        float y2 = r2blY + j*dyv2;
+        float z2 = r2blZ + j*dzv2;
+
+        for (int i = 0; i < nh; i++){
+            // room1 coordinate of virtual source in doorway:
+            x1 += dxh1;
+            y1 += dyh1;
+            z1 += dzh1;
+
+            x2 += dxh2;
+            y2 += dyh2;
+            z2 += dzh2;
+
+            float dx = sx = x1;
+            float dy = sy - y1;
+            float dz = sz - z1;
+            // distance to real source from virtual source:
+            float d1 = sqrt(dx*dx + dy*dy + dz*dz);
+
+            dx = lx + earDxL - x2;
+            dy = ly + earDyL - y2;
+            dz = lz + earDzL - z2;
+
+            // distance  from virtual source to listener (left ear):
+            float d2 = sqrt(dx*dx + dy*dy + dz*dz);
+
+            // add to impulse response:
+            int ridxL = 1 + (int)(((d2 + d1) / S) * inSampRate);
+
+            float dr; //damping due to radial distance.
+            if (d2 <= dMin)
+                dr = maxGain;
+            else
+                dr = maxGain*(dMin / d2);
+
+            if (ridxL < responseLength){
+                responseLeft[ridxL] += dr;
+            }
+
+            dx = lx + earDxR - x2;
+            dy = ly + earDyR - y2;
+            dz = lz + earDzR - z2;
+
+            // distance  from virtual source to listener(right ear):
+            d2 = sqrt(dx*dx + dy*dy + dz*dz);
+
+            // add to impulse response:
+            int ridxR = 1 + (int)(((d2 + d1) / S) * inSampRate);
+            
+            if (d2 <= dMin)
+                dr = maxGain;
+            else
+                dr = maxGain*(dMin / d2);
+
+            if (ridxL < responseLength){
+                responseRight[ridxR] += dr;
+            }
+
+        }
+    }
+}
+#endif // DOORWAY_TRANSFORM

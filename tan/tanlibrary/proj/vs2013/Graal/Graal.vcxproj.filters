@@ -7,6 +7,9 @@
     <Filter Include="OclKernels">
       <UniqueIdentifier>{8b0c67fc-8551-4326-8f99-208af7da26d4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{a925be40-00db-4af0-8af7-5d7f33b41ada}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\..\src\Graal\amdFFT_conv_kernels.cl">
@@ -27,6 +30,9 @@
     <ClCompile Include="..\..\..\src\Graal\GraalConv.cpp" />
     <ClCompile Include="..\..\..\src\Graal\GraalConv_clFFT.cpp" />
     <ClCompile Include="..\..\..\src\Graal\GraalConvOCL.cpp" />
+    <ClCompile Include="..\..\..\src\common\OCLHelper.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Graal\amdFHT.h" />
@@ -34,16 +40,22 @@
     <ClInclude Include="..\..\..\src\Graal\GraalConv_clFFT.hpp" />
     <ClInclude Include="..\..\..\src\Graal\GraalConvOCL.hpp" />
     <ClInclude Include="..\..\..\src\Graal\GraalInternal.h" />
-    <ClInclude Include="..\..\..\src\Graal\OclKernels\amdFFT_conv_kernels.cl.h">
+    <ClInclude Include="..\..\..\src\Graal\GraalCLUtil\GraalCLUtil.hpp" />
+    <ClInclude Include="..\..\..\src\Graal\GraalCLUtil\GraalFile.hpp" />
+    <ClInclude Include="..\..\..\src\Graal\GraalCLUtil\GraalUtil.hpp" />
+    <ClInclude Include="..\..\..\src\common\OCLHelper.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graal\OclKernels\CLKernel_amdFFT_conv_kernels.h">
       <Filter>OclKernels</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Graal\OclKernels\amdFIR_kernels.cl.h">
+    <ClInclude Include="..\..\..\src\Graal\OclKernels\CLKernel_amdFIR_kernels.h">
       <Filter>OclKernels</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Graal\OclKernels\GraalFHT.cl.h">
+    <ClInclude Include="..\..\..\src\Graal\OclKernels\CLKernel_GraalFHT.h">
       <Filter>OclKernels</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Graal\OclKernels\GraalUtil.cl.h">
+    <ClInclude Include="..\..\..\src\Graal\OclKernels\CLKernel_GraalUtil.h">
       <Filter>OclKernels</Filter>
     </ClInclude>
   </ItemGroup>

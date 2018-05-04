@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="images">
+    <file>Resources\RoomAcousticsNew.png</file>
+    <file>Resources\listener.png</file>
+    <file>Resources\speaker.png</file>
+  </qresource>
+</RCC>

@@ -1,10 +1,13 @@
 
 __kernel void crossfade(
 	__global	float*	fadeBuffer,		///< [in]
-	__global	float*	outputBuffer	///< [in/out]
+	__global	float*	outputBuffer,   ///< [in/out]
+	int channelStride
 	)
 {
-	int gid = get_global_id(0);
-	int gsize = get_global_size(0);
-	outputBuffer[gid] = (fadeBuffer[gid] * gid + outputBuffer[gid] * (gsize - gid)) / (float) gsize;
+	int sampleId = get_global_id(0);
+	int numSamples = get_global_size(0);
+	int chId = get_global_id(1);
+	int sampleOffset = sampleId + chId*channelStride;
+	outputBuffer[sampleOffset] = (outputBuffer[sampleOffset] * sampleId + fadeBuffer[sampleOffset] * (numSamples - sampleId)) / (float)numSamples;
 }

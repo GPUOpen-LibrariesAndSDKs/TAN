@@ -28,6 +28,8 @@
 #include "public/include/core/Context.h"        //AMF
 #include "public/include/components/Component.h"//AMF
 #include "public/common/PropertyStorageExImpl.h"
+#include <unordered_map>
+#define MAX_CACHE_POWER 64
 
 namespace amf
 {
@@ -63,11 +65,10 @@ namespace amf
                                            cl_mem pBufferInput[],
                                            cl_mem pBufferOutput[]) override;
     private:
+		//first 32 bit-> log2length, second 32 bit -> num of channel
+		std::unordered_map<amf_uint, size_t> m_pCLFFTHandleMap;
 
-        std::map<int, void *> fftPlanCache;
-
-        void *getFFTPlan(int log2len);
-
+        size_t getFFTPlan(int log2len, int numOfChannels);
         AMF_RESULT virtual AMF_STD_CALL InitCpu();
         AMF_RESULT virtual AMF_STD_CALL InitGpu();
 
@@ -77,6 +78,12 @@ namespace amf
                                                          amf_size channels,
                                                          float* ppBufferInput[],
                                                          float* ppBufferOutput[]);
+		AMF_RESULT virtual AMF_STD_CALL TransformImplGPUBatched(
+														TAN_FFT_TRANSFORM_DIRECTION direction,
+														amf_size log2len,
+														amf_size channels,
+														cl_mem pBufferInput,
+														cl_mem pBufferOutput);
         AMF_RESULT virtual AMF_STD_CALL TransformImplGpu(TAN_FFT_TRANSFORM_DIRECTION direction,
                                                          amf_size log2len,
                                                          amf_size channels,
@@ -84,16 +91,17 @@ namespace amf
                                                          cl_mem pBufferOutput[]);
 
     private:
+		void clearInternalBuffers();
+		void AdjustInternalBufferSize(size_t desireSizeInSampleLog2, size_t numofChannel);
         TANContextPtr               m_pContextTAN;
 
         AMFComputeKernelPtr         m_pKernelCopy;
         AMF_MEMORY_TYPE             m_eOutputMemoryType;
         AMFCriticalSection          m_sect;
 
-        amf_uint32      m_maxNumChannels;
-        amf_size        m_maxFftLog2Len;
-        cl_mem           *m_pInputsOCL;
-        cl_mem           *m_pOutputsOCL;
+		amf_size m_iInternalBufferSizeInBytes = 0;
+        cl_mem          m_pInputsOCL;
+        cl_mem          m_pOutputsOCL;
 
         bool                        m_doProcessingOnGpu;
         bool                        m_useConvQueue;

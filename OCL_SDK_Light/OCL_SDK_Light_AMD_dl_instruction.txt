@@ -1,0 +1,2 @@
+Please download the OCL_SDK_Light_AMD.exe revision 1.0 installer from the link below and run the installer:
+https://github.com/GPUOpen-LibrariesAndSDKs/OCL-SDK/releases/

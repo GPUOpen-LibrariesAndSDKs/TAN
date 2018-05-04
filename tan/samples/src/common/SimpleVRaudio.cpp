@@ -24,9 +24,18 @@
 #include <process.h>
 #include <AclAPI.h>
 #include <stdio.h>
-#include "CL/OpenCL.h"
+#include "CL/CL.h"
 #include "simpleVRaudio.h"
 #include "gpuutils.h"
+#include "wav.h"
+#include "cpucaps.h"
+#include <immintrin.h>
+
+
+const InstructionSet::InstructionSet_Internal InstructionSet::CPU_Rep;
+bool Audio3D::useIntrinsics = InstructionSet::AVX() && InstructionSet::FMA();
+amf::TAN_CONVOLUTION_METHOD Audio3D::m_convMethod = amf::TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD;
+
 
 #define RETURN_IF_FAILED(x) \
 { \
@@ -122,13 +131,21 @@ m_headingCCW(true)
     ZeroMemory(responses, sizeof(responses));
     ZeroMemory(inputFloatBufs, sizeof(inputFloatBufs));
     ZeroMemory(outputFloatBufs, sizeof(outputFloatBufs));
+    ZeroMemory(outputMixFloatBufs, sizeof(outputMixFloatBufs));
     ZeroMemory(m_samplePos, sizeof(m_samplePos));
 
     for (int i = 0; i < MAX_SOURCES * 2; i++){
         oclResponses[i] = NULL;
+        outputCLBufs[i] = NULL;
     }
+    outputMainCLbuf = NULL;
     m_useClMemBufs = false;
-
+    for (int i = 0; i < 2; i++)
+    {
+        outputMixCLBufs[i] = NULL;
+        outputShortBuf = NULL;
+    }
+    updated = false;
 
 }
 
@@ -156,13 +173,42 @@ int Audio3D::finit(){
         SAFE_DELETE_ARR(inputFloatBufs[i]);
         SAFE_DELETE_ARR(outputFloatBufs[i]);
 
-        if (oclResponses[i])
-        {
-            clReleaseMemObject(oclResponses[i]);
-            oclResponses[i] = NULL;
-        }
+        if (oclResponses[i] == NULL) continue;
+        clReleaseMemObject(oclResponses[i]);
+        oclResponses[i] = NULL;
+    }
+    for (int i = 0; i < m_nFiles * 2; i++)
+    {
+        if (outputCLBufs[i] == NULL) continue;
+        clReleaseMemObject(outputCLBufs[i]);
+        outputCLBufs[i] = NULL;
+    }
+    
+    if (outputMainCLbuf != NULL)
+    {
+        clReleaseMemObject(outputMainCLbuf);
+        outputMainCLbuf = NULL;
+    }
+    for (int i = 0; i < 2; i++)
+    {
+        if (outputMixCLBufs[i] == NULL) continue;
+        clReleaseMemObject(outputMixCLBufs[i]);
+        outputMixCLBufs[i] = NULL;
+    }
+    if (outputShortBuf)
+    {
+        clReleaseMemObject(outputShortBuf);
+        outputShortBuf = NULL;
     }
     m_useClMemBufs = false;
+
+    // release smart pointers:
+    m_spFft.Release();
+    m_spConvolution.Release();
+    m_spConverter.Release();
+    m_spMixer.Release();
+    m_spTANContext2.Release();
+    m_spTANContext1.Release();
 
     if (cmdQueue1 != NULL){
         clReleaseCommandQueue(cmdQueue1);
@@ -177,23 +223,40 @@ int Audio3D::finit(){
     cmdQueue2 = NULL;
     cmdQueue3 = NULL;
 
-    // release smart pointers:
-    m_spFft.Release();
-    m_spConvolution.Release();
-    m_spConverter.Release();
-    m_spTANContext2.Release();
-    m_spTANContext1.Release();
-
     return 0;
 }
 
 //int Audio3D::init(  RoomDefinition roomDef, int nFiles, char **inFiles, int fftLen, int bufSize, 
 //                    bool useGPU_Conv)
 
-int Audio3D::init(char *dllPath, RoomDefinition roomDef, int nFiles, char **inFiles, int fftLen, int bufSize,
-    bool useGPU_Conv, int devIdx_Conv, bool useGPU_IRGen, int devIdx_IRGen)
+int Audio3D::init(
+	char *dllPath, 
+	RoomDefinition roomDef, 
+	int nFiles, 
+	char **inFiles, 
+	int fftLen, 
+	int bufSize,
+    bool useGPU_Conv, int devIdx_Conv, 
+#ifdef RTQ_ENABLED
+	bool useHPr_Conv,bool useRTQ_Conv, int cuRes_Conv,
+#endif // RTQ_ENABLED
+    bool useGPU_IRGen, int devIdx_IRGen, 
+#ifdef RTQ_ENABLED
+	bool useHPr_IRGen, bool useRTQ_IRGen, int cuRes_IRGen,
+#endif // RTQ_ENABLED
+    amf::TAN_CONVOLUTION_METHOD &convMethod,
+    bool useCPU_Conv, bool useCPU_IRGen)
 {
     finit();
+    // shouldn't need this, they are radio buttons:
+    if (useGPU_Conv) useCPU_Conv = false;
+    if (useGPU_IRGen) useCPU_IRGen = false;
+
+    //m_useCpuConv = useCPU_Conv;
+    //m_useCpuIRGen = useCPU_IRGen;
+    //m_useGpuConv = useGPU_Conv;
+	//m_useGpuIRGen = useGPU_IRGen;
+
 
     /* # fft buffer length must be power of 2: */
     m_fftLen = 1;
@@ -201,7 +264,7 @@ int Audio3D::init(char *dllPath, RoomDefinition roomDef, int nFiles, char **inFi
         m_fftLen <<= 1;
     }
 
-    m_bufSize = bufSize*4;
+    m_bufSize = bufSize*sizeof(float);
 
     for (int i = 0; i < MAX_SOURCES; i++) {
         m_samplePos[i] = 0;
@@ -229,6 +292,11 @@ int Audio3D::init(char *dllPath, RoomDefinition roomDef, int nFiles, char **inFi
         memset(outputFloatBufs[i], 0, sizeof(float)*m_fftLen);
     }
 
+    for (int i = 0; i < 2; i++)//Right and left channel after mixing
+    {
+        outputMixFloatBufs[i] = new float[m_fftLen];
+        memset(outputMixFloatBufs[i], 0, sizeof(float)*m_fftLen);
+    }
 
     memset(&room, 0, sizeof(room));
 
@@ -271,53 +339,109 @@ int Audio3D::init(char *dllPath, RoomDefinition roomDef, int nFiles, char **inFi
     //cl_command_queue cmdQueue1 = NULL;
     //cl_command_queue cmdQueue2 = NULL;
     //cl_command_queue cmdQueue3 = NULL;
+    cmdQueue3 = cmdQueue2 = cmdQueue1 = NULL;
+
     unsigned int refCountQ1 = 0;
     unsigned int refCountQ2 = 0;
 
     int32_t flagsQ1 = 0;
     int32_t flagsQ2 = 0;
 
-    if (useGPU_Conv || useGPU_IRGen)
+    //if (useGPU_Conv || useGPU_IRGen)
+    if (useGPU_Conv)
     {
+#ifdef RTQ_ENABLED
+#define QUEUE_MEDIUM_PRIORITY                   0x00010000
 
-        CreateCommandQueues(devIdx_Conv, flagsQ1, &cmdQueue1, flagsQ2, &cmdQueue2);
-    
-        if (devIdx_Conv == devIdx_IRGen)
+#define QUEUE_REAL_TIME_COMPUTE_UNITS           0x00020000  
+        if (useHPr_Conv){
+            flagsQ1 = QUEUE_MEDIUM_PRIORITY;
+        }
+
+  else if (useRTQ_Conv){
+            flagsQ1 = QUEUE_REAL_TIME_COMPUTE_UNITS | cuRes_Conv;
+        }  
+
+	    if (useHPr_IRGen){
+            flagsQ2 = QUEUE_MEDIUM_PRIORITY;
+        }
+
+		else if (useRTQ_IRGen){
+			flagsQ2 = QUEUE_REAL_TIME_COMPUTE_UNITS | cuRes_IRGen;
+		}
+#endif // RTQ_ENABLED
+
+        CreateGpuCommandQueues(devIdx_Conv, flagsQ1, &cmdQueue1, flagsQ2, &cmdQueue2);
+
+        if (devIdx_Conv == devIdx_IRGen && useGPU_IRGen)
+        {
+            cmdQueue3 = cmdQueue2;
+        }
+    } 
+
+    if (useCPU_Conv)
+    {
+#ifdef RTQ_ENABLED
+		// For " core "reservation" on CPU" -ToDo test and enable
+        if (cuRes_Conv > 0 && cuRes_IRGen > 0){
+            cl_int err = CreateCommandQueuesWithCUcount(devIdx_Conv, &cmdQueue1, &cmdQueue2, cuRes_Conv, cuRes_IRGen);
+        }
+        else {
+            CreateCpuCommandQueues(devIdx_Conv, 0, &cmdQueue1, 0, &cmdQueue2);
+        }
+#endif // RTQ_ENABLED
+
+        if (devIdx_Conv == devIdx_IRGen && useCPU_IRGen)
         {
             cmdQueue3 = cmdQueue2;
         }
     }
 
+    if(cmdQueue3 == NULL)
+    {
+        if (useGPU_IRGen)
+        {
+            CreateGpuCommandQueues(devIdx_IRGen, 0, &cmdQueue3, 0, NULL);
+        } 
+        else if (useCPU_IRGen)
+        {
+            CreateCpuCommandQueues(devIdx_IRGen, 0, &cmdQueue3, 0, NULL);
+        }
+    }
 
     // Create TAN objects.
     RETURN_IF_FAILED(TANCreateContext(TAN_FULL_VERSION, &m_spTANContext1));
 
-    if (useGPU_Conv) {
+    if (useGPU_Conv || useCPU_Conv) {
         RETURN_IF_FAILED(m_spTANContext1->InitOpenCL(cmdQueue1, cmdQueue2));
     }
 
     RETURN_IF_FAILED(TANCreateContext(TAN_FULL_VERSION, &m_spTANContext2));
-    if (useGPU_IRGen) {
+    if (useGPU_IRGen || useCPU_IRGen) {
         RETURN_IF_FAILED(m_spTANContext2->InitOpenCL(cmdQueue3, cmdQueue3));
     }
 
-
-
     RETURN_IF_FAILED(TANCreateConvolution(m_spTANContext1, &m_spConvolution));
-    if (!useGPU_Conv)
+    if (!useGPU_Conv && !useCPU_Conv) // don't use OpenCL at all
     {
-        RETURN_IF_FAILED(m_spConvolution->InitCpu(TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD,
+		if (convMethod != TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD)
+			convMethod = TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD;			// ensures compatible with old room acoustic
+        // C_Model implementation
+        RETURN_IF_FAILED(m_spConvolution->InitCpu(convMethod,
             m_fftLen, bufSize,
             nFiles * 2));
     }
     else {
-        RETURN_IF_FAILED(m_spConvolution->InitGpu(TAN_CONVOLUTION_METHOD_FHT_UNIFORM_PARTITIONED,//TAN_CONVOLUTION_METHOD_FHT_UINFORM_HEAD_TAIL
+        RETURN_IF_FAILED(m_spConvolution->InitGpu(convMethod,//TAN_CONVOLUTION_METHOD_FHT_UINFORM_HEAD_TAIL
             m_fftLen, bufSize,
             nFiles * 2));
     }
 
     RETURN_IF_FAILED(TANCreateConverter(m_spTANContext2, &m_spConverter));
     RETURN_IF_FAILED(m_spConverter->Init());
+
+    RETURN_IF_FAILED(TANCreateMixer(m_spTANContext2, &m_spMixer));
+	RETURN_IF_FAILED(m_spMixer->Init(bufSize, m_nFiles));
 
     RETURN_IF_FAILED(TANCreateFFT(m_spTANContext2, &m_spFft));
     RETURN_IF_FAILED(m_spFft->Init());
@@ -327,10 +451,12 @@ int Audio3D::init(char *dllPath, RoomDefinition roomDef, int nFiles, char **inFi
         m_pTAVR = NULL;
     }
 
+    m_useOCLOutputPipeline = useGPU_Conv && useGPU_IRGen;
+
     if (useGPU_IRGen && useGPU_Conv) {
-        if (cmdQueue3 == NULL){
-            CreateCommandQueues(devIdx_IRGen, 0, &cmdQueue3, 0, NULL);
-        }
+        //if (cmdQueue3 == NULL){
+        //    CreateGpuCommandQueues(devIdx_IRGen, 0, &cmdQueue3, 0, NULL);
+        //}
 
         cl_int status;
         cl_context context_IR;
@@ -342,7 +468,69 @@ int Audio3D::init(char *dllPath, RoomDefinition roomDef, int nFiles, char **inFi
             for (int i = 0; i < nFiles * 2; i++){
                 oclResponses[i] = clCreateBuffer(context_IR, CL_MEM_READ_WRITE, m_fftLen * sizeof(float), NULL, &status);
             }
+            //HACK out for test 
             m_useClMemBufs = true;
+        }
+        // Initialize CL output buffers,
+        if(useGPU_Conv)
+        {
+            cl_int clErr;
+
+            // First create a big cl_mem buffer then create small sub-buffers from it
+            outputMainCLbuf = clCreateBuffer(m_spTANContext1->GetOpenCLContext(), CL_MEM_READ_WRITE,
+                 m_bufSize * nFiles * 2, nullptr, &clErr);
+
+            if (clErr != CL_SUCCESS)
+            {
+                printf("Could not create OpenCL buffer\n");
+                return AMF_FAIL;
+            };
+
+            for (amf_uint32 i = 0; i < nFiles * 2; i++){
+                cl_buffer_region region;
+                region.origin = i*m_bufSize;
+                region.size = m_bufSize;
+                outputCLBufs[i] = clCreateSubBuffer(
+                    outputMainCLbuf, CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &region, &clErr);
+
+                if (clErr != CL_SUCCESS)
+                {
+
+                    printf("Could not create OpenCL subBuffer\n");
+                    return AMF_FAIL;
+                };
+                float zero = 0.0;
+                clErr = clEnqueueFillBuffer(cmdQueue1, outputCLBufs[i], &zero,sizeof(zero), 0, region.size, 0, NULL, NULL);
+                if (clErr != CL_SUCCESS)
+                {
+                    printf("Could not fill OpenCL subBuffer\n");
+                    return AMF_FAIL;
+                };
+            }
+
+            for (int idx = 0; idx < 2; idx++)
+            {
+
+                outputMixCLBufs[idx] = clCreateBuffer(
+                    m_spTANContext1->GetOpenCLContext(), CL_MEM_READ_WRITE, m_bufSize, nullptr, &clErr);
+                if (clErr != CL_SUCCESS)
+                {
+
+                    printf("Could not create OpenCL buffer\n");
+                    return AMF_FAIL;
+                };
+                
+                if (clErr != CL_SUCCESS)
+                {
+
+                    printf("Could not create OpenCL buffer\n");
+                    return AMF_FAIL;
+                };
+            }
+            // The output short buffer stores the final (after mixing) left and right channels interleaved as short samples 
+            // The short buffer size is equal to sizeof(short)*2*m_bufSize/sizeof(float) which is equal to m_bufSize
+            outputShortBuf = clCreateBuffer(
+                m_spTANContext1->GetOpenCLContext(), CL_MEM_READ_WRITE, m_bufSize, nullptr, &clErr);
         }
     }
 
@@ -383,10 +571,10 @@ int Audio3D::init(char *dllPath, RoomDefinition roomDef, int nFiles, char **inFi
     }
 
     if (m_useClMemBufs) {
-        RETURN_IF_FAILED(m_spConvolution->UpdateResponseTD(oclResponses, m_fftLen, nullptr, 0));
+        RETURN_IF_FAILED(m_spConvolution->UpdateResponseTD(oclResponses, m_fftLen, nullptr, IR_UPDATE_MODE));
     }
     else {
-        RETURN_IF_FAILED(m_spConvolution->UpdateResponseTD(responses, m_fftLen, nullptr, 0));
+        RETURN_IF_FAILED(m_spConvolution->UpdateResponseTD(responses, m_fftLen, nullptr, IR_UPDATE_MODE));
     }
 
     running = false;
@@ -413,6 +601,7 @@ int Audio3D::updateHeadPosition(float x, float y, float z, float yaw, float pitc
     ears.pitch = pitch;
     ears.roll = roll;
 
+    updateParams = true;
     return 0;
 }
 
@@ -428,7 +617,41 @@ int Audio3D::updateSourcePosition(int srcNumber, float x, float y, float z)
     sources[srcNumber].speakerY = y;
     sources[srcNumber].speakerZ = z;// +room.length / 2.0f;
 
+    updateParams = true;
     return 0;
+}
+
+int Audio3D::updateRoomDimension(float _width, float _height, float _length)
+{
+	room.width = _width;
+	room.height = _height;
+	room.length = _length;
+
+	updateParams = true;
+	return 0;
+}
+
+int Audio3D::updateRoomDamping(float _left, float _right, float _top, float _buttom, float _front, float _back)
+{
+	room.mTop.damp = _top;
+	room.mBottom.damp = _buttom;
+	room.mLeft.damp = _left;
+	room.mRight.damp = _right;
+	room.mFront.damp = _front;
+	room.mBack.damp = _back;
+	
+	updateParams = true;
+	return 0;
+}
+
+AmdTrueAudioVR* Audio3D::getAMDTrueAudioVR()
+{
+	return m_pTAVR;
+}
+
+TANConverterPtr Audio3D::getTANConverter()
+{
+	return m_spConverter;
 }
 
 int Audio3D::setWorldToRoomCoordTransform(float translationX=0., float translationY=0., float translationZ=0.,
@@ -459,6 +682,7 @@ int Audio3D::Run()
     m_hUpdateThread = (HANDLE)_beginthreadex(0, 10000000, updateThreadProc, this, 0, 0);
     RETURN_IF_FALSE(m_hUpdateThread != (HANDLE)-1);
 
+    updateParams = true;
     return 0;
 }
 
@@ -477,11 +701,85 @@ int Audio3D::Stop()
     return 0;
 }
 
-
-int Audio3D::process(short *pOut, short *pChan[MAX_SOURCES], int sampleCount)
+int Audio3D::process(short *pOut, short *pChan[MAX_SOURCES], int sampleCountBytes)
 {
+    int sampleCount = sampleCountBytes / (sizeof(short) * 2);
 
-    sampleCount = sampleCount / (sizeof(short)* 2);
+    
+    // Read from the files
+    for (int idx = 0; idx < m_nFiles; idx++) {
+        for (int chan = 0; chan < 2; chan++){
+            // The way sources in inputFloatBufs are ordered is: Even indexed elements for left channels, odd indexed ones for right,
+            // this ordering matches with the way impulse responses are generated and indexed to be convolved with the sources.
+            RETURN_IF_FAILED(m_spConverter->Convert(pChan[idx] + chan, 2, sampleCount,
+                inputFloatBufs[idx * 2 + chan], 1, 1.f));
+        }
+    }
+
+
+
+
+
+    if (m_useOCLOutputPipeline) 
+    {   // OCL device memory objects are passed to the TANConvolution->Process method.
+        // Mixing and short conversion is done on GPU.
+
+        RETURN_IF_FAILED(m_spConvolution->Process(inputFloatBufs, outputCLBufs, sampleCount, nullptr, nullptr));
+
+        cl_mem outputCLBufLeft[MAX_SOURCES];
+        cl_mem outputCLBufRight[MAX_SOURCES];
+        for (int src = 0; src < MAX_SOURCES; src++)
+        {
+            outputCLBufLeft[src] = outputCLBufs[src*2 ];// Even indexed channels for left ear input
+            outputCLBufRight[src] = outputCLBufs[src*2+1];// Odd indexed channels for right ear input
+        }
+        AMF_RESULT ret = m_spMixer->Mix(outputCLBufLeft, outputMixCLBufs[0]);
+        RETURN_IF_FALSE(ret == AMF_OK);
+
+        ret = m_spMixer->Mix(outputCLBufRight, outputMixCLBufs[1]);
+        RETURN_IF_FALSE(ret == AMF_OK);
+        ret = m_spConverter->Convert(outputMixCLBufs[0], 1, 0, TAN_SAMPLE_TYPE_FLOAT, 
+            outputShortBuf, 2, 0, TAN_SAMPLE_TYPE_SHORT, sampleCount, 1.f);
+        RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED); 
+
+        ret = m_spConverter->Convert(outputMixCLBufs[1], 1, 0, TAN_SAMPLE_TYPE_FLOAT, 
+            outputShortBuf, 2, 1, TAN_SAMPLE_TYPE_SHORT, sampleCount, 1.f);
+        RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED);
+
+        cl_int clErr = clEnqueueReadBuffer(m_spTANContext1->GetOpenCLGeneralQueue(), outputShortBuf, CL_TRUE,
+             0, sampleCountBytes, pOut, NULL, NULL, NULL);
+        RETURN_IF_FALSE(clErr == CL_SUCCESS);
+
+    }
+    else
+    {   // Host memory pointers are passed to the TANConvolution->Process method
+        // Mixing and short conversion are still performed on CPU.
+
+        RETURN_IF_FAILED(m_spConvolution->Process(inputFloatBufs, outputFloatBufs, sampleCount,
+            nullptr, nullptr));
+
+        float * outputFloatBufLeft[MAX_SOURCES];
+        float * outputFloatBufRight[MAX_SOURCES];
+        for (int src = 0; src < MAX_SOURCES; src++)
+        {
+            outputFloatBufLeft[src] = outputFloatBufs[src * 2];// Even indexed channels for left ear input
+            outputFloatBufRight[src] = outputFloatBufs[src * 2 + 1];// Odd indexed channels for right ear input
+        }
+        AMF_RESULT ret = m_spMixer->Mix(outputFloatBufLeft, outputMixFloatBufs[0]);
+        RETURN_IF_FALSE(ret == AMF_OK);
+
+        ret = m_spMixer->Mix(outputFloatBufRight, outputMixFloatBufs[1]);
+        RETURN_IF_FALSE(ret == AMF_OK);
+
+        ret = m_spConverter->Convert(outputMixFloatBufs[0], 1, sampleCount, pOut, 2, 1.f);
+        RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED);
+
+        ret = m_spConverter->Convert(outputMixFloatBufs[1], 1, sampleCount, pOut + 1, 2, 1.f);
+        RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED);
+    }
+
+
+#if 0// Old code: Crossfade, Mixing and Conversion on CPU
 
     for (int idx = 0; idx < m_nFiles; idx++) {
         for (int chan = 0; chan < 2; chan++){
@@ -493,21 +791,39 @@ int Audio3D::process(short *pOut, short *pChan[MAX_SOURCES], int sampleCount)
     RETURN_IF_FAILED(m_spConvolution->Process(inputFloatBufs, outputFloatBufs, sampleCount,
                                              nullptr, nullptr));
 
-        // ToDo:  use limiter...
+    // ToDo:  use limiter...
 
-    for (int idx = 2; idx < 2*m_nFiles; idx += 2) {
-        for (int n = 0; n < sampleCount; n++) {
-            outputFloatBufs[0][n] += outputFloatBufs[idx][n];
-            outputFloatBufs[1][n] += outputFloatBufs[idx+1][n];
+ 
+    for (int idx = 2; idx < 2 * m_nFiles; idx += 2) {
+        int k = 0;
+        int n = sampleCount;
+        while (n >= 8 && useIntrinsics){
+            register __m256 *outL, *outR, *inL, *inR;
+            outL = (__m256 *)&outputFloatBufs[0][k];
+            outR = (__m256 *)&outputFloatBufs[1][k];
+            inL = (__m256 *)&outputFloatBufs[idx][k];
+            inR = (__m256 *)&outputFloatBufs[idx + 1][k];
+
+            *outL = _mm256_add_ps(*outL, *inL);
+            *outR = _mm256_add_ps(*outR, *inR);
+            k += 8;
+            n -= 8;
+        }
+        while(n > 0) {
+            outputFloatBufs[0][k] += outputFloatBufs[idx][k];
+            outputFloatBufs[1][k] += outputFloatBufs[idx + 1][k];
+            k++;
+            n--;
         }
     }
+    
 
     AMF_RESULT ret = m_spConverter->Convert(outputFloatBufs[0], 1, sampleCount, pOut, 2, 1.f);
     RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED);
 
     ret = m_spConverter->Convert(outputFloatBufs[1], 1, sampleCount, pOut + 1, 2, 1.f);
     RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED);
-
+#endif
     return 0;
 }
 
@@ -532,11 +848,11 @@ int Audio3D::processProc()
 
     FifoBuffer recFifo(FILTER_SAMPLE_RATE * 4);
 
-    pRec = new  short[FILTER_SAMPLE_RATE];
-    memset(pRec, 0, FILTER_SAMPLE_RATE * sizeof(short));
+    pRec = new  short[FILTER_SAMPLE_RATE*2];
+    memset(pRec, 0, FILTER_SAMPLE_RATE * sizeof(short) * 2);
 
-    pOut = new  short[FILTER_SAMPLE_RATE];
-    memset(pOut, 0, FILTER_SAMPLE_RATE * 2);
+    pOut = new  short[FILTER_SAMPLE_RATE*2];
+    memset(pOut, 0, FILTER_SAMPLE_RATE * sizeof(short) * 2);
 
     // upgrade our windows process and thread priorities:
     SetSecurityInfo(GetCurrentProcess(), SE_WINDOW_OBJECT, PROCESS_SET_INFORMATION, 0, 0, 0, 0);
@@ -545,6 +861,10 @@ int Audio3D::processProc()
 
     unsigned char *pProc = pProcessed;
     running = true;
+
+    while (!updated){
+        Sleep(5);
+    }
 
     while (!stop) { 
 
@@ -574,6 +894,8 @@ int Audio3D::processProc()
         int bytes2Play = m_bufSize;
         unsigned char *pData;
         pData = (unsigned char *)pOut;
+        memcpy(pProc, pData, m_bufSize);
+
         while (bytes2Play > 0) {
             bytesPlayed = Player.wasapiPlay(pData, bytes2Play, false);
             bytes2Play -= bytesPlayed;
@@ -589,12 +911,17 @@ int Audio3D::processProc()
             }
         }
 
+        pProc += m_bufSize;
+        if (pProc - pProcessed + m_bufSize > nSP){
+            pProc = pProcessed;
+        }
+
         ///compute current sample position for each stream:
         for (int i = 0; i < m_nFiles; i++) {
             m_samplePos[i] = (pWaves[i] - pWaveStarts[i]) / sizeof(short);
         }
 
-        Sleep(10);
+        Sleep(1);
     }
     Sleep(100);
 
@@ -628,6 +955,9 @@ __int64 Audio3D::getCurrentPosition(int streamIdx)
 int Audio3D::updateProc(){
 
     while (running && !stop) {
+        while (!updateParams  && running && !stop){
+            Sleep(10);
+        }
 
         if (src1TrackHeadPos) {
             sources[0].speakerX = ears.headX;
@@ -649,17 +979,40 @@ int Audio3D::updateProc(){
         AMF_RESULT ret = AMF_OK;
         do {
             if (m_useClMemBufs) {
-                ret = m_spConvolution->UpdateResponseTD(oclResponses, m_fftLen, nullptr, 0);
+                ret = m_spConvolution->UpdateResponseTD(oclResponses, m_fftLen, nullptr, IR_UPDATE_MODE);
             }
             else {
-                ret = m_spConvolution->UpdateResponseTD(responses, m_fftLen, nullptr, 0);
+                ret = m_spConvolution->UpdateResponseTD(responses, m_fftLen, nullptr, IR_UPDATE_MODE);
             }
 
         } while (ret == AMF_INPUT_FULL && running && !stop);
-        RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_INPUT_FULL);
+        RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_BUSY);
 
-        Sleep(20);
+
+        updated = true;
+        //Sleep(20);
+        updateParams = false;
     }
 
+    return 0;
+}
+
+int Audio3D::exportImpulseResponse(int srcNumber, char * fileName)
+{
+
+    int convolutionLength = this->m_fftLen;
+    m_pTAVR->generateSimpleHeadRelatedTransform(&ears.hrtf, ears.earSpacing);
+
+    float *leftResponse = responses[0];
+    float *rightResponse = responses[1];
+    short *sSamples = new short[2 * convolutionLength];
+     memset(sSamples, 0, 2 * convolutionLength*sizeof(short));
+        
+    (void)m_spConverter->Convert(leftResponse, 1, convolutionLength, sSamples, 2, 1.f);
+
+    (void)m_spConverter->Convert(rightResponse, 1, convolutionLength, sSamples + 1, 2, 1.f);
+
+    WriteWaveFileS(fileName, 48000, 2, 16, convolutionLength, sSamples);
+    delete[] sSamples;
     return 0;
 }

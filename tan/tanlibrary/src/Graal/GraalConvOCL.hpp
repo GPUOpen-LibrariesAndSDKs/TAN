@@ -31,15 +31,13 @@
 #include <string.h>
 #include "GraalCLUtil/GraalCLUtil.hpp"
 
-#include "OclKernels/GraalUtil.cl.h"
-
-#ifdef TAN_SDK_EXPORTS
+//#include "OclKernels/GraalUtil.cl.h"
+#include "OclKernels/CLKernel_GraalUtil.h"
 #  include "tanlibrary/include/TrueAudioNext.h" //TAN
 
 #  include "public/include/core/Compute.h"      //AMF
 #  include "public/include/core/context.h"      //AMF
 #  include "public/common/AMFFactory.h"         //AMF
-#endif
 
 /**
  */
@@ -134,13 +132,7 @@ template<typename T>
 class CABuf
 {
 public:
-    CABuf(cl_context _context
-#ifdef TAN_SDK_EXPORTS
-          ,
-          amf::AMFComputePtr pDevice) : m_pDevice(pDevice)
-#else
-        )
-#endif
+    CABuf(cl_context _context)
     {
         context_ = _context;
         mappingQ_ = 0;
@@ -190,10 +182,6 @@ public:
         cl_own_ = false;
         offset_ = 0;
         sys_ptr_ = nullptr;
-
-#ifdef TAN_SDK_EXPORTS
-        m_pDevice = _src.m_pDevice;
-#endif
     }
 
 
@@ -309,20 +297,22 @@ public:
     {
         T* ret = 0;
         int status = 0;
+
         if ( buf_ && !map_ptr_ ) {
             mappingQ_ = _mappingQ;
     
-            ret = map_ptr_ = (T *)clEnqueueMapBuffer (mappingQ_,
-                                                buf_,
-                                                CL_TRUE,
-                                                _flags, //CL_MAP_WRITE_INVALIDATE_REGION,
-                                                0,
-                                                len_*sizeof(T),
-                                                0,
-                                                NULL,
-                                                NULL,
-                                                &status);
+                ret = map_ptr_ = (T *)clEnqueueMapBuffer(mappingQ_,
+                    buf_,
+                    CL_TRUE,
+                    _flags, //CL_MAP_WRITE_INVALIDATE_REGION,
+                    0,
+                    len_*sizeof(T),
+                    0,
+                    NULL,
+                    NULL,
+                    &status);
         }
+
         return(ret);
     }
 
@@ -397,7 +387,7 @@ public:
         return(ret);
     }
 
-    int copyToDevice(cl_command_queue _commandQueue, uint _flags, const T* _data = NULL, size_t _len = -1)
+    int copyToDevice(cl_command_queue _commandQueue, uint _flags, const T* _data = NULL, size_t _len = -1, size_t _offset = 0)
     {
         int err = GRAAL_SUCCESS;
 
@@ -428,9 +418,9 @@ public:
 
         size_t len = (_len != -1 )? _len : len_; 
         const T * sys_ptr = (_len != -1) ? _data : sys_ptr_;
-        AMF_RETURN_IF_FALSE(sys_ptr, AMF_WRONG_STATE,
+        AMF_RETURN_IF_INVALID_POINTER(sys_ptr,
                             L"Internal error: buffer hasn't been preallocated");
-        err = clEnqueueWriteBuffer(_commandQueue, buf_, CL_TRUE,0, len * sizeof(T), sys_ptr, 0, NULL, NULL);
+        err = clEnqueueWriteBuffer(_commandQueue, buf_, CL_TRUE, _offset * sizeof(T), len * sizeof(T), sys_ptr, 0, NULL, NULL);
 
         if(err != CL_SUCCESS) {
 #ifdef _DEBUG_PRINTF
@@ -443,7 +433,7 @@ public:
         return(err);
     }
 
-    int copyToDeviceNonBlocking(cl_command_queue _commandQueue, uint _flags, const T* _data = NULL, size_t _len = -1)
+    int copyToDeviceNonBlocking(cl_command_queue _commandQueue, uint _flags, const T* _data = NULL, size_t _len = -1, size_t _offset = 0)
     {
         int err = GRAAL_SUCCESS;
 
@@ -474,9 +464,9 @@ public:
 
         size_t len = (_len!=-1 )? _len : len_; 
         const T * sys_ptr = (_len!=-1) ? _data : sys_ptr_;
-        AMF_RETURN_IF_FALSE(sys_ptr, AMF_WRONG_STATE,
+        AMF_RETURN_IF_INVALID_POINTER(sys_ptr,
                             L"Internal error: buffer hasn't been preallocated");
-        err = clEnqueueWriteBuffer(_commandQueue, buf_, CL_FALSE,0, len * sizeof(T), sys_ptr, 0, NULL, NULL);
+        err = clEnqueueWriteBuffer(_commandQueue, buf_, CL_FALSE, _offset * sizeof(T), len * sizeof(T), sys_ptr, 0, NULL, NULL);
 
         if(err != CL_SUCCESS) {
 #ifdef _DEBUG_PRINTF
@@ -576,68 +566,18 @@ public:
         return(err);
     }
 
-    int setValue2(cl_command_queue _commandQueue, T _val)
+    int setValue2(cl_command_queue _commandQueue, T _val, size_t _len = 0, size_t _offset = 0)
     {
         int err = GRAAL_SUCCESS;
-        std::string kernel_file = (const char*)GraalUtil;
-        //std::string kernel_file = "GraalUtil.cl";
-        std::string kernel_name = "amdSetValue", comp_options;
-        std:: string type_nm(typeid( _val ).name());
-
-        if (type_nm == "unsigned int" )
+        int len = (_len != 0) ? _len: len_;
+        if (NULL != _commandQueue)
         {
-            type_nm = "uint";
+           err = clEnqueueFillBuffer(_commandQueue, buf_, (const void *)&_val, sizeof(_val), _offset* sizeof(T), len * sizeof(T) , 0, nullptr, nullptr);
         }
-        comp_options = std::string("-D __TYPE__=") + type_nm;
-
-#ifdef TAN_SDK_EXPORTS
-        amf::AMF_KERNEL_ID amfKernelId = -1;
-        amf::AMFComputeKernelPtr setValueKernel = NULL;
-
-        amf::AMFPrograms* pPrograms = NULL;
-        AMF_RETURN_IF_FAILED(g_AMFFactory.GetFactory()->GetPrograms(&pPrograms), L"GetPrograms Failed");
-        AMF_RETURN_IF_FAILED(pPrograms->RegisterKernelSource(
-                                &amfKernelId,
-                                L"GraalUtil",
-                                kernel_name.c_str(),
-                                GraalUtilCount,
-                                reinterpret_cast<const amf_uint8*>(kernel_file.c_str()),
-                                comp_options.c_str()));
-
-
-        AMF_RETURN_IF_FAILED(m_pDevice->GetKernel(amfKernelId, &setValueKernel),
-                             L"GetKernel() failed");
-
-        int n_arg = 0;
-
-        AMF_RETURN_IF_FAILED(setValueKernel->SetArgBufferNative(n_arg++, buf_, amf::AMF_ARGUMENT_ACCESS_READWRITE));
-        AMF_RETURN_IF_FAILED(setValueKernel->SetArgInt32(n_arg++, *reinterpret_cast<int*>(&_val)));
-        size_t l_wk[3] = {256,1,1};
-        size_t g_wk[3] = {1,1,1};
-        g_wk[0] = len_;
-
-        AMF_RETURN_IF_FAILED(setValueKernel->Enqueue(1, NULL, g_wk, l_wk), L"Enqueue() failed");
-        AMF_RETURN_IF_FAILED(m_pDevice->FinishQueue());
-#else
-        cl_kernel setValueKernel = 0;
-        setValueKernel = graal::getGraalOCL().getKernel("GraalUtil", kernel_file, GraalUtilCount,
-                                                                  kernel_name, comp_options);
-        int n_arg = 0;
-
-        err = clSetKernelArg(setValueKernel, n_arg++, sizeof(cl_mem), &buf_);
-        err |= clSetKernelArg(setValueKernel, n_arg++, sizeof(T), &_val);
-        size_t l_wk[3] = {256,1,1};
-        size_t g_wk[3] = {1,1,1};
-        g_wk[0] = len_;
-        err |= clEnqueueNDRangeKernel(_commandQueue, setValueKernel, 1, NULL, g_wk, l_wk, 0, NULL, NULL);
-        clFinish(_commandQueue);
-#endif
-
-        for( int i = 0; sys_ptr_ && i < len_; i++)
+        for (int i = _offset; sys_ptr_ && i < len; i++)
         {
             sys_ptr_[i] = _val;
         }
-
         return(err);
     }
 
@@ -754,9 +694,8 @@ protected:
     cl_context context_;
     cl_command_queue mappingQ_;
 
-#ifdef TAN_SDK_EXPORTS
-    amf::AMFComputePtr m_pDevice;
-#endif
+    cl_kernel setUintValue2Kernel_;
+    cl_kernel setFloatValue2Kernel_;
 
     T * sys_ptr_;
     T * map_ptr_;
@@ -833,8 +772,7 @@ public:
         if (!sys_ptr_)
         {
             sys_ptr_ = m_base.getSysMem();
-            AMF_RETURN_IF_FALSE(sys_ptr_, sys_ptr_, L"Internal error: subbuffer's parent failed to "
-                                                    L"allocate system memory");
+            AMF_RETURN_IF_FALSE(sys_ptr_, sys_ptr_, L"Internal error: subbuffer's parent failed to allocate system memory");
             sys_ptr_ += m_offset;
         }
 

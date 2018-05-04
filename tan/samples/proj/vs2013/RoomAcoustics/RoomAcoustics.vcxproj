@@ -15,7 +15,11 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Win32Project1</RootNamespace>
   </PropertyGroup>
+  <PropertyGroup Label="UserMacros">
+    <TAN_ROOT>$(ProjectDir)..\..\..\..</TAN_ROOT>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(TAN_ROOT)\build\solution\TAN.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -43,19 +47,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\bin\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)..\..\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(TAN_ROOT)\bin\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IntDir>$(TAN_ROOT)\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
-    <LibraryPath>$(AMDAPPSDKROOT)\lib\x86_64;$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(AMDAPPSDKROOT)include;$(SolutionDir)../../;$(SolutionDir)../../../AMF/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(TAN_ROOT)\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(TAN_ROOT)\;$(TAN_ROOT)\..\AMF\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\bin\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)..\..\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(TAN_ROOT)\bin\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IntDir>$(TAN_ROOT)\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
-    <LibraryPath>$(AMDAPPSDKROOT)\lib\x86_64;$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(AMDAPPSDKROOT)include;$(SolutionDir)../../;$(SolutionDir)../../../AMF/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(TAN_ROOT)\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(TAN_ROOT)\;$(TAN_ROOT)\..\AMF\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -63,18 +67,18 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RTQ_ENABLED;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OCL_Include);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>tanrt$(PlatformArchitecture).lib;version.lib;OpenCL.lib;nafxcwd.lib;LIBCMTD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>nafxcwd.lib;LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OCL_Lib_X64)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(TAN_ROOT)\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -85,10 +89,10 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RTQ_ENABLED;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OCL_Include);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -97,8 +101,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>tanrt$(PlatformArchitecture).lib;version.lib;OpenCL.lib;nafxcw.lib;LIBCMT.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>nafxcw.lib;LIBCMT.lib</IgnoreSpecificDefaultLibraries>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OCL_Lib_X64)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -121,12 +124,17 @@
     <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Variant.h" />
     <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Version.h" />
     <ClInclude Include="..\..\..\..\public\include\TrueAudioNext.h" />
+    <ClInclude Include="..\..\..\src\common\cpucaps.h" />
     <ClInclude Include="..\..\..\src\common\fifo.h" />
     <ClInclude Include="..\..\..\src\common\GpuUtils.h" />
+    <ClInclude Include="..\..\..\src\common\maxlimits.h" />
     <ClInclude Include="..\..\..\src\common\SimpleVRaudio.h" />
     <ClInclude Include="..\..\..\src\common\WASAPIUtils.h" />
     <ClInclude Include="..\..\..\src\common\wav.h" />
-    <ClInclude Include="..\..\..\src\RoomAcoustics\maxlimits.h" />
+    <ClInclude Include="..\..\..\src\RoomAcoustics\AudioVR.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\..\..\src\RoomAcoustics\Resource.h" />
     <ClInclude Include="..\..\..\src\RoomAcoustics\RoomAcoustics.h" />
     <ClInclude Include="..\..\..\src\RoomAcoustics\RoomAcousticsDlg.h" />
@@ -142,6 +150,10 @@
     <ClCompile Include="..\..\..\src\common\SimpleVRaudio.cpp" />
     <ClCompile Include="..\..\..\src\common\WASAPIUtils.cpp" />
     <ClCompile Include="..\..\..\src\common\wav.cpp" />
+    <ClCompile Include="..\..\..\src\RoomAcoustics\AudioVR.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\RoomAcoustics\RoomAcoustics.cpp" />
     <ClCompile Include="..\..\..\src\RoomAcoustics\RoomAcousticsDlg.cpp" />
     <ClCompile Include="..\..\..\src\RoomAcoustics\RoomWindow.cpp" />
@@ -149,9 +161,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\src\RoomAcoustics\RoomAcoustics.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Media Include="..\..\..\src\RoomAcoustics\RoomAcousticsRun.wav" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\src\RoomAcoustics\res\RoomAcoustics.ico" />

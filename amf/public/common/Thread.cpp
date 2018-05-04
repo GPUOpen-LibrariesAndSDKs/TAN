@@ -3,7 +3,7 @@
 // any Intellectual Property Rights relating to any standards, including but not
 // limited to any audio and/or video codec technologies such as MPEG-2, MPEG-4;
 // AVC/H.264; HEVC/H.265; AAC decode/FFMPEG; AAC encode/FFMPEG; VC-1; and MP3
-// (collectively, the “Media Technologies”). For clarity, you will pay any
+// (collectively, the "Media Technologies"). For clarity, you will pay any
 // royalties due for such third party technologies, which may include the Media
 // Technologies that are owed as a result of AMD providing the Software to you.
 // 
@@ -431,7 +431,12 @@ namespace amf
         {
             return true;
         }
+
+#ifdef WIN32
+        return(WaitForSingleObject((HANDLE)m_pThread, INFINITE));
+#else
         return m_StopEvent.Lock();
+#endif
     }
     //----------------------------------------------------------------------------
     bool AMFThreadObj::StopRequested()
@@ -460,6 +465,7 @@ namespace amf
             virtual bool RequestStop();
             virtual bool WaitForStop();
             virtual bool StopRequested();
+            virtual bool IsRunning();
 
             // this is executed in the thread and overloaded by implementor
             virtual void Run() { m_pOwner->Run(); }
@@ -530,6 +536,11 @@ namespace amf
         bool bRet = m_bStopRequested;
         pthread_mutex_unlock(&m_hMutex);
         return bRet;
+    }
+
+    bool AMFThreadObj::IsRunning()
+    {
+        return m_hThread != (uintptr_t)0L;
     }
 
     void ExitThread()

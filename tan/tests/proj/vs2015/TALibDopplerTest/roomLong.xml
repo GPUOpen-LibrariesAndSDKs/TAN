@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- This document was created by AMD RoomAcousticsDemo v1.0.2 on 2016/10/21 15:01:48 -->
+<RoomAcoustics>
+<!-- All dimensions in meters, damping in decibels -->
+ <Source>
+ <streamS1  on="0" file="C:\Users\gpark\Music\engine_1.wav" />
+  <microphone enableMic="0" trackHeadPos="0" muteDirectPath="0" />
+  <positionS1 X="4.000000" Y="1.0000" Z="1.000000"  />
+ </Source>
+
+ <Listener>
+  <positionL1 X="7.000000" Y="1.750000" Z="50.000000" yaw="-90.000000" pitch="0.000000" roll="0.000000" />
+  <earSpacing S="0.160000"/>
+ </Listener>
+ <Room>
+  <dimensions width="100.000000" height="4.000000" length="100.000000" />
+  <damping left="0.200000" right="1.000000" front="1.000000" back="1.000000" top="1.000000" bottom="1.000000"/>
+ <rendering nSources="1" withGPU="0" withRTQ="0" withMPr="0" withCus="0"/>
+ </Room>
+<Convolution>
+ <configuration length="16384" buffersize ="2048" useGPU="0" useRTQ="0" useMPr="0" cuCount="0"/>
+</Convolution>
+</RoomAcoustics>

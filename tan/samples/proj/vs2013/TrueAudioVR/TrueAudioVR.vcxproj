@@ -15,7 +15,11 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>TrueAudioVR</RootNamespace>
   </PropertyGroup>
+  <PropertyGroup Label="UserMacros">
+    <TAN_ROOT>$(ProjectDir)..\..\..\..</TAN_ROOT>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(TAN_ROOT)\build\solution\TAN.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -41,19 +45,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\bin\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)..\..\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(TAN_ROOT)\bin\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IntDir>$(TAN_ROOT)\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
-    <LibraryPath>$(AMDAPPSDKROOT)\lib\x86_64;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(AMDAPPSDKROOT)include;$(SolutionDir)../../;$(SolutionDir)../../../AMF/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OCL_Lib_X64);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(TAN_ROOT)\;$(TAN_ROOT)\..\AMF\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\bin\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)..\..\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(TAN_ROOT)\bin\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IntDir>$(TAN_ROOT)\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
-    <LibraryPath>$(AMDAPPSDKROOT)\lib\x86_64;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(AMDAPPSDKROOT)include;$(SolutionDir)../../;$(SolutionDir)../../../AMF/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OCL_Lib_X64);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(TAN_ROOT)\;$(TAN_ROOT)\..\AMF\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -61,15 +65,16 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>TAN_SDK_EXPORTS;WIN32;_WINDOWS;_USRDLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RTQ_ENABLED;TAN_SDK_EXPORTS;WIN32;_WINDOWS;_USRDLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OCL_ROOT)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>$(TAN_ROOT)\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(OCL_Lib_X64)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -80,9 +85,9 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>TAN_SDK_EXPORTS;WIN32;_WINDOWS;_USRDLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RTQ_ENABLED;TAN_SDK_EXPORTS;WIN32;_WINDOWS;_USRDLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OCL_ROOT)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -90,7 +95,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>$(SolutionDir)..\..\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>$(TAN_ROOT)\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(OCL_Lib_X64)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -136,19 +142,19 @@
   <ItemGroup>
     <CustomBuild Include="..\..\..\src\TrueAudioVR\Kernels\Fill.cl">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(TAN_ROOT)\..\Thirdparty\file_to_header\file_to_header.exe" "%(FullPath)" %(Filename)</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(FullPath).h</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(TAN_ROOT)\..\Thirdparty\file_to_header\file_to_header.exe" "%(FullPath)" %(Filename)</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(FullPath).h</Outputs>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\TrueAudioVR\Kernels\GenerateRoomResponse.cl">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(TAN_ROOT)\..\Thirdparty\file_to_header\file_to_header.exe" "%(FullPath)" %(Filename)</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(FullPath).h</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)../../../Thirdparty/file_to_header/file_to_header.exe" "%(FullPath)" %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(TAN_ROOT)\..\Thirdparty\file_to_header\file_to_header.exe" "%(FullPath)" %(Filename)</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building binary resource header for %(Filename)%(Extension)...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(FullPath).h</Outputs>
     </CustomBuild>

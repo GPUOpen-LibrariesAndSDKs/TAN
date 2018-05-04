@@ -33,17 +33,19 @@
 __kernel
 void amdPadFFTBlock(__global const float * in,
 				__global float * out,
-				int inOffset,
+				__global const int * inOffset,
 				int inLength,
-				int outOffset,
+				__global const int * outOffset,
 				int outLength,
 				int blockLength,
-				int padLength)  {
+				int padLength, 
+				int channelCount)  {
 	int glbl_id = get_global_id(0);
-
+	int chnl_id = get_global_id(1);
+	if(chnl_id >= channelCount){ return; }
 	int blockNumber = (glbl_id) / (blockLength + padLength);
-	int inIndex = ((glbl_id + inOffset - blockNumber * padLength) % inLength);
-	int outIndex = ((glbl_id + outOffset) % outLength);
+	int inIndex = ((glbl_id + inOffset[chnl_id] - blockNumber * padLength) % inLength);
+	int outIndex = ((glbl_id + outOffset[chnl_id]) % outLength);
 
 	bool isPad = (glbl_id % (blockLength + padLength)) >= blockLength;
 	
@@ -850,7 +852,7 @@ void amdFHTConvHead1(__global const char * in, // pipelone input
 		{
 			*(__local float*)&data[i<<2] = Hist[i + hist_off];
 		}
-
+		barrier(CLK_LOCAL_MEM_FENCE);
 	}
 /*----------------------------------------------------------------------------------------------
  CMAD

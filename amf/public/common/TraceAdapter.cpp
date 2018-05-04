@@ -3,7 +3,7 @@
 // any Intellectual Property Rights relating to any standards, including but not
 // limited to any audio and/or video codec technologies such as MPEG-2, MPEG-4;
 // AVC/H.264; HEVC/H.265; AAC decode/FFMPEG; AAC encode/FFMPEG; VC-1; and MP3
-// (collectively, the “Media Technologies”). For clarity, you will pay any
+// (collectively, the "Media Technologies"). For clarity, you will pay any
 // royalties due for such third party technologies, which may include the Media
 // Technologies that are owed as a result of AMD providing the Software to you.
 // 
@@ -204,19 +204,19 @@ amf_int32 AMF_CDECL_CALL amf::AMFTraceGetWriterLevelForScope(const wchar_t* writ
 //------------------------------------------------------------------------------------------------
 void AMF_CDECL_CALL amf::AMFTraceRegisterWriter(const wchar_t* writerID, AMFTraceWriter* pWriter)
 {
-    return GetTrace()->RegisterWriter(writerID, pWriter, true);
+    GetTrace()->RegisterWriter(writerID, pWriter, true);
 }
 
 void AMF_CDECL_CALL amf::AMFTraceUnregisterWriter(const wchar_t* writerID)
 {
-    return GetTrace()->UnregisterWriter(writerID);
+    GetTrace()->UnregisterWriter(writerID);
 }
 
 static amf_map<amf_uint32, amf_uint32> s_threadDepth;
 
 void AMF_CDECL_CALL amf::AMFTraceEnterScope()
 {
-    return GetTrace()->Indent(1);
+    GetTrace()->Indent(1);
 }
 
 amf_uint32 AMF_CDECL_CALL AMFTraceGetScopeDepth()
@@ -226,7 +226,7 @@ amf_uint32 AMF_CDECL_CALL AMFTraceGetScopeDepth()
 
 void AMF_CDECL_CALL amf::AMFTraceExitScope()
 {
-    return GetTrace()->Indent(-1);
+    GetTrace()->Indent(-1);
 }
 
 void AMF_CDECL_CALL  amf::AMFAssertsEnable(bool enable)

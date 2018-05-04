@@ -1,0 +1,361 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{0d936e7c-b5f1-44ec-8990-4021f3aa797f}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{5050c64c-07e8-4cd4-a9ae-0d4cca5eb852}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{696c25ca-f33d-446d-97db-bc05ec58be0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf">
+      <UniqueIdentifier>{da9158a9-b8f0-4129-8302-95603425e03f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public">
+      <UniqueIdentifier>{0959565b-c4ff-4c2d-9d38-e459510b5492}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\common">
+      <UniqueIdentifier>{34555bd2-8089-4f9f-9f33-c53c7b369048}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\include">
+      <UniqueIdentifier>{0fe76b74-17fb-4162-bce8-b610f560d97c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\common\Windows">
+      <UniqueIdentifier>{7f2b5403-29cb-432d-af12-f75fc96e7425}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amf\public\include\core">
+      <UniqueIdentifier>{5a324cb1-2f1c-4d68-a006-9074d3190561}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QT Objects">
+      <UniqueIdentifier>{37994737-c293-4b35-8789-25b540b2c754}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QT Objects\Header">
+      <UniqueIdentifier>{f9076afc-115f-45d1-ad0c-929262d2c8fc}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="QT Objects\Source">
+      <UniqueIdentifier>{75c117f1-53ee-43d3-a7ad-5e5e772b5c4e}</UniqueIdentifier>
+      <Extensions>cpp</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\AMFFactory.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\AMFSTL.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\DataStreamFactory.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\DataStreamFile.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\DataStreamMemory.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\IOCapsImpl.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\PropertyStorageExImpl.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\Thread.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\TraceAdapter.cpp">
+      <Filter>amf\public\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\Windows\ThreadWindows.cpp">
+      <Filter>amf\public\common\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\fifo.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\GpuUtils.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\SimpleVRaudio.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\utilities.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\WASAPIUtils.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\wav.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\FileUtility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\RegisterBrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\RoomAcoustic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\QTObject\AdvanceGraphicView.cpp">
+      <Filter>QT Objects\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\QTObject\QTRoomAcousticConfig.cpp">
+      <Filter>QT Objects\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\QTObject\QTRoomAcousticGraphic.cpp">
+      <Filter>QT Objects\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\bin\vs2015x64Debug\GeneratedFiles\moc_QTRoomAcousticConfig.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\bin\vs2015x64Debug\GeneratedFiles\moc_QTRoomAcousticGraphic.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\bin\vs2015x64Debug\GeneratedFiles\moc_QTExportResponse.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\bin\vs2015x64Debug\GeneratedFiles\qrc_roomaccousticnew.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\bin\vs2015x64Release\GeneratedFiles\moc_QTRoomAcousticConfig.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\bin\vs2015x64Release\GeneratedFiles\moc_QTRoomAcousticGraphic.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\bin\vs2015x64Release\GeneratedFiles\moc_QTExportResponse.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\bin\vs2015x64Release\GeneratedFiles\qrc_roomaccousticnew.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\QTObject\QTExportResponse.cpp">
+      <Filter>QT Objects\Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\src\RoomAcousticQT\UI\RoomAcousticConfig.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\RoomAcousticQT\QTObject\QTRoomAcousticConfig.h">
+      <Filter>QT Objects\Header</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\RoomAcousticQT\QTObject\QTRoomAcousticGraphic.h">
+      <Filter>QT Objects\Header</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\RoomAcousticQT\QTObject\QTExportResponse.h">
+      <Filter>QT Objects\Header</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\RoomAcousticQT\roomaccousticnew.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\RoomAcousticQT\UI\RoomAcousticConfig_NoRTQ.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\RoomAcousticQT\UI\ExportResponse.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\AMFFactory.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\AMFSTL.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\ByteArray.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\DataStream.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\DataStreamFile.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\DataStreamMemory.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\InterfaceImpl.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\IOCapsImpl.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\ObservableImpl.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\PropertyStorageExImpl.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\PropertyStorageImpl.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\Thread.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\TraceAdapter.h">
+      <Filter>amf\public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\AudioBuffer.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Buffer.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Compute.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\ComputeFactory.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Context.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Data.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Debug.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Factory.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Interface.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Plane.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Platform.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\PropertyStorage.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\PropertyStorageEx.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Result.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Surface.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Trace.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Variant.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Version.h">
+      <Filter>amf\public\include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\fifo.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\GpuUtils.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\maxlimits.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\SimpleVRaudio.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\utilities.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\WasAPI.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\WASAPIUtils.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\wav.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\FileUtility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\RegisterBrowser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\RoomAcoustic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\QTObject\AdvanceGraphicView.h">
+      <Filter>QT Objects\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\Resources\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\bin\vs2015x64Debug\GeneratedFiles\ui_RoomAcousticConfig.h">
+      <Filter>Generated Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\bin\vs2015x64Debug\GeneratedFiles\ui_RoomAcousticConfig_NoRTQ.h">
+      <Filter>Generated Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\bin\vs2015x64Release\GeneratedFiles\ui_RoomAcousticConfig.h">
+      <Filter>Generated Files\Release</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\bin\vs2015x64Release\GeneratedFiles\ui_RoomAcousticConfig_NoRTQ.h">
+      <Filter>Generated Files\Release</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\bin\vs2015x64Debug\GeneratedFiles\ui_ExportResponse.h">
+      <Filter>Generated Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\bin\vs2015x64Release\GeneratedFiles\ui_ExportResponse.h">
+      <Filter>Generated Files\Release</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\QTObject\QTExportResponse.h">
+      <Filter>QT Objects\Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\RoomAcousticQT\Resources\Resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\src\RoomAcousticQT\Resources\listener.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\src\RoomAcousticQT\Resources\RoomAcousticsNew.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\src\RoomAcousticQT\Resources\speaker.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
