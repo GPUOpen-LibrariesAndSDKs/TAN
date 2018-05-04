@@ -1,0 +1,8 @@
+============================QT Setup Instruction=====================
+
+1. Make sure you download QT 5.6 from QT offline installer from the website (https://www.qt.io/download-open-source/#section-2). There are different installers for QT 5.6, install the one that matches the solution you want to use (Visual Studio 2013 or 2015)
+2- Run the installer. After installation is complete, navigate to the installation path and find the "msvc2015_64" (for VS2015) or "msvc2013_64" (for VS2013) folder under the "5.6" folder and copy it to the \thirdparty\QT5.6\ folder. After the copying done there should be the following directory structure in the thirdparty folder:
+
+\thirdparty\QT5.6\msvc2015_64\...
+or 
+\thirdparty\QT5.6\msvc2013_64\...

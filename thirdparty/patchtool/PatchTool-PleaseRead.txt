@@ -1,0 +1,1 @@
+1- Patch tool binaries need to be downloaded as a zipped file from the GNU website (http://gnuwin32.sourceforge.net/packages/patch.htm) and be unzipped inside the thirdpart/patchtool folder. Currently, a copy of the binaries has been provided with the TrueAudioNext package and has been placed in the thirspart/patchtool folder.
