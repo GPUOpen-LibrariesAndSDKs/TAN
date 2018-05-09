@@ -1,6 +1,6 @@
 # TrueAudio Next (TAN) SDK
 
-AMD TrueAudio Next is a software development kit for GPU accelerated audio signal processing. As part of the LiquidVR technology initiative aimed at enabling a fully immersive and comfortable virtual reality experience, TrueAudio Next enables full real-time dynamic physics-based audio acoustics rendering.
+AMD TrueAudio Next is a software development kit for GPU accelerated and multi-core audio signal processing. TrueAudio Next provides pre-optimized library functions for computationally expensive algorithms such as time-varying audio convolution, FFT/FHT, and audio-oriented vector math. The SDK also provides GPU utilities functions that support AMD GPU Resource Reservation, a technology that allows audio to share resources on the GPU with graphics while minimizing impact to quality-of-service.
 
 <div>
   <a href="https://github.com/GPUOpen-LibrariesAndSDKs/TAN/releases/latest/"><img src="http://gpuopen-librariesandsdks.github.io/media/latest-release-button.svg" alt="Latest release" title="Latest release"></a>
