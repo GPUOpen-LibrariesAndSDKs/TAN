@@ -8,7 +8,7 @@ AMD TrueAudio Next is a software development kit for GPU accelerated audio signa
 
 ### Prerequisites
 * Windows&reg; 7 (SP1 with the [Platform Update](https://msdn.microsoft.com/en-us/library/windows/desktop/jj863687.aspx)), Windows&reg; 8.1, or Windows&reg; 10
-* Visual Studio&reg; 2013
+* Visual Studio&reg; 2013 or 2015
 * AMD Radeon Software Crimson Edition 16.7.3 (16.30.2311) or newer
 
 ### Getting Started
