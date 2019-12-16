@@ -1,0 +1,38 @@
+# This is currently a windows-only project. Force CRLF.
+* text=auto
+
+# Explicit settings for specific file types.
+*.h         text
+*.hpp       text
+*.c         text
+*.cpp       text
+*.inl       text
+*.hlsl      text
+*.patch     text
+*.cl        text
+*.rc        text
+*.rc2       text
+*.manifest  text
+*.vcxproj   text
+*.filters   text
+*.props     text
+*.sln       text
+*.bat       text
+*.txt       text
+*.lua       text
+*.xml       text
+*.md        text
+*.pdf       binary
+*.ppsx      binary
+*.ico       binary
+*.png       binary
+*.bmp       binary
+*.jpg       binary
+*.dds       binary
+*.DDS       binary
+*.sdkmesh   binary
+*.lib       binary
+*.dll       binary
+*.exe       binary
+*.zip       binary
+*.wav       binary

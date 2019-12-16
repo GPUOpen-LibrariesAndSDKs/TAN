@@ -1,0 +1,286 @@
+41c41
+<     #define VALIDATE(x, msg) if (!(x)) { MessageBoxA(NULL, (msg), "OculusRoomTiny", MB_ICONERROR | MB_OK); exit(-1); }
+---
+>     #define VALIDATE(x, msg) if (!(x)) { MessageBoxA(nullptr, (msg), "OculusRoomTiny", MB_ICONERROR | MB_OK); exit(-1); }
+45c45
+< #define FATALERROR(msg) { MessageBoxA(NULL, (msg), "OculusRoomTiny", MB_ICONERROR | MB_OK); exit(-1); }
+---
+>     #define FATALERROR(msg) { MessageBoxA(nullptr, (msg), "OculusRoomTiny", MB_ICONERROR | MB_OK); exit(-1); }
+48,49d47
+< #define ARGB(a,r,g,b)       ((COLORREF)((((BYTE)(b)|((WORD)((BYTE)(g))<<8))|(((DWORD)(BYTE)(r))<<16))|(((DWORD)(BYTE)(a))<<24)))
+< 
+79,80c77,78
+<         Device->CreateTexture2D(&dsDesc, NULL, &Tex);
+<         Device->CreateDepthStencilView(Tex, NULL, &TexDsv);
+---
+>         Device->CreateTexture2D(&dsDesc, nullptr, &Tex);
+>         Device->CreateDepthStencilView(Tex, nullptr, &TexDsv);
+105c103
+<         Device->CreateBuffer(&desc, buffer ? &sr : NULL, &D3DBuffer);
+---
+>         Device->CreateBuffer(&desc, buffer ? &sr : nullptr, &D3DBuffer);
+266c264
+<         hr = Device->CreateRenderTargetView(BackBuffer, NULL, &BackBufferRT);
+---
+>         hr = Device->CreateRenderTargetView(BackBuffer, nullptr, &BackBufferRT);
+274c272
+<         UniformBufferGen = new DataBuffer(Device, D3D11_BIND_CONSTANT_BUFFER, NULL, UNIFORM_DATA_SIZE);
+---
+>         UniformBufferGen = new DataBuffer(Device, D3D11_BIND_CONSTANT_BUFFER, nullptr, UNIFORM_DATA_SIZE);
+308c306
+<         while (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+---
+>         while (PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
+343c341
+<             SwapChain->SetFullscreenState(FALSE, NULL);
+---
+>             SwapChain->SetFullscreenState(FALSE, nullptr);
+388,389c386,387
+<         DIRECTX.Device->CreateTexture2D(&dsDesc, NULL, &Tex);
+<         DIRECTX.Device->CreateShaderResourceView(Tex, NULL, &TexSv);
+---
+>         DIRECTX.Device->CreateTexture2D(&dsDesc, nullptr, &Tex);
+>         DIRECTX.Device->CreateShaderResourceView(Tex, nullptr, &TexSv);
+391c389
+<         if (rendertarget) DIRECTX.Device->CreateRenderTargetView(Tex, NULL, &TexRtv);
+---
+>         if (rendertarget) DIRECTX.Device->CreateRenderTargetView(Tex, nullptr, &TexRtv);
+416c414
+<             DIRECTX.Context->UpdateSubresource(Tex, level, NULL, (unsigned char *)pix, sizeW * 4, sizeH * sizeW * 4);
+---
+>             DIRECTX.Context->UpdateSubresource(Tex, level, nullptr, (unsigned char *)pix, sizeW * 4, sizeH * sizeW * 4);
+485,486c483,484
+<     Material(Texture * t, uint32_t flags = MAT_WRAP | MAT_TRANS, D3D11_INPUT_ELEMENT_DESC * vertexDesc = NULL, int numVertexDesc = 3,
+<         char* vertexShader = NULL, char* pixelShader = NULL, int vSize = 24) : Tex(t), VertexSize(vSize)
+---
+>     Material(Texture * t, uint32_t flags = MAT_WRAP | MAT_TRANS, D3D11_INPUT_ELEMENT_DESC * vertexDesc = nullptr, int numVertexDesc = 3,
+>         char* vertexShader = nullptr, char* pixelShader = nullptr, int vSize = 24) : Tex(t), VertexSize(vSize)
+535c533
+<             MessageBoxA(NULL, (char *)errorBlob->GetBufferPointer(), "Error compiling vertex shader", MB_OK);
+---
+>             MessageBoxA(nullptr, (char *)errorBlob->GetBufferPointer(), "Error compiling vertex shader", MB_OK);
+538c536
+<         DIRECTX.Device->CreateVertexShader(blobData->GetBufferPointer(), blobData->GetBufferSize(), NULL, &VertexShader);
+---
+>         DIRECTX.Device->CreateVertexShader(blobData->GetBufferPointer(), blobData->GetBufferSize(), nullptr, &VertexShader);
+549c547
+<             MessageBoxA(NULL, (char *)errorBlob->GetBufferPointer(), "Error compiling vertex shader", MB_OK);
+---
+>             MessageBoxA(nullptr, (char *)errorBlob->GetBufferPointer(), "Error compiling vertex shader", MB_OK);
+552c550
+<         DIRECTX.Device->CreateVertexShader(blobData->GetBufferPointer(), blobData->GetBufferSize(), NULL, &VertexShaderInstanced);
+---
+>         DIRECTX.Device->CreateVertexShader(blobData->GetBufferPointer(), blobData->GetBufferSize(), nullptr, &VertexShaderInstanced);
+557c555
+<         DIRECTX.Device->CreatePixelShader(blobData->GetBufferPointer(), blobData->GetBufferSize(), NULL, &PixelShader);
+---
+>         DIRECTX.Device->CreatePixelShader(blobData->GetBufferPointer(), blobData->GetBufferSize(), nullptr, &PixelShader);
+684,726d681
+< 
+< 
+<     void AddMultiColorBox(float x1, float y1, float z1, float x2, float y2, float z2, DWORD c[6])
+<     {
+<         const struct {
+<             XMFLOAT3 pos;
+<             float u, v;
+<         } Vert[] =
+<         {
+<             { XMFLOAT3(x1, y2, z1), z1, x1 },
+<             { XMFLOAT3(x2, y2, z1), z1, x2 },
+<             { XMFLOAT3(x1, y2, z2), z2, x1 },
+<             { XMFLOAT3(x2, y2, z2), z2, x2 },
+<             { XMFLOAT3(x2, y1, z1), z1, x2 },
+<             { XMFLOAT3(x1, y1, z1), z1, x1 },
+<             { XMFLOAT3(x2, y1, z2), z2, x2 },
+<             { XMFLOAT3(x1, y1, z2), z2, x1 },
+<             { XMFLOAT3(x1, y1, z2), z2, y1 },
+<             { XMFLOAT3(x1, y1, z1), z1, y1 },
+<             { XMFLOAT3(x1, y2, z2), z2, y2 },
+<             { XMFLOAT3(x1, y2, z1), z1, y2 },
+<             { XMFLOAT3(x2, y1, z1), z1, y1 },
+<             { XMFLOAT3(x2, y1, z2), z2, y1 },
+<             { XMFLOAT3(x2, y2, z1), z1, y2 },
+<             { XMFLOAT3(x2, y2, z2), z2, y2 },
+<             { XMFLOAT3(x1, y1, z1), x1, y1 },
+<             { XMFLOAT3(x2, y1, z1), x2, y1 },
+<             { XMFLOAT3(x1, y2, z1), x1, y2 },
+<             { XMFLOAT3(x2, y2, z1), x2, y2 },
+<             { XMFLOAT3(x2, y1, z2), x2, y1 },
+<             { XMFLOAT3(x1, y1, z2), x1, y1 },
+<             { XMFLOAT3(x2, y2, z2), x2, y2 },
+<             { XMFLOAT3(x1, y2, z2), x1, y2 },
+<         };
+<         for (int v = 0; v < 24; v += 4)
+<         {
+<             AddQuad(Vertex(Vert[v + 0].pos, c[v / 4], Vert[v + 0].u, Vert[v + 0].v),
+<                 Vertex(Vert[v + 1].pos, c[v / 4], Vert[v + 1].u, Vert[v + 1].v),
+<                 Vertex(Vert[v + 2].pos, c[v / 4], Vert[v + 2].u, Vert[v + 2].v),
+<                 Vertex(Vert[v + 3].pos, c[v / 4], Vert[v + 3].u, Vert[v + 3].v));
+<         }
+<     }
+< 
+789,790c744,745
+<         DIRECTX.Context->VSSetShader(Fill->VertexShader, NULL, 0);
+<         DIRECTX.Context->PSSetShader(Fill->PixelShader, NULL, 0);
+---
+>         DIRECTX.Context->VSSetShader(Fill->VertexShader, nullptr, 0);
+>         DIRECTX.Context->PSSetShader(Fill->PixelShader, nullptr, 0);
+794c749
+<         DIRECTX.Context->OMSetBlendState(Fill->BlendState, NULL, 0xffffffff);
+---
+>         DIRECTX.Context->OMSetBlendState(Fill->BlendState, nullptr, 0xffffffff);
+826,827c781,782
+<         DIRECTX.Context->VSSetShader(Fill->VertexShaderInstanced, NULL, 0);
+<         DIRECTX.Context->PSSetShader(Fill->PixelShader, NULL, 0);
+---
+>         DIRECTX.Context->VSSetShader(Fill->VertexShaderInstanced, nullptr, 0);
+>         DIRECTX.Context->PSSetShader(Fill->PixelShader, nullptr, 0);
+831c786
+<         DIRECTX.Context->OMSetBlendState(Fill->BlendState, NULL, 0xffffffff);
+---
+>         DIRECTX.Context->OMSetBlendState(Fill->BlendState, nullptr, 0xffffffff);
+867,877d821
+<         //TriangleSet cube;
+<         //cube.AddSolidColorBox(0.5f, -0.5f, 0.5f, -0.5f, 0.5f, -0.5f, 0xff404040);
+<         //Add(
+<         //    new Model(&cube, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1),
+<         //        new Material(
+<         //            new Texture(false, 256, 256, Texture::AUTO_CEILING)
+<         //        )
+<         //    )
+<         //);
+< 
+<         // Moving box
+879,884c823
+<         DWORD boxColors[6] = {
+<             ARGB(0xff, 150, 64, 64), ARGB(0xff, 64, 150, 64), ARGB(0xff, 64, 64, 150),
+<             ARGB(0xff, 150, 64, 150), ARGB(0xff, 150, 150, 64), ARGB(0xff, 64, 150, 150)
+<         };
+<         cube.AddMultiColorBox(0, 0, 0, +1.0f, +1.0f, 1.0f, boxColors);
+<         //Model[0]
+---
+>         cube.AddSolidColorBox(0.5f, -0.5f, 0.5f, -0.5f, 0.5f, -0.5f, 0xff404040);
+888,930c827
+<                     new Texture(false, 256, 256, Texture::AUTO_WHITE)
+<                         )
+<                 )
+<             );
+< 
+<         // Hammer
+<         TriangleSet hammer;
+<         DWORD box2Colors[6] = {
+<             CMYK(0xff, 40, 32, 32), CMYK(0xff, 40, 32, 32), CMYK(0xff, 40, 32, 32),
+<             CMYK(0xff, 40, 32, 32), CMYK(0xff, 40, 32, 32), CMYK(0xff, 40, 32, 32)
+<         };
+<         hammer.AddMultiColorBox(0, 0, 0, +1.0f, +4.0f, 1.0f, box2Colors);
+<         //Model[1]
+<         Add(
+<             new Model(&hammer, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1),
+<                 new Material(
+<                     new Texture(false, 256, 256, Texture::AUTO_WHITE)
+<                     )
+<                 )
+<             );
+< 
+<         // Anvil
+<         TriangleSet anvil;
+<         anvil.AddMultiColorBox(0, -3.0, 0, +1.0f, +1.0f, 1.0f, box2Colors);
+<         //Model[2]
+<         Add(
+<             new Model(&anvil, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1),
+<                 new Material(
+<                     new Texture(false, 256, 256, Texture::AUTO_WHITE)
+<                     )
+<                 )
+<             );
+< 
+<         // Radio
+<         TriangleSet radio;
+<         radio.AddSolidColorBox(0.0, 0.0, 0.0, .33f, .54f, .87f, CMYK(0xff, 80, 32, 32));  // Left Wall
+<         radio.AddSolidColorBox(0.05f, 0.05f, 0.05f, .34f, .49f, .82f, CMYK(0xff, 80, 80, 60)); // Back Wall
+<         //Model[3]
+<         Add(
+<             new Model(&radio, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1),
+<                 new Material(
+<                     new Texture(false, 256, 256, Texture::AUTO_WHITE)
+<                     )
+---
+>                     new Texture(false, 256, 256, Texture::AUTO_CEILING)
+932,933c829,830
+<             );
+< 
+---
+>             )
+>         );
+937d833
+<         //Model[4]
+950d845
+<         //Model[5]
+964d858
+<             //Model[6]
+977c871
+<         Add( // Model[6] 
+---
+>         Add(
+987c881
+<         Add( //Model[7]
+---
+>         Add(
+1006,1017c900,910
+<         furniture.AddSolidColorBox(-1.8f, 0.8f, 1.0f, 0.0f, 0.7f, 0.0f, 0xff505000);  // Table
+<         furniture.AddSolidColorBox(-1.8f, 0.0f, 0.0f, -1.7f, 0.7f, 0.1f, 0xff505000); // Table Leg 
+<         furniture.AddSolidColorBox(-1.8f, 0.7f, 1.0f, -1.7f, 0.0f, 0.9f, 0xff505000); // Table Leg 
+<         furniture.AddSolidColorBox(0.0f, 0.0f, 1.0f, -0.1f, 0.7f, 0.9f, 0xff505000);  // Table Leg 
+<         furniture.AddSolidColorBox(0.0f, 0.7f, 0.0f, -0.1f, 0.0f, 0.1f, 0xff505000);  // Table Leg 
+< 
+<         furniture.AddSolidColorBox(-1.4f, 0.5f, -1.1f, -0.8f, 0.55f, -0.5f, 0xff202050);  // Chair Set
+<         furniture.AddSolidColorBox(-1.401f, 0.0f, -1.101f, -1.339f, 1.0f, -1.039f, 0xff202050); // Chair Leg 1
+<         furniture.AddSolidColorBox(-1.401f, 0.5f, -0.499f, -1.339f, 0.0f, -0.561f, 0xff202050); // Chair Leg 2
+<         furniture.AddSolidColorBox(-0.799f, 0.0f, -0.499f, -0.861f, 0.5f, -0.561f, 0xff202050); // Chair Leg 2
+<         furniture.AddSolidColorBox(-0.799f, 1.0f, -1.101f, -0.861f, 0.0f, -1.039f, 0xff202050); // Chair Leg 2
+<         furniture.AddSolidColorBox(-1.4f, 0.97f, -1.05f, -0.8f, 0.92f, -1.10f, 0xff202050); // Chair Back high bar
+---
+>         furniture.AddSolidColorBox(1.8f, 0.8f, -1.0f, 0.0f, 0.7f, 0.0f, 0xff505000);  // Table
+>         furniture.AddSolidColorBox(1.8f, 0.0f, 0.0f, 1.7f, 0.7f, -0.1f, 0xff505000); // Table Leg 
+>         furniture.AddSolidColorBox(1.8f, 0.7f, -1.0f, 1.7f, 0.0f, -0.9f, 0xff505000); // Table Leg 
+>         furniture.AddSolidColorBox(0.0f, 0.0f, -1.0f, 0.1f, 0.7f, -0.9f, 0xff505000);  // Table Leg 
+>         furniture.AddSolidColorBox(0.0f, 0.7f, 0.0f, 0.1f, 0.0f, -0.1f, 0xff505000);  // Table Leg 
+>         furniture.AddSolidColorBox(1.4f, 0.5f, 1.1f, 0.8f, 0.55f, 0.5f, 0xff202050);  // Chair Set
+>         furniture.AddSolidColorBox(1.401f, 0.0f, 1.101f, 1.339f, 1.0f, 1.039f, 0xff202050); // Chair Leg 1
+>         furniture.AddSolidColorBox(1.401f, 0.5f, 0.499f, 1.339f, 0.0f, 0.561f, 0xff202050); // Chair Leg 2
+>         furniture.AddSolidColorBox(0.799f, 0.0f, 0.499f, 0.861f, 0.5f, 0.561f, 0xff202050); // Chair Leg 2
+>         furniture.AddSolidColorBox(0.799f, 1.0f, 1.101f, 0.861f, 0.0f, 1.039f, 0xff202050); // Chair Leg 2
+>         furniture.AddSolidColorBox(1.4f, 0.97f, 1.05f, 0.8f, 0.92f, 1.10f, 0xff202050); // Chair Back high bar
+1020c913
+<         Add( //Model[8]
+---
+>         Add(
+1027,1054d919
+< 
+<         TriangleSet arrow;
+<         Vertex exvs[8] = { 
+<             // arrow head
+<             Vertex(XMFLOAT3(0.5f, 0.5f, 0.0f),  ARGB(100, 200, 10, 10),   0.5, 0.0),
+<             Vertex(XMFLOAT3(-0.5f, 0.5f, 0.0f), ARGB(100, 200, 10, 10),  -0.5, 0.0),
+<             Vertex(XMFLOAT3(0.01f, 0.5f, -1.0f), ARGB(100, 200, 10, 10),-0.01, -1.0),
+<             Vertex(XMFLOAT3(-0.01f, 0.5f, -1.0f), ARGB(100, 200, 10, 10),  0.01, -1.0),
+<             // arrow tail
+<             Vertex(XMFLOAT3(0.5f, 0.5f, .75f), ARGB(100, 200, 10, 10), 0.5, 0.0),
+<             Vertex(XMFLOAT3(-0.5f, 0.5f, .75f), ARGB(100, 200, 10, 10), -0.5, 0.0),
+<             Vertex(XMFLOAT3(0.375f, 0.5f, 0.0f), ARGB(100, 200, 10, 10), -0.01, -1.0),
+<             Vertex(XMFLOAT3(-0.375f, 0.5f, 0.0f), ARGB(100, 200, 10, 10), 0.01, -1.0),
+< 
+<         };
+<         arrow.AddQuad(exvs[0], exvs[1], exvs[2], exvs[3]);
+<         arrow.AddQuad(exvs[4], exvs[5], exvs[6], exvs[7]);
+< 
+< 
+<         Add( //Model[9]
+<             new Model(&arrow, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1),
+<             new Material(
+<             new Texture(false, 256, 256, Texture::AUTO_WHITE)
+<             )
+<             )
+<             ); // Arrow
+< 
+< 

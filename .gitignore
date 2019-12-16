@@ -1,0 +1,13 @@
+*CLKernel_*.h
+/.vscode/c_cpp_properties.json
+/.vscode/settings.json
+/.vscode/tasks.json
+/tan/build/cmake/linux
+/tan/build/cmake/mac
+/tan/build/cmake/mac-xcode
+/tan/build/cmake/mac-gnumake
+/tan/build/cmake/vs2015
+/tan/build/cmake/vs2017
+/thirdparty/portaudio/*
+/thirdparty/OpenCL-Headers/*
+.DS_Store

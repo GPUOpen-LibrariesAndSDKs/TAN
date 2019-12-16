@@ -1,0 +1,5 @@
+============================Oculus Room TAN Setup Instruction=====================
+
+1. Make sure you download OculusSDK 1.17 from Oculust website (https://developer.oculus.com/downloads/package/oculus-sdk-for-windows/1.17.0/) and unzip it to the third party folder(\thirdparty\OculusSDK1.17). Please make sure the folder and its contents are not readonly.
+2. Find and run the PatchOculusRoom.bat in the \tan\samples\src\OculusRoomTAN\ , the script will create the source file for OculusRoomTAN Demo
+3. Start the demo after compiling it by opening the solution file (TAN_Oculus_vs2015.sln) located in \tan\build\solution\.

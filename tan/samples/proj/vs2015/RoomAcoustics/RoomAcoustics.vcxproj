@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{66740C28-2D49-411B-8ECE-6ADD20D8B06C}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Win32Project1</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros">
+    <TAN_ROOT>$(ProjectDir)..\..\..\..</TAN_ROOT>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(TAN_ROOT)\build\solution\TAN.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+    <UseOfMfc>Static</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+    <UseOfMfc>Static</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(TAN_ROOT)\bin\vs2015x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IntDir>$(TAN_ROOT)\bin\obj\vs2015x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
+    <LibraryPath>$(TAN_ROOT)\bin\lib\vs2015x$(PlatformArchitecture)$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(TAN_ROOT)\;$(TAN_ROOT)\..\AMF\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(TAN_ROOT)\bin\vs2015x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IntDir>$(TAN_ROOT)\bin\obj\vs2015x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
+    <LibraryPath>$(TAN_ROOT)\bin\lib\vs2015x$(PlatformArchitecture)$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(TAN_ROOT)\;$(TAN_ROOT)\..\AMF\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>RTQ_ENABLED;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(OCL_Include);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>tanrt$(PlatformArchitecture).lib;version.lib;OpenCL.lib;nafxcwd.lib;LIBCMTD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>nafxcwd.lib;LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>$(OCL_Lib_X64)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(TAN_ROOT)\bin\lib\vs2015x$(PlatformArchitecture)$(Configuration)\$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>RTQ_ENABLED;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(OCL_Include);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>tanrt$(PlatformArchitecture).lib;version.lib;OpenCL.lib;nafxcw.lib;LIBCMT.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>nafxcw.lib;LIBCMT.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>$(OCL_Lib_X64)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\AudioBuffer.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Buffer.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Compute.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\ComputeFactory.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Context.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Data.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Debug.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Factory.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Interface.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Plane.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Platform.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\PropertyStorage.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\PropertyStorageEx.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Result.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Surface.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Trace.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Variant.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Version.h" />
+    <ClInclude Include="..\..\..\..\public\include\TrueAudioNext.h" />
+    <ClInclude Include="..\..\..\src\common\cpucaps.h" />
+    <ClInclude Include="..\..\..\src\common\fifo.h" />
+    <ClInclude Include="..\..\..\src\common\GpuUtils.h" />
+    <ClInclude Include="..\..\..\src\common\maxlimits.h" />
+    <ClInclude Include="..\..\..\src\common\SimpleVRaudio.h" />
+    <ClInclude Include="..\..\..\src\common\WASAPIUtils.h" />
+    <ClInclude Include="..\..\..\src\common\wav.h" />
+    <ClInclude Include="..\..\..\src\RoomAcoustics\AudioVR.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcoustics\Resource.h" />
+    <ClInclude Include="..\..\..\src\RoomAcoustics\RoomAcoustics.h" />
+    <ClInclude Include="..\..\..\src\RoomAcoustics\RoomAcousticsDlg.h" />
+    <ClInclude Include="..\..\..\src\RoomAcoustics\RoomWindow.h" />
+    <ClInclude Include="..\..\..\src\RoomAcoustics\stdafx.h" />
+    <ClInclude Include="..\..\..\src\RoomAcoustics\targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\AMFFactory.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\Windows\ThreadWindows.cpp" />
+    <ClCompile Include="..\..\..\src\common\fifo.cpp" />
+    <ClCompile Include="..\..\..\src\common\GpuUtils.cpp" />
+    <ClCompile Include="..\..\..\src\common\SimpleVRaudio.cpp" />
+    <ClCompile Include="..\..\..\src\common\WASAPIUtils.cpp" />
+    <ClCompile Include="..\..\..\src\common\wav.cpp" />
+    <ClCompile Include="..\..\..\src\RoomAcoustics\AudioVR.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RoomAcoustics\RoomAcoustics.cpp" />
+    <ClCompile Include="..\..\..\src\RoomAcoustics\RoomAcousticsDlg.cpp" />
+    <ClCompile Include="..\..\..\src\RoomAcoustics\RoomWindow.cpp" />
+    <ClCompile Include="..\..\..\src\RoomAcoustics\stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\RoomAcoustics\RoomAcoustics.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\src\RoomAcoustics\res\RoomAcoustics.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\RoomAcoustics\res\RoomAcoustics.rc2" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

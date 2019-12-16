@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B12702AD-ABFB-343A-A199-8E24837244A3}</ProjectGuid>
+    <Keyword>Qt4VSv1.0</Keyword>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros">
+    <TAN_ROOT>$(ProjectDir)..\..\..\..</TAN_ROOT>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(TAN_ROOT)\build\solution\TAN.props" />
+  <Import Project="..\QT_Macros.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(TAN_ROOT)\bin\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName);$(QT_DIR)\include\QtWidgets;$(QT_DIR)\include\QtGui;$(QT_DIR)\include\QtCore;$(QT_DIR)\include;$(TAN_ROOT)\..\AMF\;$(TAN_ROOT)\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\;$(TAN_ROOT)\;..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName);%(AdditionalIncludeDirectories)</IncludePath>
+    <IntDir>$(TAN_ROOT)\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(TAN_ROOT)\..\Thirdparty\QT5.6\msvc2013_64\lib</LibraryPath>
+    <SourcePath>$(SourcePath)</SourcePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(TAN_ROOT)\bin\vs2013x$(PlatformArchitecture)$(Configuration)\</OutDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName);$(QT_DIR)\include\QtWidgets;$(QT_DIR)\include\QtGui;$(QT_DIR)\include\QtCore;$(QT_DIR)\include;$(TAN_ROOT)\..\AMF\;$(TAN_ROOT)\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\;$(TAN_ROOT)\;..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName);%(AdditionalIncludeDirectories)</IncludePath>
+    <IntDir>$(TAN_ROOT)\bin\obj\vs2013x$(PlatformArchitecture)$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(TAN_ROOT)\..\Thirdparty\QT5.6\msvc2013_64\lib</LibraryPath>
+    <SourcePath>$(SourcePath)</SourcePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>RTQ_ENABLED;WIN32;WIN64;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(OCL_Include);..\..\..\src\RoomAcousticQT\GeneratedFiles;.;$(QT_DIR)\include;..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName);$(QT_DIR)\include\QtCore;$(ProjectDir)..\..\..\src\RoomAcousticQT\QTObject;$(QT_DIR)\includeQtWidgets;%(AdditionalIncludeDirectories);$(TAN_ROOT)\;$(TAN_ROOT)\..\AMF\</AdditionalIncludeDirectories>
+      <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(OCL_Lib_X64);$(QT_DIR)\lib;%(AdditionalLibraryDirectories);%(AdditionalLibraryDirectories);$(TAN_ROOT)\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies);tanrt$(PlatformArchitecture).lib;TrueAudioVR.lib;Shlwapi.lib;version.lib;OpenCL.lib</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y "$(QT_DIR)\plugins\platforms" $(OutDir)platforms\
+xcopy /Y "$(QT_DIR)\plugins\imageformats\qicod.dll" $(OutDir)imageformats\
+xcopy /Y "$(QT_DIR)\plugins\imageformats\qjpegd.dll" $(OutDir)imageformats\
+xcopy /Y "$(QT_DIR)\bin\Qt5Cored.dll" "$(OutDir)"
+xcopy /Y "$(QT_DIR)\bin\Qt5Guid.dll" "$(OutDir)"
+xcopy /Y "$(QT_DIR)\bin\Qt5Widgetsd.dll" "$(OutDir)"
+	  </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>RTQ_ENABLED;WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(OCL_Include);..\..\..\src\RoomAcousticQT\GeneratedFiles;.;$(QT_DIR)\include;..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName);$(QT_DIR)\include\QtCore;$(ProjectDir)..\..\..\src\RoomAcousticQT\QTObject;$(QT_DIR)\includeQtWidgets;%(AdditionalIncludeDirectories);$(TAN_ROOT)\;$(TAN_ROOT)\..\AMF\</AdditionalIncludeDirectories>
+      <DebugInformationFormat />
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(OCL_Lib_X64);$(QT_DIR)\lib;%(AdditionalLibraryDirectories);%(AdditionalLibraryDirectories);$(TAN_ROOT)\bin\lib\vs2013x$(PlatformArchitecture)$(Configuration)\</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies);tanrt$(PlatformArchitecture).lib;version.lib;Shlwapi.lib;TrueAudioVR.lib;OpenCL.lib</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y "$(QT_DIR)\plugins\platforms" $(OutDir)platforms\
+xcopy /Y "$(QT_DIR)\plugins\imageformats\qico.dll" $(OutDir)imageformats\
+xcopy /Y "$(QT_DIR)\plugins\imageformats\qjpeg.dll" $(OutDir)imageformats\
+xcopy /Y "$(QT_DIR)\bin\Qt5Core.dll" "$(OutDir)"
+xcopy /Y "$(QT_DIR)\bin\Qt5Gui.dll" "$(OutDir)"
+xcopy /Y "$(QT_DIR)\bin\Qt5Widgets.dll" "$(OutDir)"
+	  </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\AMFFactory.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\AMFSTL.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\DataStreamFactory.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\DataStreamFile.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\DataStreamMemory.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\IOCapsImpl.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\PropertyStorageExImpl.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\Thread.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\TraceAdapter.cpp" />
+    <ClCompile Include="..\..\..\..\..\AMF\public\common\Windows\ThreadWindows.cpp" />
+    <ClCompile Include=".\..\..\..\src\RoomAcousticQT\GeneratedFiles\Debug\moc_QTRoomAcousticConfig.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".\..\..\..\src\RoomAcousticQT\GeneratedFiles\Debug\moc_QTRoomAcousticGraphic.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".\..\..\..\src\RoomAcousticQT\GeneratedFiles\Debug\qrc_roomaccousticnew.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".\..\..\..\src\RoomAcousticQT\GeneratedFiles\Release\moc_QTRoomAcousticConfig.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".\..\..\..\src\RoomAcousticQT\GeneratedFiles\Release\moc_QTRoomAcousticGraphic.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".\..\..\..\src\RoomAcousticQT\GeneratedFiles\Release\qrc_roomaccousticnew.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\fifo.cpp" />
+    <ClCompile Include="..\..\..\src\common\GpuUtils.cpp" />
+    <ClCompile Include="..\..\..\src\common\SimpleVRaudio.cpp" />
+    <ClCompile Include="..\..\..\src\common\utilities.c" />
+    <ClCompile Include="..\..\..\src\common\WASAPIUtils.cpp" />
+    <ClCompile Include="..\..\..\src\common\wav.cpp" />
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\FileUtility.cpp" />
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\main.cpp" />
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\QTObject\AdvanceGraphicView.cpp" />
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\QTObject\QTExportResponse.cpp" />
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\QTObject\QTRoomAcousticConfig.cpp" />
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\QTObject\QTRoomAcousticGraphic.cpp" />
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\RegisterBrowser.cpp" />
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\RoomAcoustic.cpp" />
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\GeneratedFiles\Debug\moc_QTExportResponse.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\RoomAcousticQT\GeneratedFiles\Release\moc_QTExportResponse.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\AMFFactory.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\AMFSTL.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\ByteArray.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\DataStream.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\DataStreamFile.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\DataStreamMemory.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\InterfaceImpl.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\IOCapsImpl.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\ObservableImpl.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\PropertyStorageExImpl.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\PropertyStorageImpl.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\Thread.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\common\TraceAdapter.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\AudioBuffer.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Buffer.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Compute.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\ComputeFactory.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Context.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Data.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Debug.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Factory.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Interface.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Plane.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Platform.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\PropertyStorage.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\PropertyStorageEx.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Result.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Surface.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Trace.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Variant.h" />
+    <ClInclude Include="..\..\..\..\..\AMF\public\include\core\Version.h" />
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\GeneratedFiles\Debug\ui_RoomAcousticConfig.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\GeneratedFiles\Debug\ui_RoomAcousticConfig_NoRTQ.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\GeneratedFiles\Release\ui_RoomAcousticConfig.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\GeneratedFiles\Release\ui_RoomAcousticConfig_NoRTQ.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\fifo.h" />
+    <ClInclude Include="..\..\..\src\common\GpuUtils.h" />
+    <ClInclude Include="..\..\..\src\common\maxlimits.h" />
+    <ClInclude Include="..\..\..\src\common\SimpleVRaudio.h" />
+    <ClInclude Include="..\..\..\src\common\utilities.h" />
+    <ClInclude Include="..\..\..\src\common\WasAPI.h" />
+    <ClInclude Include="..\..\..\src\common\WASAPIUtils.h" />
+    <ClInclude Include="..\..\..\src\common\wav.h" />
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\FileUtility.h" />
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\QTObject\AdvanceGraphicView.h" />
+    <CustomBuild Include="..\..\..\src\RoomAcousticQT\QTObject\QTRoomAcousticConfig.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QT_DIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing %(Filename)%(Extension) ...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QT_DIR)\bin\moc.exe"  "%(FullPath)" -o "..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)" "-I." "-I$(QT_DIR)\include" "-I$(QT_DIR)\include\QtCore" "-I$(ProjectDir)..\..\..\src\RoomAcousticQT\QTObject" "-I$(QT_DIR)\includeQtWidgets" "-I$(INHERIT)\." "-I$(OCL_Include)" "-I$(TAN_ROOT)\" "-I$(TAN_ROOT)\..\AMF"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QT_DIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing %(Filename)%(Extension) ...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QT_DIR)\bin\moc.exe"  "%(FullPath)" -o "..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB  "-I..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)" "-I." "-I$(QT_DIR)\include" "-I$(QT_DIR)\include\QtCore" "-I$(ProjectDir)..\..\..\src\RoomAcousticQT\QTObject" "-I$(QT_DIR)\includeQtWidgets" "-I$(INHERIT)\." "-I$(OCL_Include)" "-I$(TAN_ROOT)\" "-I$(TAN_ROOT)\..\AMF"</Command>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\RoomAcousticQT\QTObject\QTRoomAcousticGraphic.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QT_DIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing %(Filename)%(Extension) ...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QT_DIR)\bin\moc.exe"  "%(FullPath)" -o "..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)" "-I." "-I$(QT_DIR)\include" "-I$(QT_DIR)\include\QtCore" "-I$(ProjectDir)..\..\..\src\RoomAcousticQT\QTObject" "-I$(QT_DIR)\includeQtWidgets" "-I$(INHERIT)\." "-I$(OCL_Include)" "-I$(TAN_ROOT)\" "-I$(TAN_ROOT)\..\AMF"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QT_DIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing QTRoomAcousticGraphic.h ...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QT_DIR)\bin\moc.exe"  "%(FullPath)" -o "..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB  "-I..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)" "-I." "-I$(QT_DIR)\include" "-I$(QT_DIR)\include\QtCore" "-I$(ProjectDir)..\..\..\src\RoomAcousticQT\QTObject" "-I$(QT_DIR)\includeQtWidgets" "-I$(INHERIT)\." "-I$(OCL_Include)" "-I$(TAN_ROOT)\" "-I$(TAN_ROOT)\..\AMF"</Command>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\RoomAcousticQT\QTObject\QTExportResponse.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing %(Filename)%(Extension) into ..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp ...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QT_DIR)\bin\moc.exe"  "%(FullPath)" -o "..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DRTQ_ENABLED -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)" "-I." "-I$(QT_DIR)\include" "-I..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\." "-I$(QT_DIR)\include\QtCore" "-I$(ProjectDir)..\..\..\src\RoomAcousticQT\QTObject" "-I$(QT_DIR)\includeQtWidgets" "-I$(INHERIT)\." "-I$(OCL_Include)" "-I$(TAN_ROOT)\" "-I$(TAN_ROOT)\..\AMF"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing %(Filename)%(Extension)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QT_DIR)\bin\moc.exe"  "%(FullPath)" -o "..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DRTQ_ENABLED -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)" "-I." "-I$(QT_DIR)\include" "-I..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\." "-I$(QT_DIR)\include\QtCore" "-I$(ProjectDir)..\..\..\src\RoomAcousticQT\QTObject" "-I$(QT_DIR)\includeQtWidgets" "-I$(INHERIT)\." "-I$(OCL_Include)" "-I$(TAN_ROOT)\" "-I$(TAN_ROOT)\..\AMF"</Command>
+    </CustomBuild>
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\RegisterBrowser.h" />
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\Resources\resource.h" />
+    <ClInclude Include="..\..\..\src\RoomAcousticQT\RoomAcoustic.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\src\RoomAcousticQT\UI\RoomAcousticConfig.ui">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QT_DIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QT_DIR)\bin\uic.exe" -o "..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\ui_%(Filename).h" "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QT_DIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QT_DIR)\bin\uic.exe" -o "..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\ui_%(Filename).h" "%(FullPath)"</Command>
+      <SubType>Designer</SubType>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\RoomAcousticQT\Resources\Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\src\RoomAcousticQT\roomaccousticnew.qrc">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(FullPath);..\..\..\src\RoomAcousticQT\Resources\RoomAcousticsNew.ico;..\..\..\src\RoomAcousticQT\Resources\listener.jpg;..\..\..\src\RoomAcousticQT\Resources\speaker.jpg;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rcc%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\qrc_%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QT_DIR)\bin\rcc.exe" -name "%(Filename)" -no-compress "%(FullPath)" -o ..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\qrc_%(Filename).cpp</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(FullPath);..\..\..\src\RoomAcousticQT\Resources\RoomAcousticsNew.ico;..\..\..\src\RoomAcousticQT\Resources\listener.jpg;..\..\..\src\RoomAcousticQT\Resources\speaker.jpg;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rcc%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\qrc_%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QT_DIR)\bin\rcc.exe" -name "%(Filename)" -no-compress "%(FullPath)" -o ..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\qrc_%(Filename).cpp</Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\src\RoomAcousticQT\Resources\listener.png" />
+    <Image Include="..\..\..\src\RoomAcousticQT\Resources\RoomAcousticsNew.png" />
+    <Image Include="..\..\..\src\RoomAcousticQT\Resources\speaker.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\src\RoomAcousticQT\UI\RoomAcousticConfig_NoRTQ.ui">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QT_DIR)\bin\uic.exe" -o "..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\ui_%(Filename).h" "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QT_DIR)\bin\uic.exe" -o "..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\ui_%(Filename).h" "%(FullPath)"</Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\src\RoomAcousticQT\UI\ExportResponse.ui">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QT_DIR)\bin\uic.exe" -o "..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\ui_%(Filename).h" "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QT_DIR)\bin\uic.exe" -o "..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)\ui_%(Filename).h" "%(FullPath)"</Command>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties MocDir="..\..\..\src\RoomAcousticQT\GeneratedFiles\$(ConfigurationName)" UicDir="..\..\..\src\RoomAcousticQT\GeneratedFiles" RccDir="..\..\..\src\RoomAcousticQT\GeneratedFiles" lupdateOptions="" lupdateOnBuild="0" lreleaseOptions="" Qt5Version_x0020_x64="QT5.6" MocOptions="" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

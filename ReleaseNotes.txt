@@ -1,0 +1,11 @@
+TrueAudio Next 1.3.1.1 Cross Platform Beta release notes
+New features in this release:
+
+* Fast low latency convolution for GPU using Non-Uniform Partition methods.
+* Fast low latency convolution for CPU using AVX instrinsics and fast FFTs ( FFTW or IPPFFT)
+* TAN library Code can be built on Windows, Linux, and Mac using CMake.
+
+Notes:
+This is a Beta release. Some features are in progress.
+
+

@@ -1,0 +1,261 @@
+27,33c27
+< //#include "../../OculusRoomTiny_Advanced/Common/Win32_DirectXAppUtil.h"
+< #include "SimpleVRaudio.h"
+< #include "Win32_DirectXAppUtil.h"
+< 
+< #include "Extras\OVR_Math.h"
+< #include <memory>
+< #include "maxlimits.h"
+---
+> #include "../../OculusRoomTiny_Advanced/Common/Win32_DirectXAppUtil.h"
+118,129d111
+< 
+< #  define RETURN_IF_FALSE(x) \
+<     { \
+<         bool tmp = (x); \
+<         if (!tmp) { \
+<             ::MessageBoxA(0, #x, "Error", MB_OK); \
+<             result = -1; \
+<             goto Done; \
+<                 } \
+<     }
+< 
+< 
+150,193d131
+<     //TAN >>>>>>
+<     //
+<     //Initialize the AMD True Audio Next audio engine:
+<     //
+<     std::auto_ptr<Audio3D> pAudioVR(new Audio3D());
+< 
+<     // define acoustic room properties to match VR room:
+<     RoomDefinition roomDef;
+<     roomDef.height = 4.0;
+<     roomDef.width = 20.0;
+<     roomDef.length = 40.0;
+<     roomDef.mLeft.damp = DBTODAMP(1.0);
+<     roomDef.mRight.damp = DBTODAMP(1.0);
+<     roomDef.mFront.damp = DBTODAMP(1.0);
+<     roomDef.mBack.damp = DBTODAMP(1.0);
+<     roomDef.mTop.damp = DBTODAMP(1.0);
+<     roomDef.mBottom.damp = DBTODAMP(1.0);
+< 
+<     // Edit inFiles to change sound associated sources in the room:
+<     char *inFiles[MAX_SOURCES];
+<     inFiles[0] = "stream1.wav";    // Music Box
+<     inFiles[1] = "stream2.wav";	   // Thumper
+<     inFiles[2] = "stream3.wav";	   // Table Radio
+< 
+<     // Initialize the audio engine for 3 streams, 64k convolution, 4k buffers:
+<     RETURN_IF_FALSE(pAudioVR->init(NULL, roomDef, 3, inFiles, 65536, 4096) == 0);
+<     // Set transform to convert VR room coordinates to audio room sim:
+<     pAudioVR->setWorldToRoomCoordTransform(roomDef.width / 2.0f, 0.0, roomDef.length / 2.0f, 0.0, 180.0, false);
+< 
+<     // set initial source and head positions:
+<     RETURN_IF_FALSE(pAudioVR->updateSourcePosition(0, 0.0, 2.0, 5.0) == 0);
+<     RETURN_IF_FALSE(pAudioVR->updateSourcePosition(0, 0.0, 2.0, 5.0) == 0);
+<     RETURN_IF_FALSE(pAudioVR->updateSourcePosition(0, 0.0, 2.0, 5.0) == 0);
+<     RETURN_IF_FALSE(pAudioVR->updateHeadPosition(0.0, 2.0, 0.0, 0.0, 0.0, 0.0) == 0);
+< 
+<     //start audio engine
+<     RETURN_IF_FALSE(pAudioVR->Run() == 0);
+<     //
+<     // Done initializing AMD True Audio Next audio engine.
+<     //
+<     // TAN <<<<<<<
+< 
+< 
+< 
+234c172
+<     roomScene = new Scene(false);// false);
+---
+>     roomScene = new Scene(false);
+258,298c196,201
+<             static float maxSpeed = 0.05f;
+<             static float maxRot = 0.02f;
+<             static float fwdSpeed = 0.0f;
+<             static float rotSpeed = 0.0f;
+<             static unsigned int ticksSinceMove = 0;
+<             static unsigned int ticksSinceYaw = 0;
+<  
+<             ticksSinceMove++;
+<             ticksSinceYaw++;
+<  
+<             if (ticksSinceMove > 10)
+<                 fwdSpeed = 0.0f;
+<             if (ticksSinceYaw > 10)
+<                 rotSpeed = 0.0f;
+< 
+<             XMVECTOR forward = XMVector3Rotate(XMVectorSet(0, 0, -fwdSpeed, 0), mainCam->Rot);
+<             XMVECTOR right = XMVector3Rotate(XMVectorSet(fwdSpeed, 0, 0, 0), mainCam->Rot);
+<             if (DIRECTX.Key['W'] || DIRECTX.Key[VK_UP]){
+<                 ticksSinceMove = 0;
+<                 if (fwdSpeed < maxSpeed)
+<                     fwdSpeed += 0.0005f;
+<                 mainCam->Pos = XMVectorAdd(mainCam->Pos, forward);
+<             }
+<             if (DIRECTX.Key['S'] || DIRECTX.Key[VK_DOWN]) {
+<                 ticksSinceMove = 0;
+<                 if (fwdSpeed < maxSpeed)
+<                     fwdSpeed += 0.0005f;
+<                 mainCam->Pos = XMVectorSubtract(mainCam->Pos, forward);
+<             }
+<             if (DIRECTX.Key['D']) {
+<                 ticksSinceMove = 0;
+<                 if (fwdSpeed < maxSpeed)
+<                     fwdSpeed += 0.0005f;
+<                 mainCam->Pos = XMVectorAdd(mainCam->Pos, right);
+<             }
+<             if (DIRECTX.Key['A']) {
+<                 ticksSinceMove = 0;
+<                 if (fwdSpeed < maxSpeed)
+<                     fwdSpeed += 0.0005f;
+<                 mainCam->Pos = XMVectorSubtract(mainCam->Pos, right);
+<             }
+---
+>             XMVECTOR forward = XMVector3Rotate(XMVectorSet(0, 0, -0.05f, 0), mainCam->Rot);
+>             XMVECTOR right   = XMVector3Rotate(XMVectorSet(0.05f, 0, 0, 0),  mainCam->Rot);
+>             if (DIRECTX.Key['W'] || DIRECTX.Key[VK_UP])      mainCam->Pos = XMVectorAdd(mainCam->Pos, forward);
+>             if (DIRECTX.Key['S'] || DIRECTX.Key[VK_DOWN])    mainCam->Pos = XMVectorSubtract(mainCam->Pos, forward);
+>             if (DIRECTX.Key['D'])                            mainCam->Pos = XMVectorAdd(mainCam->Pos, right);
+>             if (DIRECTX.Key['A'])                            mainCam->Pos = XMVectorSubtract(mainCam->Pos, right);
+300,311c203,204
+<             if (DIRECTX.Key[VK_LEFT]){
+<                 ticksSinceYaw = 0;
+<                 if (rotSpeed < maxRot)
+<                     rotSpeed += 0.0002f;
+<                 mainCam->Rot = XMQuaternionRotationRollPitchYaw(0, Yaw += rotSpeed, 0);
+<             }
+<             if (DIRECTX.Key[VK_RIGHT]){
+<                 ticksSinceYaw = 0;
+<                 if (rotSpeed < maxRot)
+<                     rotSpeed += 0.0002f;
+<                 mainCam->Rot = XMQuaternionRotationRollPitchYaw(0, Yaw -= rotSpeed, 0);
+<             }
+---
+>             if (DIRECTX.Key[VK_LEFT])  mainCam->Rot = XMQuaternionRotationRollPitchYaw(0, Yaw += 0.02f, 0);
+>             if (DIRECTX.Key[VK_RIGHT]) mainCam->Rot = XMQuaternionRotationRollPitchYaw(0, Yaw -= 0.02f, 0);
+317c210
+<             // Call ovr_GetRenderDesc each frame to get the ovrEyeRenderDesc, as the returned values (e.g. HmdToEyeOffset) may change at runtime.
+---
+>             // Call ovr_GetRenderDesc each frame to get the ovrEyeRenderDesc, as the returned values (e.g. HmdToEyePose) may change at runtime.
+322,374d214
+<             // TAN >>>> 
+<             // Update cube's position in 3D Audio library.
+<             {
+<                 float Sx, Sy, Sz;
+<                 Sx = roomScene->Models[0]->Pos.x;
+<                 Sy = roomScene->Models[0]->Pos.y;
+<                 Sz = -roomScene->Models[0]->Pos.z;
+< 
+<                 pAudioVR->updateSourcePosition(0, Sx, Sy, Sz);
+<             }
+< 
+<             // Animate Hammer
+<         {
+<             float x, y, z;
+<             x = -5.0;
+<             y = 0.0;
+<             z = 10.0;
+< 
+<             float dy = 0.0;
+<             float dt = pAudioVR->getCurrentPosition(1) / 48000.0f;
+< 
+<             dt = dt - 5.0f * floorf(dt / 5.0f);
+< 
+<             if (dt < .638f) {
+<                 dy = 3.0f - 0.5f * 9.8f * dt*dt;
+<             }
+<             else if (dt < 1.0f) {
+<                 dy = 0.0f;
+<             }
+<             else {
+<                 dy = (dt - 1.0f) * 3.0f / 4.0f;
+<             }
+< 
+<             roomScene->Models[1]->Pos = XMFLOAT3(x, 1.0f + y + dy, z);  //hammer
+<             roomScene->Models[2]->Pos = XMFLOAT3(-5.0f, 0.0f, z);       //anvil
+<         }
+< 
+<         // TAN >>>> 
+<         // Update hammer's position in 3D Audio library.
+<         RETURN_IF_FALSE(pAudioVR->updateSourcePosition(1, roomScene->Models[1]->Pos.x,
+<             roomScene->Models[1]->Pos.y,
+<             -roomScene->Models[1]->Pos.z) == 0);
+< 
+<         // Place radio
+<         roomScene->Models[3]->Pos = XMFLOAT3(-1.8f, .8f, .06f); //radio
+< 
+<         // TAN >>>> 
+<         // Update radio's position in 3D Audio library.
+<         RETURN_IF_FALSE(pAudioVR->updateSourcePosition(2, roomScene->Models[3]->Pos.x,
+<             roomScene->Models[3]->Pos.y,
+<             -roomScene->Models[3]->Pos.z) == 0);
+< 
+< 
+376,378c216,218
+<             ovrPosef         EyeRenderPose[2];
+<             ovrPosef         HmdToEyePose[2] = { eyeRenderDesc[0].HmdToEyePose,
+<                                                    eyeRenderDesc[1].HmdToEyePose };
+---
+>             ovrPosef EyeRenderPose[2];
+>             ovrPosef HmdToEyePose[2] = { eyeRenderDesc[0].HmdToEyePose,
+>                                          eyeRenderDesc[1].HmdToEyePose};
+383,429d222
+<             // TAN >>>> 
+<             // 3D Audio - update head's position.
+<             {
+<                 const float headX = mainCam->Pos.m128_f32[0] +
+<                     (EyeRenderPose[0].Position.x + EyeRenderPose[1].Position.x) / 2;
+<                 const float headY = mainCam->Pos.m128_f32[1] +
+<                     (EyeRenderPose[0].Position.y + EyeRenderPose[1].Position.y) / 2;
+<                 const float headZ = -mainCam->Pos.m128_f32[2] +
+<                     (EyeRenderPose[0].Position.z + EyeRenderPose[1].Position.z) / 2;
+< 
+<                 float hYaw, hPitch, hRoll;
+<                 OVR::Posef pose = EyeRenderPose[0];
+<                 pose.Rotation.GetEulerAngles<OVR::Axis_Y, OVR::Axis_X, OVR::Axis_Z>(&hYaw, &hPitch, &hRoll);
+< 
+<                 // Note: audio engine head orientation angles need to be in degrees, so multiply by 180/PI:
+<                 RETURN_IF_FALSE(pAudioVR->updateHeadPosition(headX, headY, headZ, (hYaw + Yaw)*180.0 / PI, hPitch*180.0 / PI, hRoll*180.0 / PI) == 0);
+< 
+< 
+<                 //Arrow
+<                 // use direction set by arrow keys, not head tracker --- draw arrow in Yaw direction:
+<                 XMVECTOR apos = XMVector3Rotate(XMVectorSet(0, 0, -2.0f, 0), mainCam->Rot);
+< 
+<                 roomScene->Models[9]->Pos.x = mainCam->Pos.m128_f32[0] + apos.m128_f32[0];
+<                 roomScene->Models[9]->Pos.z = mainCam->Pos.m128_f32[2] + apos.m128_f32[2];
+<                 
+<                 roomScene->Models[9]->Rot.w = mainCam->Rot.m128_f32[3];
+<                 roomScene->Models[9]->Rot.x = mainCam->Rot.m128_f32[2];
+<                 roomScene->Models[9]->Rot.y = mainCam->Rot.m128_f32[1];
+<                 roomScene->Models[9]->Rot.z = mainCam->Rot.m128_f32[0];
+<                 
+< 
+< 
+<                 //XMVector3Rotate()
+<                
+<                 //forward
+< 
+<                 //XMVector3Rotate(XMVectorSet(0, 0, -0.05f, 0), mainCam->Rot);
+< 
+<                 /*roomScene->Models[9]->Rot.w = pose.Rotation.w;
+<                 roomScene->Models[9]->Rot.x = pose.Rotation.x;
+<                 roomScene->Models[9]->Rot.y = pose.Rotation.y;
+<                 roomScene->Models[9]->Rot.z = pose.Rotation.z;
+< */
+<      
+< 
+<             }
+< 
+505,506d297
+<     pAudioVR->Stop();
+< 
+515c306,307
+<     ovrResult result = ovr_Initialize(nullptr);
+---
+> 	ovrInitParams initParams = { ovrInit_RequestVersion, OVR_MINOR_VERSION, NULL, 0, 0 };
+> 	ovrResult result = ovr_Initialize(&initParams);
+520d311
+<     CoInitializeEx(NULL, COINIT_MULTITHREADED);

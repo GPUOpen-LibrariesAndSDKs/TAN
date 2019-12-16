@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- This document was created by AMD RoomAcousticsDemo v1.0.2 on 2018/03/22 14:45:16 -->
+<RoomAcoustics>
+<!-- All dimensions in meters, damping in decibels -->
+ <Source1>
+ <streamS1  on="1" file="quirksx48S.wav" />
+  <microphone enableMic="0" trackHeadPos="0" muteDirectPath="0" />
+  <positionS1 X="5.083000" Y="1.750000" Z="0.686000"  />
+ </Source1>
+ <Listener>
+  <positionL1 X="4.212000" Y="1.750000" Z="2.064000" yaw="40.000000" pitch="0.000000" roll="0.000000" />
+  <earSpacing S="0.160000"/>
+  <autoSpin AS="0"/>
+  <timerPeriod TP="0"/>
+ </Listener>
+ <Room>
+  <dimensions width="6.000000" height="4.000000" length="10.000000" />
+  <damping left="0.500000" right="0.500000" front="0.100000" back="1.100000" top="0.100000" bottom="1.100000"/>
+ <rendering nSources="1" withGPU="1" withRTQ="0" withMPr="0" withCus="0"/>
+ </Room>
+<Convolution>
+ <configuration length="131000" buffersize ="2048" useGPU="0" useRTQ="1" useMPr="0" cuCount="4" method="3"/>
+</Convolution>
+</RoomAcoustics>

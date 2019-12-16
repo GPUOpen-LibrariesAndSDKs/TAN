@@ -1,0 +1,8 @@
+============================OpenCL Setup Instructions=====================
+1. OpenCL headers are not added as submodule inside OpenCL-Headers directory
+2. To download it go to TAN root directory and type "git submodule update --init"
+3. Make sure you have OpenCL-Headers downloaded or cloned via zip
+4. Go to the Tan/tan/build/cmake folder
+5. Edit generate-mac.sh with actual OpenCL folders set to this
+6. Generate Makefiles by running generate-mac.sh script
+7. Build Tan library and examples
