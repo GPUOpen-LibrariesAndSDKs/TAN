@@ -35,7 +35,12 @@
 #include "tanlibrary/src/clFFT-master/src/include/clFFT.h"
 #include "FFTImpl.h"
 #include "../core/TANContextImpl.h"     //TAN
+#ifdef __APPLE__
+#include <stdlib.h>
+#else
 #include <malloc.h>
+#endif
+
 #include <memory>
 
 #include "../../clFFT-master/src/include/sharedLibrary.h"

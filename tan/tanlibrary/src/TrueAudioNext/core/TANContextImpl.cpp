@@ -1,7 +1,5 @@
 //
-// MIT license
-//
-// Copyright (c) 2019 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2016 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +19,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-
 #include <omp.h>
 #include "TANContextImpl.h"
 #include "TANTraceAndDebug.h"
@@ -80,7 +77,9 @@ TAN_SDK_LINK AMF_RESULT        AMF_CDECL_CALL TANCreateContext(
 #endif
     }
 
-    AMF_ASSERT_OK(res, L"AMF Factory Failed to initialize");
+	//AMF_ASSERT_OK(res, L"AMF Factory Failed to initialize");
+	// missing Amf library is informational only, Mac doesn't have amf.
+	AMFTraceInfo(L"TANContext", L"AMF Factory Failed to initialize\n");
 
 
     //TOD when new version is needed version checking should be extended
@@ -260,12 +259,12 @@ AMF_RESULT AMF_STD_CALL TANContextImpl::InitOpenCL(
                             L"could not retrieve the device ids from context");
     cl_int error;
     m_oclConvQueue = clCreateCommandQueue(pClContext, devices[0], NULL, &error);
-    printf("Queue created %llX\r\n", m_oclConvQueue);
+    //printf("Queue created %llX\r\n", m_oclConvQueue);
     AMF_RETURN_IF_FALSE(error == CL_SUCCESS, AMF_FAIL,
                         L"cannot create the conv command queue");
 
     m_oclGeneralQueue = clCreateCommandQueue(pClContext, devices[0], NULL, &error);
-    printf("Queue created %llX\r\n", m_oclGeneralQueue);
+    //printf("Queue created %llX\r\n", m_oclGeneralQueue);
     AMF_RETURN_IF_FALSE(error == CL_SUCCESS, AMF_FAIL,
                         L"cannot create the general command queue");
 

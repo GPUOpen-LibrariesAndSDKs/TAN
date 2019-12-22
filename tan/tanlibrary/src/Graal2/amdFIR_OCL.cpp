@@ -215,7 +215,7 @@ int firDirectFIR(ProjPlan * plan,
 	cl_command_queue commandQueue = GetOCLQueue(plan);
 
 	size_t l_wk[3] = {64,1,1};
-	size_t g_wk[3] = {block_sz * l_wk[0], plan->nmb_channels,1};
+	size_t g_wk[3] = {block_sz * l_wk[0], size_t(plan->nmb_channels),1};
 
 	n_arg = 0;
 
@@ -276,7 +276,7 @@ int firDirectRun(ProjPlan * plan) {
 	cl_command_queue commandQueue = GetOCLQueue(plan);
 	cl_kernel fir_kernel = fir_plan->FIR_kernel[FIR_OCL];
 	size_t l_wk[3] = {64,1,1};
-	size_t g_wk[3] = {block_sz * l_wk[0], plan->nmb_channels,1};
+	size_t g_wk[3] = {block_sz * l_wk[0], size_t(plan->nmb_channels),1};
 
 	n_arg = 0;
 

@@ -130,8 +130,8 @@ int prepareKernels(ProjPlan * plan, int init_flags, const cl_mem kernel, int _n_
     int long_strm_chnl_stride =  plan->conv_blocks * frame_ln * 2;
     err |= CopyToDevice2(queue, &fht_plan->updateChannelMap, _channel_ids, fht_plan->updateChannelMap.len, 0, false);
     {
-        size_t global[3] = { frame1_ln, conv_blocks1, _n_channels };
-        size_t local[3] = { (frame1_ln>256) ? 256 : frame1_ln, 1, 1 };
+        size_t global[3] = { size_t(frame1_ln), size_t(conv_blocks1), size_t(_n_channels) };
+        size_t local[3] = { size_t((frame1_ln>256) ? 256 : frame1_ln), 1, 1 };
         cl_kernel partition_kernel = fht_plan->fht_kernels[PARTITION_KERNEL];
         int index = 0;
         err |= clSetKernelArg(partition_kernel, index++, sizeof(cl_mem), &kernel);
@@ -145,8 +145,8 @@ int prepareKernels(ProjPlan * plan, int init_flags, const cl_mem kernel, int _n_
         err |= clEnqueueNDRangeKernel(queue, partition_kernel, 3, NULL, global, local, 0, NULL, NULL);
     }
     {
-        size_t global[3] = { frame_ln, plan->conv_blocks, _n_channels };
-        size_t local[3] = { (frame_ln>256) ? 256 : frame_ln, 1, 1 };
+        size_t global[3] = { size_t(frame_ln), size_t(plan->conv_blocks), size_t(_n_channels) };
+        size_t local[3] = { size_t((frame_ln>256) ? 256 : frame_ln), 1, 1 };
         cl_kernel partition_kernel = fht_plan->fht_kernels[PARTITION_KERNEL];
         int index = 0;
         err |= clSetKernelArg(partition_kernel, index++, sizeof(cl_mem), &kernel);

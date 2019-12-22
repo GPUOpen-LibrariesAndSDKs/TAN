@@ -16,10 +16,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 enable_language(CXX)
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
 if(NOT WIN32)
+if(APPLE)
+#SET (CMAKE_CXX_COMPILER "/usr/bin/c++")
+set(CMAKE_CXX_FLAGS_DEBUG "-Xpreprocessor -fopenmp -lomp")
+set(CMAKE_CXX_FLAGS "-Xpreprocessor -fopenmp -lomp")
+#set(CMAKE_SHARED_LINKER_FLAGS " -lomp" )
+else()
 set(CMAKE_CXX_FLAGS_DEBUG "-fopenmp")
 set(CMAKE_CXX_FLAGS "-fopenmp")
 endif()
+endif()
+
 
 
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)

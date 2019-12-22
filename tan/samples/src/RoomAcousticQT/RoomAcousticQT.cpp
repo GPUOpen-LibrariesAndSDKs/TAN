@@ -265,7 +265,7 @@ void RoomAcousticQT::initializeAudioPosition(int index)
 void RoomAcousticQT::initializeDevice()
 {
 	m_iConvolutionLength = 32768;
-	m_iBufferSize = 2048;
+	m_iBufferSize = 1024;
 	for (int i = 0; i < MAX_DEVICES; i++){
 		m_cpDeviceName[i] = new char[MAX_PATH + 2];
 		memset(m_cpDeviceName[i], 0, (MAX_PATH + 2));

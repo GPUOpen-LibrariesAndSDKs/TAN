@@ -63,6 +63,9 @@ int GraalWrapper::Init(
     int buffer_size,
     int number_ir_buffer_sets)
 {
+#ifndef _WIN32
+	return -3;
+#endif
     m_amfComputeConv = pConvolution;
     m_amfComputeUpdate = pUpdate;
     m_pContextTAN = pContextTAN;

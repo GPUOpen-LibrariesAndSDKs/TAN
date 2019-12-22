@@ -173,7 +173,9 @@ AMF_RESULT  AMF_STD_CALL TANMathImpl::InitGpu()
 	m_eOutputMemoryType = (AMF_MEMORY_TYPE)tmp;
 
 	AMFPrograms* pPrograms = NULL;
-	g_AMFFactory.GetFactory()->GetPrograms(&pPrograms);
+	if (g_AMFFactory.GetFactory() != NULL) {
+		g_AMFFactory.GetFactory()->GetPrograms(&pPrograms);
+	}
 
 	TANContextImplPtr contextImpl(m_pContextTAN);
 	//m_pDeviceCompute = contextImpl->GetGeneralCompute();

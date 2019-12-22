@@ -39,8 +39,8 @@
 #  undef AMF_FACILITY
 #endif
 
-#define SAFE_DELETE(x) { delete x; (x) = nullptr; }
-#define SAFE_ARR_DELETE(x) { delete[] x; (x) = nullptr; }
+#define SAFE_DELETE(x) {if(x) { delete x;} (x) = nullptr; }
+#define SAFE_ARR_DELETE(x) {if(x){ delete[] x;} (x) = nullptr; }
 
 #define TRANSFORMTYPE_FFTCOMPLEX 1
 #define TRANSFORMTYPE_FFTREAL 2

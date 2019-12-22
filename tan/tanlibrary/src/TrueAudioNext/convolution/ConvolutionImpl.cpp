@@ -1549,23 +1549,23 @@ AMF_RESULT TANConvolutionImpl::allocateBuffers()
 			m_ovlAddLocalInBuffs[n] = new float[m_length];
 			m_ovlAddLocalOutBuffs[n] = new float[m_iBufferSizeInSamples];
 
-			m_OutSamples[n] = (float *)_mm_malloc(32, 2 * m_length * sizeof(float));// new float[2 * m_length];
+			m_OutSamples[n] = (float *)_mm_malloc(2 * m_length * sizeof(float),32);// new float[2 * m_length];
 			memset(m_OutSamples[n], 0, (2 * m_length) * sizeof(float));
 
-			m_OutSamplesXFade[n] = (float *)_mm_malloc(32, 2 * m_length * sizeof(float));// new float[2 * m_length];
+			m_OutSamplesXFade[n] = (float *)_mm_malloc( 2 * m_length * sizeof(float),32);// new float[2 * m_length];
 			memset(m_OutSamplesXFade[n], 0, (2 * m_length) * sizeof(float));
 
-			m_NUTailAccumulator[n] = (float *)_mm_malloc(32, 2 * m_length * sizeof(float));// new float[2 * m_length];
+			m_NUTailAccumulator[n] = (float *)_mm_malloc(2 * m_length * sizeof(float), 32);// new float[2 * m_length];
 			memset(m_NUTailAccumulator[n], 0, (2 * m_length) * sizeof(float));
 
-			m_NUTailSaved[n] = (float *)_mm_malloc(32, 2 * m_length * sizeof(float));// new float[2 * m_length];
+			m_NUTailSaved[n] = (float *)_mm_malloc(2 * m_length * sizeof(float), 32);// new float[2 * m_length];
 			memset(m_NUTailSaved[n], 0, (2 * m_length) * sizeof(float));
 
 			for (int i = 0; i < N_FILTER_STATES; i++) {
-				m_nupFilterState[i]->m_Filter[n] = (float *)_mm_malloc(32, bufLen * sizeof(float));// new float[bufLen];
+				m_nupFilterState[i]->m_Filter[n] = (float *)_mm_malloc( bufLen * sizeof(float), 32);// new float[bufLen];
 				memset(m_nupFilterState[i]->m_Filter[n], 0, bufLen * sizeof(float));
 
-				m_nupFilterState[i]->m_workBuffer[n] = (float *)_mm_malloc(32, partLen * sizeof(float));
+				m_nupFilterState[i]->m_workBuffer[n] = (float *)_mm_malloc( partLen * sizeof(float), 32);
 				memset(m_nupFilterState[i]->m_workBuffer[n], 0, partLen * sizeof(float));
 
 				m_nupFilterState[i]->m_internalFilter[n] = m_nupFilterState[i]->m_Filter[n];
@@ -1574,10 +1574,10 @@ AMF_RESULT TANConvolutionImpl::allocateBuffers()
 					m_nupFilterState[i]->m_Overlap[n] = new float[m_length];
 					memset(m_nupFilterState[i]->m_Overlap[n], 0, m_length * sizeof(float));
 
-					m_nupFilterState[0]->m_DataPartitions[n] = (float *)_mm_malloc(32, bufLen * sizeof(float));// new float[bufLen];
+					m_nupFilterState[0]->m_DataPartitions[n] = (float *)_mm_malloc( bufLen * sizeof(float), 32);// new float[bufLen];
 					memset(m_nupFilterState[0]->m_DataPartitions[n], 0, bufLen * sizeof(float));
 
-					m_nupFilterState[0]->m_SubPartitions[n] = (float *)_mm_malloc(32, partLen * sizeof(float));// new float[bufLen];
+					m_nupFilterState[0]->m_SubPartitions[n] = (float *)_mm_malloc( partLen * sizeof(float), 32);// new float[bufLen];
 					memset(m_nupFilterState[0]->m_SubPartitions[n], 0, partLen * sizeof(float));
 				}
 
@@ -1811,8 +1811,6 @@ AMF_RESULT TANConvolutionImpl::deallocateBuffers()
     case TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD:
         // deallocate state data for ovlAddProcess:
         for (amf_uint32 n = 0; n < m_iChannels; n++){
-            SAFE_ARR_DELETE(m_ovlAddLocalInBuffs[n]);
-            SAFE_ARR_DELETE(m_ovlAddLocalOutBuffs[n]);
             for (int i = 0; i < N_FILTER_STATES; i++) {
                 if (m_FilterState[i] && ((ovlAddFilterState *)m_FilterState[i])->m_Filter[n]) {
                     SAFE_ARR_DELETE(((ovlAddFilterState *)m_FilterState[i])->m_Filter[n]);
@@ -1837,12 +1835,8 @@ AMF_RESULT TANConvolutionImpl::deallocateBuffers()
 	{
 		int nParts = (1 << m_log2len) / (1 << m_log2bsz);
 		nParts /= m_2ndBufSizeMultiple; //NU
-
-										// deallocate state data for ovlUPProcess:
+		// deallocate state data for ovlUPProcess:
 		for (amf_uint32 n = 0; n < m_iChannels; n++) {
-			SAFE_ARR_DELETE(m_ovlAddLocalInBuffs[n]);
-			SAFE_ARR_DELETE(m_ovlAddLocalOutBuffs[n]);
-			SAFE_ARR_DELETE(m_FilterTD[n]);
 
 			for (int i = 0; i < N_FILTER_STATES; i++) {
 				if (m_nupFilterState[i] && ((_ovlUniformPartitionFilterState *)m_nupFilterState[i])->m_Filter[n]) {
@@ -1860,6 +1854,7 @@ AMF_RESULT TANConvolutionImpl::deallocateBuffers()
 		}
 		SAFE_ARR_DELETE(m_ovlAddLocalInBuffs);
 		SAFE_ARR_DELETE(m_ovlAddLocalOutBuffs);
+		SAFE_ARR_DELETE(m_FilterTD);
 		SAFE_ARR_DELETE(m_nupFilterState[0]->m_DataPartitions);
 		SAFE_ARR_DELETE(m_nupFilterState[0]->m_SubPartitions);
 

@@ -45,12 +45,13 @@ double subtractTimes( double endTime, double startTime )
     if( conversion == 0.0 )
     {
 #if __APPLE__
-        mach_timebase_info_data_t info;
-        kern_return_t err = mach_timebase_info( &info );
-        
-		//Convert the timebase into seconds
-        if( err == 0  )
-			conversion = 1e-9 * (double) info.numer / (double) info.denom;
+  //      mach_timebase_info_data_t info;
+  //      kern_return_t err = mach_timebase_info( &info );
+  //      
+		////Convert the timebase into seconds
+  //      if( err == 0  )
+  //	conversion = 1e-9 * (double) info.numer / (double) info.denom;
+		conversion = 1.;
 #endif
 #ifdef _WIN32
 		conversion = 1.;
