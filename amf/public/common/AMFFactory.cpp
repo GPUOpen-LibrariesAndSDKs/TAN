@@ -67,11 +67,15 @@ AMF_RESULT AMFFactoryHelper::Init()
         amf_atomic_inc(&m_iRefCount);
         return AMF_OK;
     }
-
     auto amfDllNameMbs = std::getenv("AMF_DLL_NAME");
+#ifdef WIN32
     amf_wstring amfDllNameWide = amfDllNameMbs ? amf::amf_from_multibyte_to_unicode(amfDllNameMbs) : L"";
 
     m_hDLLHandle = amf_load_library(amfDllNameWide.length() ? amfDllNameWide.c_str() : AMF_DLL_NAME);
+#else
+	m_hDLLHandle = amf_load_libraryA( AMF_DLL_NAMEA);
+#endif
+
     if(m_hDLLHandle == NULL)
     {
         return AMF_FAIL;

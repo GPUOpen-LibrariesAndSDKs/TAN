@@ -236,7 +236,7 @@ bool 			ReadWaveFile
 			k = sampleNumber*channelsCount;
 			for (int n = 0; n < channelsCount; n++)
 			{
-				(*pfSamples)[n][sampleNumber] = (float)(((uint16_t *)*pSamples)[k + n]) / 32768.0f;
+				(*pfSamples)[n][sampleNumber] = (float)(((short *)*pSamples)[k + n]) / 32768.0f;
 			}
 		}
 		break;

@@ -82,6 +82,35 @@ int ret = 0;
 	return(ret);
 }
 
+int OCLInit(ProjPlan *plan, uint init_flags, cl_command_queue OCLqueue_conv, cl_command_queue OCLqueue_update) {
+	int ret = 0;
+	cl_context clContext;
+	clGetCommandQueueInfo(OCLqueue_conv, CL_QUEUE_CONTEXT, sizeof(cl_context), &clContext, NULL);
+
+	// TODO: mutex
+	if (0 == OclCounter++) {
+		SetupHSAOpenCL(&OCLConfig, init_flags, clContext, OCLqueue_conv, OCLqueue_update);
+
+		CreateScheduler(&AmdScheduler, init_flags);
+		OCLConfig->schedulers[0] = AmdScheduler;
+		OCLConfig->amf_compute_conv = nullptr;
+		OCLConfig->amf_compute_update = nullptr;
+	}
+
+	plan->AmdSched = AmdScheduler;
+	plan->OclConfig = OCLConfig;
+
+
+	if (!(SchedGetInitFlags(GetScheduler(plan)) & __INIT_FLAG_GLOBAL_QUEUES__)) {
+		{
+			plan->OCLqueue[0] = OCLqueue_conv;
+			plan->OCLqueue[1] = OCLqueue_update;
+		}
+	}
+	return(ret);
+}
+
+
 
 void DecreaseGlobalReferenceCounter(ProjPlan *plan) {
 	OclCounter--;

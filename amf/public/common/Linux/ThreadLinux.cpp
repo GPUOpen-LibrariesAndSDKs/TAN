@@ -590,15 +590,7 @@ amf_pts AMF_STD_CALL amf_high_precision_clock()
 //-------------------------------------------------------------------------------------------------
 amf_handle AMF_STD_CALL amf_load_library(const wchar_t* filename)
 {
-    //void *ret = dlopen(amf_from_unicode_to_multibyte(filename).c_str(), RTLD_NOW | RTLD_GLOBAL);
-	// HACK fix this:
-	void *ret;
-	if (wcsncmp(filename, L"libamfrt64.so.1", 511) == 0) {
-		ret = dlopen("libamfrt64.so.1", RTLD_NOW | RTLD_GLOBAL);
-	}
-	else {
-		ret = dlopen(amf_from_unicode_to_multibyte(filename).c_str(), RTLD_NOW | RTLD_GLOBAL);
-	}
+    void *ret = dlopen(amf_from_unicode_to_multibyte(filename).c_str(), RTLD_NOW | RTLD_GLOBAL);
 
     if(!ret)
     {
@@ -607,6 +599,20 @@ amf_handle AMF_STD_CALL amf_load_library(const wchar_t* filename)
     }
 
     return ret;
+}
+
+//-------------------------------------------------------------------------------------------------
+amf_handle AMF_STD_CALL amf_load_libraryA(const char* filename)
+{
+	void *ret = dlopen(filename, RTLD_NOW | RTLD_GLOBAL);
+
+	if (!ret)
+	{
+		const char *err = dlerror();
+		fprintf(stderr, "\nError: %s\n", err);
+	}
+
+	return ret;
 }
 
 void* AMF_STD_CALL amf_get_proc_address(amf_handle module, const char* procName)

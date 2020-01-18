@@ -160,6 +160,34 @@ int err = 0;
 	return err;
 }
 
+int ReverbOCLInitialize(ProjPlan * plan, amdOCLRvrb *new_plan, const char * ocl_kernels_path, int init_flags,
+	cl_command_queue OCLqueue_conv, cl_command_queue OCLqueue_update) {
+	int err = 0;
+	err = OCLInit(plan, init_flags, OCLqueue_conv, OCLqueue_update);
+	plan->Stat = (StatisticsPerRun *)malloc(sizeof(StatisticsPerRun));
+	if (err || !plan->Stat) {
+		err = -1;
+		printf("Failed to start OpenCL with error %d\n", err);
+
+		OCLTerminate(plan);
+		free(plan);
+		exit(err);
+	}
+
+	err = ReverbOCLInitializeInternal(plan, ocl_kernels_path, init_flags);
+	// inital setup - kernel compile
+
+	*new_plan = (amdOCLRvrb)plan;
+
+	// compiler kerenl once
+	CompileAllKernels(plan);
+
+	// HERE we are setting global block counter to 0
+	SetRunCounter(plan, 0);
+	return err;
+}
+
+
 
 int ReverbOCLTerminateDeffered(ProjPlan * plan) {
 	int err = 0;

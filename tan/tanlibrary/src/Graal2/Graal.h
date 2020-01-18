@@ -80,6 +80,14 @@ int graalInitialize(
     amf::AMFComputePtr amf_compute_conv= 0,       ///< [in] the AMF compute device used for passing the convolution queue and compiling and caching the kernels, if not provided will use ocl API to compile
     amf::AMFComputePtr amf_compute_update = 0       ///< [in] the AMF compute device used for passing the general queue and compiling and caching the kernels, if not provided will use ocl API to compile
 	);
+
+int graalInitialize(
+	graalHandle * handle,				///< [out] handle to the pipeline.
+	const char * ocl_kernels_path,		///< [in]  path to the set of OCL kernels. Default - working directory.
+	int init_flags,						///< [in] initialization flags (see below).
+	cl_command_queue OCLqueue_conv = 0,       ///< [in] the OpenCL queue used for passing the convolution queue and compiling and caching the kernels, if not provided will use ocl API to compile
+	cl_command_queue OCLqueue_update = 0       ///< [in] the OpenCL queue device used for passing the general queue and compiling and caching the kernels, if not provided will use ocl API to compile
+);
 /**
 **************************************************************************************************
 Possible initialization flag combinations:

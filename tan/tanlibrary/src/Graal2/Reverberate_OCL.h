@@ -171,9 +171,11 @@ typedef struct _ProjPlan {
 
 void ReverbDebugOutput(ProjPlan *plan, char * msg);
 int OCLInit(ProjPlan *plan, uint init_flags, amf::AMFComputePtr amf_compute_conv=0, amf::AMFComputePtr amf_compute_update=0);
+int OCLInit(ProjPlan *plan, uint init_flags, cl_command_queue OCLqueue_conv = 0, cl_command_queue OCLqueue_update = 0);
 int OCLTerminate(ProjPlan *plan);
 void DecreaseGlobalReferenceCounter(ProjPlan *plan);
 int ReverbOCLInitialize(ProjPlan * plan, amdOCLRvrb *new_plan, const char * ocl_kernels_path, int init_flags, amf::AMFComputePtr amf_compute_conv = 0, amf::AMFComputePtr amf_compute_update = 0);
+int ReverbOCLInitialize(ProjPlan * plan, amdOCLRvrb *new_plan, const char * ocl_kernels_path, int init_flags, cl_command_queue OCLqueue_conv = 0, cl_command_queue OCLqueue_update = 0);
 int ReverbOCLTerminateDeffered(ProjPlan * plan);
 
 

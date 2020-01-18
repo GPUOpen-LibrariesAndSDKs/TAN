@@ -83,7 +83,8 @@ TANConvolutionImpl::TANConvolutionImpl(TANContext *pContextTAN)
     ,m_eOutputMemoryType(AMF_MEMORY_HOST)
     ,m_updThread(this)
     ,m_doHeadTailXfade(0)
-	, m_OutSamplesXFade(NULL)
+	,m_OutSamplesXFade(NULL)
+	,m_bUseProcessFinalize(false)
 #ifdef USE_TAIL_THREAD
 	, m_tailThread(this)
 #endif

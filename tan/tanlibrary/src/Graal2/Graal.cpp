@@ -72,6 +72,27 @@ ProjPlan * plan = NULL;
     return(err);
 }
 
+int graalInitialize(graalHandle *new_plan, const char * ocl_kernels_path, int init_flags,
+	cl_command_queue OCLqueue_conv, cl_command_queue OCLqueue_update) {
+	int err = 0;
+	ProjPlan * plan = NULL;
+
+	if (!new_plan) {
+		err = -1;
+		return(err);
+	}
+
+
+	plan = CreatePlan(init_flags);
+	// reverbirate conv kernel initialization
+
+	ReverbOCLInitialize(plan, new_plan, ocl_kernels_path, init_flags, OCLqueue_conv, OCLqueue_update);
+
+
+	return(err);
+}
+
+
 
 
 int graalTerminate(graalHandle rvrb) {

@@ -53,6 +53,8 @@ typedef void * HMODULE;
 #define _mkdir mkdir
 #define _chdir chdir
 #define PATH_MAX MAX_PATH
+#else
+#define PATH_MAX 1024
 #endif
 
 #define AMF_FACILITY L"TANFFTImpl"
@@ -455,6 +457,8 @@ void TANFFTImpl::GetFFTWCachePath(char *path, DWORD len)
 
 	// use W version in case folders have unicode names:
 	SetCurrentDirectoryW(curDir);
+#else
+	strncpy(path, "~/FFTW_TAN_WISDOM.cache",len);
 #endif
 	return;
 }

@@ -69,9 +69,26 @@ int main(int argc, char* argv[])
 	//char logfname[] = "TALibTestConvolutionLog.html";
 	//errno = fopen_s(&fpLog, logfname, "w+");
 
+	struct {
+		char abrev[20];
+		enum TAN_CONVOLUTION_METHOD method;
+		bool gpu;
+	} methodTable[6] = { 
+		{"CPU-OV",TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD, false },
+		{"CPU-UN",TAN_CONVOLUTION_METHOD_FFT_PARTITIONED_UNIFORM, false },
+		{"CPU-NU",TAN_CONVOLUTION_METHOD_FFT_PARTITIONED_NONUNIFORM, false },
+		{"GPU-OV",TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD, true },
+		{"GPU-UN",TAN_CONVOLUTION_METHOD_FHT_UNIFORM_PARTITIONED, true },
+		{"GPU-NU",TAN_CONVOLUTION_METHOD_FHT_NONUNIFORM_PARTITIONED, true },
+	};
+
+	getchar();
+
 	char *inFileName, *outFileName, *responseFileName, *responseFileName2;
-	std::vector<std::string> outFileNm(2);
+	//std::vector<std::string> outFileNm(2);
 	int n_samples = 128;
+
+
 
 	uint32_t SamplesPerSec, resSamplesPerSec;
 	uint16_t BitsPerSample, resBitsPerSample;
@@ -82,45 +99,33 @@ int main(int argc, char* argv[])
 	float **pfSamples = NULL;
 	float **pfResponse = NULL;
 	float **pfResponse2 = NULL;
-	int gpu = 0;
+	bool gpu = 0;
+	enum TAN_CONVOLUTION_METHOD method = TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD;
+	char * abrv = NULL;
 
 	if (argc < 5){
 		puts("syntax:\n");
-		puts("TALibTestConvolution <gpu | cpu> inFile outFile responseFile1 [responseFile2]\n");
+		puts("TALibTestConvolution method inFile outFile responseFile1 [responseFile2]\n");
+		puts("method = [CPU-OV | CPU-UN | CPU-NU | GPU-OV | GPU-UN | GPU-NU]\n"); 
+		puts("Where: OV = Overlap-Add, UN = Uniform Partitioned, NU = Non-Uniform Partitioned");
 		return(0);
 	}
-	if (!(!strcmp(argv[1], "gpu") || !strcmp(argv[1], "cpu") || !strcmp(argv[1], "both")))
-	{
-		puts("syntax:\n");
-		puts("TALibTestConvolution <gpu | cpu | both> inFile outFile responseFile1 [responseFile2]\n");
-		return(0);
-	}
-
-	gpu = (!strcmp(argv[1], "gpu")) ? 1 : (!strcmp(argv[1], "both")) ? 2 : 0;
-	if (gpu == 0)
-	{
-		printf("CPU ONLY\n");
-	}
-	else if (gpu == 1)
-	{
-		printf("GPU ONLY\n");
-	}
-	else
-	{
-		printf("CPU/GPU cross-verification\n");
+	
+	for (int i = 0; i < sizeof(methodTable) / sizeof(methodTable[0]); i++) {
+		if (strncmp(argv[1], methodTable[i].abrev, 20) == 0) {
+			method = methodTable[i].method;
+			gpu = methodTable[i].gpu;
+			abrv = methodTable[i].abrev;
+		}
 	}
 
 	inFileName = argv[2];
 	outFileName = argv[3];
-	size_t point_pos = std::string(argv[3]).find_last_of('.');
-	outFileNm[0] = std::string(argv[3]).substr(0, point_pos);
-	outFileNm[1] = outFileNm[0];
-	std::string ext = std::string(argv[3]).substr(point_pos);
-	outFileNm[0] += std::string("CPU") + ext;
-	outFileNm[1] += std::string("GPU") + ext;
 
 	responseFileName = argv[4];
 	responseFileName2 = argv[5];
+
+	printf("inFile: %s outFile: %s responseFile: %s \n", inFileName, outFileName, responseFileName);
 
 	ReadWaveFile(responseFileName, resSamplesPerSec, resBitsPerSample, NResChannels, NResSamples, &pResponse, &pfResponse);
 	ReadWaveFile(inFileName, SamplesPerSec, BitsPerSample, NChannels, NSamples, &pSamples, &pfSamples);
@@ -131,29 +136,21 @@ int main(int argc, char* argv[])
 	}
 
 	int n_blocks = (NSamples + n_samples - 1) / n_samples;
-	std::vector<float*> inp_hist(NChannels);
-	std::vector<float*> out_c(NChannels);
+	//std::vector<float*> inp_hist(NChannels);
+	//std::vector<float*> out_c(NChannels);
 	float **pfOutSamples = new float*[NChannels];
 	float **pfOutTemp = new float*[NChannels];
 	float **pfInTemp = new float*[NChannels];
-	float **pfOutSamplesCPU = new float*[NChannels];
-	float **pfOutTempCPU = new float*[NChannels];
-	float **pfInTempCPU = new float*[NChannels];
 	for (int n = 0; n < NChannels; n++) {
 
 
-		inp_hist[n] = new float[(n_blocks + 1) * n_samples];
-		memset(inp_hist[n], 0, (n_blocks + 1) * n_samples * sizeof(float));
-		out_c[n] = new float[n_samples];
+		//inp_hist[n] = new float[(n_blocks + 1) * n_samples];
+		//memset(inp_hist[n], 0, (n_blocks + 1) * n_samples * sizeof(float));
+		//out_c[n] = new float[n_samples];
 		pfOutSamples[n] = new float[NSamples];
-		memset(pfOutSamples[n], 0, sizeof(float));
+		memset(pfOutSamples[n], 0, NSamples*sizeof(float));
 		pfOutTemp[n] = pfOutSamples[n];
 		pfInTemp[n] = pfSamples[n];
-
-		pfOutSamplesCPU[n] = new float[NSamples];
-		memset(pfOutSamplesCPU[n], 0, sizeof(float));
-		pfOutTempCPU[n] = pfOutSamplesCPU[n];
-		pfInTempCPU[n] = pfSamples[n];
 
 	}
 
@@ -165,11 +162,7 @@ int main(int argc, char* argv[])
 	TANContextPtr taGPU;
 	TANContextPtr taCPU = NULL;
 
-	if (gpu == 0 || gpu == 2)
-	{
-		TANCreateContext(TAN_FULL_VERSION, &taCPU);
-	}
-	if (gpu == 1 || gpu == 2)
+	if (gpu)
 	{
 		TANCreateContext(TAN_FULL_VERSION, &taGPU);
 		cl_context gpu_context;
@@ -177,20 +170,23 @@ int main(int argc, char* argv[])
 		getDeviceAndContext(0, &gpu_context, &device_id);
 		taGPU->InitOpenCL(createQueue(gpu_context, device_id), createQueue(gpu_context, device_id));
 	}
+	else {
+		TANCreateContext(TAN_FULL_VERSION, &taCPU);
+	}
 
 	amf_uint32 flags[] = { 0, 0 };
 	TANConvolutionPtr convCPU = NULL;
 	TANConvolutionPtr convGPU = NULL;
-	if (gpu == 0 || gpu == 2)
+	if (!gpu)
 	{
 		TANCreateConvolution(taCPU, &convCPU);
-		convCPU->Init(TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD, NResSamples, n_samples, NChannels);
+		convCPU->Init(method, NResSamples, n_samples, NChannels);
 
 	}
-	if (gpu == 1 || gpu == 2)
+	if (gpu)
 	{
 		TANCreateConvolution(taGPU, &convGPU);
-		convGPU->Init(TAN_CONVOLUTION_METHOD_FHT_UNIFORM_PARTITIONED, NResSamples, n_samples, NChannels);
+		convGPU->Init(method, NResSamples, n_samples, NChannels);
 	}
 
 
@@ -208,18 +204,14 @@ int main(int argc, char* argv[])
 		if (b % update_interv == 0)
 		{
 			pfResp = ((b & 1) == 0 || !pfResponse2) ? pfResponse : pfResponse2;
-			if (gpu == 0 || gpu == 2)
+			if (!gpu)
 			{
 				convCPU->UpdateResponseTD(pfResp, NResSamples,NULL,NULL);
-				if (gpu == 0)
-				{
-					printf("UPLOAD: %d\n", ns);
-				}
+				printf("UPLOAD: %d\n", ns);
 			}
-			if (gpu == 1 || gpu == 2)
+			if (gpu)
 			{
 				convGPU->UpdateResponseTD(pfResp, NResSamples,NULL,NULL);
-
 				printf("UPLOAD: %d\n", ns);
 			}
 
@@ -233,78 +225,26 @@ int main(int argc, char* argv[])
 			oh++;
 		}
 
-		if (gpu == 0 || gpu == 2)
+		if (!gpu)
 		{
-			convCPU->Process(pfInTempCPU, pfOutTempCPU, actual_samples, flags,NULL);
+			convCPU->Process(pfInTemp, pfOutTemp, actual_samples, flags,NULL);
 
 		}
 
-		if (gpu == 1 || gpu == 2)
+		if (gpu)
 		{
 			convGPU->Process(pfInTemp, pfOutTemp, actual_samples, flags,NULL);
 		}
 
 		for (int nch = 0; nch < NChannels && !mismatch; nch++){
 
-			if (gpu == 2)
+			if (!gpu)
 			{
-				double diff2 = 0;
-				double cpu2 = 0;
-				int index = b % (n_blocks + 1);
-				memset(inp_hist[nch] + index * n_samples, 0, n_samples * sizeof(float));
-				memcpy(inp_hist[nch] + index * n_samples, pfInTempCPU[nch], actual_samples * sizeof(float));
-
-				DirectConv(out_c[nch], inp_hist[nch], index, n_samples, pfResp[nch], NResSamples, (n_blocks + 1));
-
-				for (int s = 0; s < actual_samples && !mismatch; s++)
-				{
-#if 0
-					if (abs(out_c[nch][s] - pfOutTempCPU[nch][s]) > 0.001)
-					{
-						printf("CPU-em/CPU mismatch c=%d s=%d cev=%f cv=%f\n", nch, ns + s, out_c[nch][s], pfOutTempCPU[nch][s]);
-						//						mismatch = 1;
-						//						break;
-					}
-					//#else
-					if (abs(out_c[nch][s] - pfOutTemp[nch][s]) > 0.01)
-					{
-						printf("CPU_em/GPU mismatch c=%d s=%d cev=%f gv=%f\n", nch, ns + s, out_c[nch][s], pfOutTemp[nch][s]);
-						//						mismatch = 1;
-						//						break;
-					}
-
-
-#endif
-					diff2 += (pfOutTemp[nch][s] - pfOutTempCPU[nch][s]) * (pfOutTemp[nch][s] - pfOutTempCPU[nch][s]);
-					cpu2 += pfOutTempCPU[nch][s] * pfOutTempCPU[nch][s];
-				}
-
-#if 1
-				//				double err = (cpu2 != 0) ? diff2 / cpu2 : 0;
-				if (sqrt(diff2) > 0.01)
-				{
-					for (int s = 0; s < actual_samples && !mismatch; s++)
-					{
-
-						if (abs(pfOutTemp[nch][s] - pfOutTempCPU[nch][s]) > 0.001)
-						{
-							printf("CPU/GPU mismatch c=%d s=%d cv=%f gv=%f\n", nch, ns + s, pfOutTempCPU[nch][s], pfOutTemp[nch][s]);
-							break;
-						}
-
-					}
-					mismatch = 1;
-				}
-#endif
+				pfInTemp[nch] += n_samples;
+				pfOutTemp[nch] += n_samples;
 			}
 
-			if (gpu == 0 || gpu == 2)
-			{
-				pfInTempCPU[nch] += n_samples;
-				pfOutTempCPU[nch] += n_samples;
-			}
-
-			if (gpu == 1 || gpu == 2)
+			if (gpu)
 			{
 				pfInTemp[nch] += n_samples;
 				pfOutTemp[nch] += n_samples;
@@ -327,15 +267,7 @@ int main(int argc, char* argv[])
 	}
 
 
-	if (gpu == 0 || gpu == 2)
-	{
-		WriteWaveFileF((char*)outFileNm[0].c_str(), SamplesPerSec, NChannels, BitsPerSample, NSamples, pfOutSamplesCPU);
-	}
-
-	if (gpu == 1 || gpu == 2)
-	{
-		WriteWaveFileF((char*)outFileNm[1].c_str(), SamplesPerSec, NChannels, BitsPerSample, NSamples, pfOutSamples);
-	}
+	WriteWaveFileF(outFileName, SamplesPerSec, NChannels, BitsPerSample, NSamples, pfOutSamples);
 
 
 	delete[] pResponse;
@@ -347,8 +279,8 @@ int main(int argc, char* argv[])
 	delete[] pSamples;
 	for (int n = 0; n < NChannels; n++){
 		delete[] pfSamples[n];
-		delete[] inp_hist[n];
-		delete[] out_c[n];
+		//delete[] inp_hist[n];
+		//delete[] out_c[n];
 
 	}
 	delete pfSamples;
@@ -360,9 +292,6 @@ int main(int argc, char* argv[])
 	delete[]pfOutSamples;
 	delete[] pfOutTemp;
 	delete[] pfInTemp;
-	delete[] pfOutSamplesCPU;
-	delete[] pfOutTempCPU;
-	delete[] pfInTempCPU;
 
 
 	//_spawnlp(_P_NOWAIT, "C:/Program Files/Internet Explorer/iexplore.exe", &logfname[0], &logfname[0], NULL);

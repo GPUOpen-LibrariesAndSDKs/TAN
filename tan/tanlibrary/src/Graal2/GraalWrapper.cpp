@@ -63,25 +63,25 @@ int GraalWrapper::Init(
     int buffer_size,
     int number_ir_buffer_sets)
 {
-#ifndef _WIN32
-	return -3;
-#endif
+//#ifndef _WIN32
+//	return -3;
+//#endif
     m_amfComputeConv = pConvolution;
     m_amfComputeUpdate = pUpdate;
     m_pContextTAN = pContextTAN;
-    // Sanity check to make sure context and queues assciated with A<F compute devices and TAN context are consistent
-    if (m_amfComputeConv->GetNativeCommandQueue() != pContextTAN->GetOpenCLConvQueue() ||
-        m_amfComputeUpdate->GetNativeCommandQueue() != pContextTAN->GetOpenCLGeneralQueue())
-    {
-        printf("Command queues associated with AMF compute devices different from the ones in the TAN context\n");
-        return -1;
-    }
-    if (m_amfComputeConv->GetNativeContext() != pContextTAN->GetOpenCLContext() ||
-        m_amfComputeUpdate->GetNativeContext() != pContextTAN->GetOpenCLContext())
-    {
-        printf("Context associated with AMF compute devices different from the ones in the TAN context\n");
-        return -2;
-    }
+    //// Sanity check to make sure context and queues assciated with A<F compute devices and TAN context are consistent
+    //if (m_amfComputeConv->GetNativeCommandQueue() != pContextTAN->GetOpenCLConvQueue() ||
+    //    m_amfComputeUpdate->GetNativeCommandQueue() != pContextTAN->GetOpenCLGeneralQueue())
+    //{
+    //    printf("Command queues associated with AMF compute devices different from the ones in the TAN context\n");
+    //    return -1;
+    //}
+    //if (m_amfComputeConv->GetNativeContext() != pContextTAN->GetOpenCLContext() ||
+    //    m_amfComputeUpdate->GetNativeContext() != pContextTAN->GetOpenCLContext())
+    //{
+    //    printf("Context associated with AMF compute devices different from the ones in the TAN context\n");
+    //    return -2;
+    //}
     // Setting the falgs 
     int init_flags = (  heterogen | FHT_2streams | fht | fft | fir);
     int ret =  ReverbDriverInit(&m_handle, buffer_size, n_max_channels, 1, init_flags);
@@ -155,7 +155,10 @@ int GraalWrapper::ReverbDriverInit(graalHandle* new_plan, int block_size, int n_
     int err = 0;
     amdOCLRvrb plan;
 
-    err = graalInitialize(&plan, NULL, verification, m_amfComputeConv, m_amfComputeUpdate);
+    //err = graalInitialize(&plan, NULL, verification, m_amfComputeConv, m_amfComputeUpdate);
+	
+	err = graalInitialize(&plan, NULL, verification, m_pContextTAN->GetOpenCLConvQueue(), m_pContextTAN->GetOpenCLGeneralQueue());
+
     // actually should reposrt the number
     err = graalReverbSetNChannels(plan, n_channels, subchannels, n_channels, subchannels);
 

@@ -89,7 +89,8 @@ extern "C"
     void        AMF_CDECL_CALL amf_restore_timer_precision();
 
     amf_handle  AMF_CDECL_CALL amf_load_library(const wchar_t* filename);
-    void*       AMF_CDECL_CALL amf_get_proc_address(amf_handle module, const char* procName);
+	amf_handle  AMF_CDECL_CALL amf_load_libraryA(const char* filename);
+	void*       AMF_CDECL_CALL amf_get_proc_address(amf_handle module, const char* procName);
     int         AMF_CDECL_CALL amf_free_library(amf_handle module);
 
     amf_uint32 AMF_STD_CALL get_current_thread_id();
