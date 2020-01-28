@@ -172,6 +172,7 @@ int main(int argc, char* argv[])
 	}
 	else {
 		TANCreateContext(TAN_FULL_VERSION, &taCPU);
+		taCPU->InitOpenMP(4);
 	}
 
 	amf_uint32 flags[] = { 0, 0 };
@@ -180,13 +181,15 @@ int main(int argc, char* argv[])
 	if (!gpu)
 	{
 		TANCreateConvolution(taCPU, &convCPU);
-		convCPU->Init(method, NResSamples, n_samples, NChannels);
+		//convCPU->Init(method, NResSamples, n_samples, NChannels);
+		convCPU->InitCpu(method, NResSamples, n_samples, NChannels);
 
 	}
 	if (gpu)
 	{
 		TANCreateConvolution(taGPU, &convGPU);
-		convGPU->Init(method, NResSamples, n_samples, NChannels);
+		//convGPU->Init(method, NResSamples, n_samples, NChannels);
+		convGPU->InitGpu(method, NResSamples, n_samples, NChannels);
 	}
 
 

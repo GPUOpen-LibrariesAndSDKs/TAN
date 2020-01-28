@@ -458,7 +458,7 @@ void TANFFTImpl::GetFFTWCachePath(char *path, DWORD len)
 	// use W version in case folders have unicode names:
 	SetCurrentDirectoryW(curDir);
 #else
-	strncpy(path, "~/FFTW_TAN_WISDOM.cache",len);
+	strncpy(path, "/var/tmp/FFTW_TAN_WISDOM.cache",len);
 #endif
 	return;
 }
@@ -466,8 +466,8 @@ void TANFFTImpl::GetFFTWCachePath(char *path, DWORD len)
 
 void TANFFTImpl::cacheFFTWplans()
 {
-	int minL2N = 15;
-	int maxL2N = 16; MAX_CACHE_POWER;
+	int minL2N = 4;
+	int maxL2N = MAX_CACHE_POWER;
 
 	char path[PATH_MAX + 2] = "\0";
 	int len = PATH_MAX;

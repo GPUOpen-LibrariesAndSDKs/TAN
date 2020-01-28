@@ -299,8 +299,8 @@ int Audio3D::Init
         return -1;
     }
 
-    //m_useOCLOutputPipeline = useGPU_Conv && useGPU_IRGen;
-    m_useOCLOutputPipeline = useGPU_Conv || useGPU_IRGen;
+    m_useOCLOutputPipeline = useGPU_Conv && useGPU_IRGen;
+    //m_useOCLOutputPipeline = useGPU_Conv || useGPU_IRGen;
     
     mSrc1EnableMic = useMicSource;
     mSrc1TrackHeadPos = trackHeadPos;
@@ -620,7 +620,7 @@ int Audio3D::Init
         // C_Model implementation
         RETURN_IF_FAILED(
             m_spConvolution->InitCpu(
-                convMethod,
+                amf::TAN_CONVOLUTION_METHOD(convMethod),  // | TAN_CONVOLUTION_METHOD_USE_PROCESS_FINALIZE), //optional to reduce latency, must call ProcessFinalize in separate thread.
                 m_fftLen,
                 mBufferSizeInSamples,
                 mWavFiles.size() * STEREO_CHANNELS_COUNT
@@ -632,7 +632,7 @@ int Audio3D::Init
         RETURN_IF_FAILED(
             m_spConvolution->InitGpu(
                 //TAN_CONVOLUTION_METHOD_FHT_UNIFORM_HEAD_TAIL,
-                convMethod,
+				amf::TAN_CONVOLUTION_METHOD(convMethod), // | TAN_CONVOLUTION_METHOD_USE_PROCESS_FINALIZE), //optional to reduce latency, must call ProcessFinalize in separate thread.
                 m_fftLen,
                 mBufferSizeInSamples,
                 mWavFiles.size() * STEREO_CHANNELS_COUNT
@@ -640,10 +640,12 @@ int Audio3D::Init
             );
     }
 
-    RETURN_IF_FAILED(TANCreateConverter(mTANRoomContext, &m_spConverter));
-    RETURN_IF_FAILED(m_spConverter->Init());
+    //RETURN_IF_FAILED(TANCreateConverter(mTANRoomContext, &m_spConverter));
+	RETURN_IF_FAILED(TANCreateConverter(mTANConvolutionContext, &m_spConverter));
+	RETURN_IF_FAILED(m_spConverter->Init());
 
-    RETURN_IF_FAILED(TANCreateMixer(mTANRoomContext, &m_spMixer));
+	//RETURN_IF_FAILED(TANCreateMixer(mTANRoomContext, &m_spMixer));
+	RETURN_IF_FAILED(TANCreateMixer(mTANConvolutionContext, &m_spMixer));
 	RETURN_IF_FAILED(m_spMixer->Init(mBufferSizeInSamples, mWavFiles.size()));
 
     RETURN_IF_FAILED(TANCreateFFT(mTANRoomContext, &m_spFft));
@@ -992,11 +994,12 @@ int Audio3D::Process(int16_t *pOut, int16_t *pChan[MAX_SOURCES], uint32_t sample
             mOutputShortBuf, 2, 1, TAN_SAMPLE_TYPE_SHORT, sampleCount, 1.f);
         RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED);
 
-        cl_int clErr = clEnqueueReadBuffer(mTANConvolutionContext->GetOpenCLGeneralQueue(), mOutputShortBuf, CL_TRUE,
+        cl_int clErr = clEnqueueReadBuffer(mTANConvolutionContext->GetOpenCLConvQueue(), mOutputShortBuf, CL_TRUE,
              0, sampleCountBytes, pOut, NULL, NULL, NULL);
 
 		// Call the processFinalize() method after all the post processing is enqueued on the convolution queue
-		m_spConvolution->ProcessFinalize();
+		//if method & TAN_CONVOLUTION_METHOD_USE_PROCESS_FINALIZE
+		// m_spConvolution->ProcessFinalize();
 		RETURN_IF_FALSE(clErr == CL_SUCCESS);
         /**/
     }
@@ -1032,7 +1035,8 @@ int Audio3D::Process(int16_t *pOut, int16_t *pChan[MAX_SOURCES], uint32_t sample
     }
 
 	// Call the processFinalize() method after all the post processing is enqueued on the convolution queue
-	m_spConvolution->ProcessFinalize();
+	//if method & TAN_CONVOLUTION_METHOD_USE_PROCESS_FINALIZE
+	// m_spConvolution->ProcessFinalize();
 
 #if 0// Old code: Crossfade, Mixing and Conversion on CPU
 

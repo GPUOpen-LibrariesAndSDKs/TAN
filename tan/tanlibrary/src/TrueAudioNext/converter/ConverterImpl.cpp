@@ -109,7 +109,7 @@ AMF_RESULT  AMF_STD_CALL TANConverterImpl::InitGpu()
     /* OpenCL Initialization */
 
     // Given some command queue, retrieve the cl_context...
-    m_pCommandQueueCl = m_pContextTAN->GetOpenCLGeneralQueue();
+    m_pCommandQueueCl = m_pContextTAN->GetOpenCLConvQueue();
     ret = clGetCommandQueueInfo(m_pCommandQueueCl, CL_QUEUE_CONTEXT, sizeof(cl_context),
         &m_pContextCl, NULL);
         AMF_RETURN_IF_CL_FAILED(ret,  L"Cannot retrieve cl_context from cl_command_queue.");
@@ -129,20 +129,20 @@ AMF_RESULT  AMF_STD_CALL TANConverterImpl::InitGpu()
     GetProperty(TAN_OUTPUT_MEMORY_TYPE, &tmp);
     m_eOutputMemoryType = (AMF_MEMORY_TYPE)tmp;
 	TANContextImplPtr contextImpl(m_pContextTAN);
-	m_pDeviceAMF = contextImpl->GetGeneralCompute();
+	m_pDeviceAMF = contextImpl->GetConvolutionCompute();
     int temp = 0;
     m_overflowBuffer = clCreateBuffer(
         m_pContextCl, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(amf_int32), &temp, &ret);
     AMF_RETURN_IF_CL_FAILED(ret, L"Failed to create buffer");
 	//... Preparing OCL Kernel
 	bool OCLKenel_Err = false;
-	OCLKenel_Err = GetOclKernel(m_clkFloat2Float, m_pDeviceAMF, contextImpl->GetOpenCLGeneralQueue(), "floatToFloat", Converter, ConverterCount, "floatToFloat", "");
+	OCLKenel_Err = GetOclKernel(m_clkFloat2Float, m_pDeviceAMF, contextImpl->GetOpenCLConvQueue(), "floatToFloat", Converter, ConverterCount, "floatToFloat", "");
 	if (!OCLKenel_Err){ printf("Failed to compile Converter Kernel floatToFloat"); return AMF_FAIL; }
-	OCLKenel_Err = GetOclKernel(m_clkFloat2Short, m_pDeviceAMF, contextImpl->GetOpenCLGeneralQueue(), "floatToShort", Converter, ConverterCount, "floatToShort", "");
+	OCLKenel_Err = GetOclKernel(m_clkFloat2Short, m_pDeviceAMF, contextImpl->GetOpenCLConvQueue(), "floatToShort", Converter, ConverterCount, "floatToShort", "");
 	if (!OCLKenel_Err){ printf("Failed to compile Converter Kernel floatToShort"); return AMF_FAIL; }
-	OCLKenel_Err = GetOclKernel(m_clkShort2Short, m_pDeviceAMF, contextImpl->GetOpenCLGeneralQueue(), "shortToShort", Converter, ConverterCount, "shortToShort", "");
+	OCLKenel_Err = GetOclKernel(m_clkShort2Short, m_pDeviceAMF, contextImpl->GetOpenCLConvQueue(), "shortToShort", Converter, ConverterCount, "shortToShort", "");
 	if (!OCLKenel_Err){ printf("Failed to compile Converter Kernel shortToShort"); return AMF_FAIL; }
-	OCLKenel_Err = GetOclKernel(m_clkShort2Float, m_pDeviceAMF, contextImpl->GetOpenCLGeneralQueue(), "shortToFloat", Converter, ConverterCount, "shortToFloat", "");
+	OCLKenel_Err = GetOclKernel(m_clkShort2Float, m_pDeviceAMF, contextImpl->GetOpenCLConvQueue(), "shortToFloat", Converter, ConverterCount, "shortToFloat", "");
 	if (!OCLKenel_Err){ printf("Failed to compile Converter Kernel shortToFloat"); return AMF_FAIL; }
 
 	return res;

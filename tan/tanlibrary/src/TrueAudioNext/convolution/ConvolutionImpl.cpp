@@ -2280,6 +2280,7 @@ amf_size TANConvolutionImpl::ovlNUPProcess(
 	bool useXFadeAccumulator
 )
 {
+	amf_size ret = 0;
 	if (inputData.mType != AMF_MEMORY_HOST)
 	{
 		return 0;
@@ -2291,12 +2292,13 @@ amf_size TANConvolutionImpl::ovlNUPProcess(
 		return -1;
 	}
 	else {
-		return ovlNUPProcessCPU(state, inputData, outputData, nSamples, n_channels, advanceOverlap, useXFadeAccumulator);
+		ret = ovlNUPProcessCPU(state, inputData, outputData, nSamples, n_channels, advanceOverlap, useXFadeAccumulator);
 	}
 	if (!m_bUseProcessFinalize) {
 		// app isn't going to call finalize, so do it here:
 		ProcessFinalize();
 	}
+	return ret;
 }
 
 

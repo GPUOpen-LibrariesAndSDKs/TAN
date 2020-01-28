@@ -115,7 +115,7 @@ AMF_RESULT  AMF_STD_CALL TANMixerImpl::InitGpu()
     /* OpenCL Initialization */
 
     // Given some command queue, retrieve the cl_context...
-    m_pCommandQueueCl = m_pContextTAN->GetOpenCLGeneralQueue();
+    m_pCommandQueueCl = m_pContextTAN->GetOpenCLConvQueue();
     ret = clGetCommandQueueInfo(m_pCommandQueueCl, CL_QUEUE_CONTEXT, sizeof(cl_context),
         &m_pContextCl, NULL);
         AMF_RETURN_IF_CL_FAILED(ret,  L"Cannot retrieve cl_context from cl_command_queue.");
@@ -135,13 +135,13 @@ AMF_RESULT  AMF_STD_CALL TANMixerImpl::InitGpu()
     GetProperty(TAN_OUTPUT_MEMORY_TYPE, &tmp);
     m_eOutputMemoryType = (AMF_MEMORY_TYPE)tmp;
     TANContextImplPtr contextImpl(m_pContextTAN);
-    m_pDeviceAMF = contextImpl->GetGeneralCompute();
+    m_pDeviceAMF = contextImpl->GetConvolutionCompute();
 
     m_internalBuff = clCreateBuffer(m_pContextTAN->GetOpenCLContext(), CL_MEM_READ_WRITE, m_bufferSize * m_numChannels * sizeof(float), nullptr, &ret);
     AMF_RETURN_IF_CL_FAILED(ret, L"Failed to create CL buffer");
     //... Preparing OCL Kernel
     bool OCLKenel_Err = false;
-    OCLKenel_Err = GetOclKernel(m_clMix, m_pDeviceAMF, contextImpl->GetOpenCLGeneralQueue(), "Mixer", Mixer, MixerCount, "Mixer", "");
+    OCLKenel_Err = GetOclKernel(m_clMix, m_pDeviceAMF, contextImpl->GetOpenCLConvQueue(), "Mixer", Mixer, MixerCount, "Mixer", "");
     if (!OCLKenel_Err){ printf("Failed to compile Mixer Kernel"); return AMF_FAIL; }
 	m_OCLInitialized = true;
     return res;
@@ -230,7 +230,7 @@ AMF_RESULT  AMF_STD_CALL    TANMixerImpl::Mix(
     amf_size global[3] = { numOfSamplesToProcess, 0, 0 };
     amf_size local[3] = { (numOfSamplesToProcess>256) ? 256 : numOfSamplesToProcess, 0, 0 };
     //amf_size local[3] = { 1, 0, 0 };
-    int status = clEnqueueNDRangeKernel(m_pContextTAN->GetOpenCLGeneralQueue(), m_clMix, 1, NULL, global, local, 0, NULL, NULL);
+    int status = clEnqueueNDRangeKernel(m_pContextTAN->GetOpenCLConvQueue(), m_clMix, 1, NULL, global, local, 0, NULL, NULL);
     AMF_RETURN_IF_CL_FAILED(status, L"Failed to enqueue OCL kernel");
     return AMF_OK;
 }
@@ -246,7 +246,7 @@ AMF_RESULT  AMF_STD_CALL    TANMixerImpl::Mix(
     for (int i = 0; i < m_numChannels; i++)
     {
         int status = clEnqueueCopyBuffer(
-            m_pContextTAN->GetOpenCLGeneralQueue(),
+            m_pContextTAN->GetOpenCLConvQueue(),
             pBufferInput[i],
             m_internalBuff,
             0,

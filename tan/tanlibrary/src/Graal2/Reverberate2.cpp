@@ -457,7 +457,7 @@ __FLOAT__ *stream_data = NULL;
 	stream_data = (__FLOAT__ *)in_out_plan->stream_in[curr_stream].sys_map;
 
 	for (int j = 0; j < numChans; j++) {
-#if 1
+#ifdef _WIN32
         int chId = channel_ids[j];
         __FLOAT__ * block_ptr = stream_data + plan->frame_ln * (que_index + plan->in_que_ln * chId);
 		memcpy(block_ptr, input[j], numSamples * sizeof(__FLOAT__));
@@ -470,7 +470,7 @@ __FLOAT__ *stream_data = NULL;
 // TODO: MOVE INTO KERNEL
         if (plan->frame_ln > numSamples)
         {
-#if 1
+#ifdef _WIN32
             memset((block_ptr + numSamples), 0, (plan->frame_ln - numSamples) * sizeof(__FLOAT__));
 #else
             // Replacing memory mapping with explicit memory OCL write 
