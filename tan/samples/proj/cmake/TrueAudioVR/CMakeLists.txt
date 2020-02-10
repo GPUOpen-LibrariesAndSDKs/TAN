@@ -103,6 +103,7 @@ generateCLKernelHeader(
   CL_Directories
   CL_Files
   CL_Output
+  TrueAudioVR
   )
 
 # linking
@@ -117,7 +118,7 @@ if(NOT WIN32)
   if(CMAKE_BUILD_TYPE MATCHES "Debug" OR CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
     target_compile_options(TrueAudioVR PUBLIC -g)
   endif()
-  
+
   if(NOT APPLE)
     target_compile_options(TrueAudioVR PUBLIC -Wpsabi)
   endif()

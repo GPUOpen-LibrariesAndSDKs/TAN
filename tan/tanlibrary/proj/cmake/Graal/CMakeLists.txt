@@ -12,26 +12,6 @@ include(../../../../tanlibrary/proj/cmake/utils/OpenCL.cmake)
 # cl kernel preprocessor
 include(../../../../samples/proj/cmake/CLKernelPreprocessor/CLKernelPreprocessor.cmake)
 
-#cl-helper
-#SET(clHelper_DIR ../../../../../OpenCLHelper/clHelper)
-# this builds the clHelper library (optional, if you want
-# to manually access the globally generated symbols)
-#ADD_SUBDIRECTORY(${clHelper_DIR} cmake-clHelper-bin)
-# specify include paths for #include's in opencl files:
-#OPENCL_INCLUDE_DIRECTORIES(${OpenCL_INCLUDE_DIRS})
-
-# compile some opencl kernels. This properly preprocessor-exapands
-# and test-compiles the given .cl files (once to asm, once to llvm),
-# and puts the preprocessor-expanded code (as a char[] array)
-# into dedicated .c files (that can be accessed through the
-# implicit EMBEDDED_OPENCL_KERNELS variable
-#COMPILE_OPENCL(
-#  ../../../src/Graal/amdFFT_conv_kernels.cl
-#  ../../../src/Graal/amdFIR_kernels.cl
-#  ../../../src/Graal/GraalFHT.cl
-#  ../../../src/Graal/GraalUtil.cl
-#  )
-
 # library name
 project(Graal)
 
@@ -119,6 +99,7 @@ generateCLKernel(
   Graal_CL_Directories
   Graal_CL_Files
   Graal_CL_Output
+  Graal
   )
 
 add_dependencies(Graal CLKernelPreprocessor)
