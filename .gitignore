@@ -1,4 +1,5 @@
 *CLKernel_*.h
+*Kernels/*.cl.h
 /.vscode/c_cpp_properties.json
 /.vscode/settings.json
 /.vscode/tasks.json
@@ -10,4 +11,5 @@
 /tan/build/cmake/vs2017
 /thirdparty/portaudio/*
 /thirdparty/OpenCL-Headers/*
+/tan/tanlibrary/src/fftw-3.3.5/*
 .DS_Store
