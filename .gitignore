@@ -3,6 +3,8 @@
 /.vscode/c_cpp_properties.json
 /.vscode/settings.json
 /.vscode/tasks.json
+/tan/tanlibrary/src/Graal/OclKernels/*.h
+/tan/samples/src/TrueAudioVR/Kernels/*.h
 /tan/build/cmake/linux
 /tan/build/cmake/mac
 /tan/build/cmake/mac-xcode
