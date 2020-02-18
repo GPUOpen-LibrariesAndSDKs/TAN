@@ -72,7 +72,7 @@ if(PortAudio_DIR)
     )
 
   add_subdirectory(${PortAudio_DIR} cmake-portaudio-bin EXCLUDE_FROM_ALL)
-  
+
   ADD_DEFINITIONS(-DENABLE_PORTAUDIO)
   include_directories(${PortAudio_DIR}/include)
 endif()
@@ -236,4 +236,30 @@ if(NOT WIN32)
   if(NOT APPLE)
     target_compile_options(RoomAcousticsQT PUBLIC -Wpsabi)
   endif()
+endif()
+
+#copy runtime dll to the binary dir
+if(WIN32)
+  #if(NOT AMF_CORE_STATIC)
+  #  add_custom_command(
+  #    TARGET RoomAcousticsQT
+  #    POST_BUILD
+  #
+  #    COMMAND ${CMAKE_COMMAND} -E copy_directory "${${AMF_NAME}_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
+  #    )
+  #endif()
+
+  add_custom_command(
+    TARGET RoomAcousticsQT
+    POST_BUILD
+    #COMMAND ${CMAKE_COMMAND} -E copy_directory "${${AMF_NAME}_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioNext_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioVR_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${GPUUtilities_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${RoomAcousticsQT_BINARY_DIR}/cmake-portaudio-bin/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
+
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Core> $<TARGET_FILE_DIR:RoomAcousticsQT>
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Gui> $<TARGET_FILE_DIR:RoomAcousticsQT>
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Widgets> $<TARGET_FILE_DIR:RoomAcousticsQT>
+    )
 endif()

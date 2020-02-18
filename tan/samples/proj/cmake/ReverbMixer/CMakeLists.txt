@@ -54,7 +54,7 @@ if(PortAudio_DIR)
   message("portaudio install_dir: " ${install_dir})
 
   #add_subdirectory(${PortAudio_DIR} cmake-portaudio-bin EXCLUDE_FROM_ALL)
-  
+
   ADD_DEFINITIONS(-DENABLE_PORTAUDIO)
   include_directories(${PortAudio_DIR}/include)
 endif()
@@ -175,4 +175,29 @@ else()
   if(NOT APPLE)
     target_link_libraries(ReverbMixer "asound")
   endif()
+endif()
+
+#copy runtime dll to the binary dir
+if(WIN32)
+  #if(NOT AMF_CORE_STATIC)
+  #  add_custom_command(
+  #    TARGET ReverbMixer
+  #    POST_BUILD
+  #
+  #    COMMAND ${CMAKE_COMMAND} -E copy_directory "${${AMF_NAME}_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:ReverbMixer>
+  #    )
+  #endif()
+
+  add_custom_command(
+    TARGET ReverbMixer
+    POST_BUILD
+    #COMMAND ${CMAKE_COMMAND} -E copy_directory "${${AMF_NAME}_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:ReverbMixer>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioNext_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:ReverbMixer>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${GPUUtilities_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:ReverbMixer>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${RoomAcousticsQT_BINARY_DIR}/cmake-portaudio-bin/$<CONFIGURATION>" $<TARGET_FILE_DIR:ReverbMixer>
+
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Core> $<TARGET_FILE_DIR:ReverbMixer>
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Gui> $<TARGET_FILE_DIR:ReverbMixer>
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Widgets> $<TARGET_FILE_DIR:ReverbMixer>
+    )
 endif()
