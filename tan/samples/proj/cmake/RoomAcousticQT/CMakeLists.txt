@@ -18,18 +18,16 @@ set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 enable_language(CXX)
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
 if(NOT WIN32)
-if(APPLE)
-#SET (CMAKE_CXX_COMPILER "/usr/bin/c++")
-set(CMAKE_CXX_FLAGS_DEBUG "-Xpreprocessor -fopenmp -lomp")
-set(CMAKE_CXX_FLAGS "-Xpreprocessor -fopenmp -lomp")
-#set(CMAKE_SHARED_LINKER_FLAGS " -lomp" )
-else()
-set(CMAKE_CXX_FLAGS_DEBUG "-fopenmp")
-set(CMAKE_CXX_FLAGS "-fopenmp")
+  if(APPLE)
+    #SET (CMAKE_CXX_COMPILER "/usr/bin/c++")
+    set(CMAKE_CXX_FLAGS_DEBUG "-Xpreprocessor -fopenmp -lomp")
+    set(CMAKE_CXX_FLAGS "-Xpreprocessor -fopenmp -lomp")
+    #set(CMAKE_SHARED_LINKER_FLAGS " -lomp" )
+  else()
+    set(CMAKE_CXX_FLAGS_DEBUG "-fopenmp")
+    set(CMAKE_CXX_FLAGS "-fopenmp")
+  endif()
 endif()
-endif()
-
-
 
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
@@ -91,7 +89,7 @@ include_directories(../../../src/RoomAcousticQT/QTObject)
 ADD_DEFINITIONS(-D_DEBUG)
 
 if(CMAKE_BUILD_TYPE EQUAL "Debug")
-    ADD_DEFINITIONS(-D_DEBUG)
+  ADD_DEFINITIONS(-D_DEBUG)
 endif()
 
 # sources
@@ -121,10 +119,9 @@ set(
 if(WIN32)
   list(APPEND SOURCE_EXE ../../../src/common/WASAPIPlayer.cpp)
 else()
-if(NOT APPLE)
-  list(APPEND SOURCE_EXE ../../../src/common/AlsaPlayer.cpp)
-endif()
-
+  if(NOT APPLE)
+    list(APPEND SOURCE_EXE ../../../src/common/AlsaPlayer.cpp)
+  endif()
 endif()
 
 set(
@@ -148,7 +145,7 @@ set(
   ../../../src/RoomAcousticQT/QTObject/AdvanceGraphicView.h
   ../../../src/RoomAcousticQT/Resources/resource.h
   ../../../src/RoomAcousticQT/RoomAcousticQT.h
-)
+  )
 
 if(WIN32)
   list(APPEND HEADER_EXE ../../../src/common/WASAPIPlayer.h)
@@ -199,8 +196,8 @@ add_executable(
   )
 
 target_link_libraries(RoomAcousticsQT amf)
-target_link_libraries(RoomAcousticsQT TrueAudioNext)
 target_link_libraries(RoomAcousticsQT TrueAudioVR)
+target_link_libraries(RoomAcousticsQT TrueAudioNext)
 target_link_libraries(RoomAcousticsQT GPUUtilities)
 target_link_libraries(RoomAcousticsQT ${OpenCL_LIBRARY})
 target_link_libraries(RoomAcousticsQT Qt5::Widgets)
@@ -238,22 +235,25 @@ if(NOT WIN32)
   endif()
 endif()
 
+message("1: ${TrueAudioNext_BINARY_DIR}")
+message("2: ${TrueAudioNext_PROJECT_DIR}")
+message("3: $<TARGET_FILE_DIR:TrueAudioNext>")
+message("4: ${TAN_BINARY_DIR}")
+message("5: ${GPUUtilities_BINARY_DIR}")
+message("6: ${TrueAudioVR_BINARY_DIR}")
+
 #copy runtime dll to the binary dir
 if(WIN32)
-  #if(NOT AMF_CORE_STATIC)
-  #  add_custom_command(
-  #    TARGET RoomAcousticsQT
-  #    POST_BUILD
-  #
-  #    COMMAND ${CMAKE_COMMAND} -E copy_directory "${${AMF_NAME}_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
-  #    )
-  #endif()
-
   add_custom_command(
     TARGET RoomAcousticsQT
     POST_BUILD
-    #COMMAND ${CMAKE_COMMAND} -E copy_directory "${${AMF_NAME}_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioNext_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
+    )
+    
+  add_custom_command(
+    TARGET RoomAcousticsQT
+    POST_BUILD
+    #COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioNext_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioVR_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${GPUUtilities_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${RoomAcousticsQT_BINARY_DIR}/cmake-portaudio-bin/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
@@ -262,4 +262,12 @@ if(WIN32)
     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Gui> $<TARGET_FILE_DIR:RoomAcousticsQT>
     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Widgets> $<TARGET_FILE_DIR:RoomAcousticsQT>
     )
+
+  if(PortAudio_DIR)
+    add_custom_command(
+      TARGET RoomAcousticsQT
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy_directory "${RoomAcousticsQT_BINARY_DIR}/cmake-portaudio-bin/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
+      )
+  endif()
 endif()
