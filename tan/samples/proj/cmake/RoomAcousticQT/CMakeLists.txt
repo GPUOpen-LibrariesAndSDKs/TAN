@@ -235,25 +235,12 @@ if(NOT WIN32)
   endif()
 endif()
 
-message("1: ${TrueAudioNext_BINARY_DIR}")
-message("2: ${TrueAudioNext_PROJECT_DIR}")
-message("3: $<TARGET_FILE_DIR:TrueAudioNext>")
-message("4: ${TAN_BINARY_DIR}")
-message("5: ${GPUUtilities_BINARY_DIR}")
-message("6: ${TrueAudioVR_BINARY_DIR}")
-
 #copy runtime dll to the binary dir
 if(WIN32)
   add_custom_command(
     TARGET RoomAcousticsQT
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioNext_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
-    )
-    
-  add_custom_command(
-    TARGET RoomAcousticsQT
-    POST_BUILD
-    #COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioNext_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioVR_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${GPUUtilities_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${RoomAcousticsQT_BINARY_DIR}/cmake-portaudio-bin/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
