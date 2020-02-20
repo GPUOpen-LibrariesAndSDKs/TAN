@@ -1,38 +1,10 @@
-//
-// MIT license
-//
-// Copyright (c) 2019 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-
 #ifndef ROOMACCOUSTICNEW_H
 #define ROOMACCOUSTICNEW_H
 #define MAX_DEVICES 10
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QtWidgets>
 
-#ifdef RTQ_ENABLED
 #include "ui_RoomAcousticConfig.h"
-#else
-#include "ui_RoomAcousticConfig_NoRTQ.h"
-#endif // RTQ_ENABLED
 #include "../RoomAcousticQT.h"
 #include "QTRoomAcousticGraphic.h"
 
@@ -48,10 +20,11 @@ private slots:
 	void on_actionExport_Response_triggered();
 	void on_AddSoundSourceButton_clicked();
 	void on_RemoveSoundSourceButton_clicked();
-	void on_SourcesTable_cellClicked(int row, int col);
-	void on_CB_TrackHead_stateChanged(int stage);
-	void on_CB_SoundSourceEnable_stateChanged(int stage);
-	void on_CB_AutoSpin_stateChanged(int stage);
+	void on_SourcesTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
+	void on_CB_SoundSourceEnable_stateChanged(int state);
+	void on_CB_UseMicroPhone_stateChanged(int state);
+	void on_CB_TrackHead_stateChanged(int state);
+	void on_CB_AutoSpin_stateChanged(int state);
 	void on_SB_ConvolutionLength_valueChanged(int value);
 	void on_SB_BufferSize_valueChanged(int value);
 	void on_SB_RoomWidth_valueChanged(double value);
@@ -75,19 +48,16 @@ private slots:
 	void on_SB_HeadPositionY_valueChanged(double value);
 	void on_SB_HeadPositionZ_valueChanged(double value);
 
-	void on_CB_UseGPU4Room_currentIndexChanged(int index);
-	void on_CB_UseGPU4Conv_currentIndexChanged(int index);
+	void on_CB_RoomDevice_currentIndexChanged(int index);
+	void on_CB_ConvolutionDevice_currentIndexChanged(int index);
 	void on_CB_ConvMethod_currentIndexChanged(int index);
 	void on_RB_DEF4Room_clicked();
-
-
 	void on_RB_DEF4Conv_clicked();
-#ifdef RTQ_ENABLED
 	void on_RB_MPr4Room_clicked();
 	void on_RB_MPr4Conv_clicked();
 	void on_RB_RTQ4Conv_clicked();
 	void on_RB_RTQ4Room_clicked();
-#endif // RTQ_ENABLED
+
 	void on_PB_RunDemo_clicked();
 
 	void table_selection_changed(int index);
@@ -98,14 +68,13 @@ private slots:
 	void update_listener_orientation(float pitch, float yaw, float roll);
 	void update_listener_orientation_top_view(float yaw);
 	void update_instance_sound_sources();
-	void update_convMethod_CPU();
-	void update_convMethod_GPU();
+	void update_convMethod(bool gpu);
 public:
 	RoomAcousticQTConfig(QWidget *parent = 0);
 	~RoomAcousticQTConfig();
 	void Init();
-private:
 
+private:
 	void initSoundSourceGraphic();								// Initialize the soundsource graphcis(icon)
 	void initListenerGraphics();								// Initialize the listener graphcis(icon)
 	/************************************************************************************/
@@ -116,11 +85,10 @@ private:
 	void updateAllFields();
 	void updateSelectedSoundSource();							// Trasfer the focus to the current selected item
 	void updateSoundsourceNames();
-	void updateRoomDefinitionFields();
+	void updateRoomFields();
 	void updateConvolutionFields();
 	void updateListenerFields();								// Update the listener fields
 	void updateReverbFields();									// Use the reverb function in instance and update reverb field
-	void setEnableSoundsourceFields(bool enable);				// set enable for sound source fields
 	void setEnableHeadPositionFields(bool enable);				// set enable for head position fields
 	/************************************************************************************/
 	/*							Graphics Update Function								*/
@@ -133,13 +101,14 @@ private:
 	void addListenerGraphics();									// add Listener into graphcis
 	void removeSoundsourceGraphics(int index);					// remove sound source from graphics
 	/************************************************************************************/
-	/*							Params Store Functions								*/
+	/*							Params Store Functions                                  */
 	/************************************************************************************/
 	void storeSelectedSoundSource();							// Save the last selected item's info
 	void storeTrackedHeadSource();
 	void storeAllFieldsToInstance();							// Porting all configuration from UI to instance
 	void storeListenerPosition();
-	void storeRoomDefinitionToInstance();						// Porting room definition from UI to instance
+	void storeRoomFields();						// Porting room definition from UI to instance
+	void storeConvolutionFields();
 	/************************************************************************************/
 	/*									Debug											*/
 	/************************************************************************************/
@@ -166,7 +135,5 @@ private:
 	QTimer *mTimer = nullptr;
 	bool mLockUpdate = false;
 };
-
-
 
 #endif // ROOMACCOUSTICNEW_H

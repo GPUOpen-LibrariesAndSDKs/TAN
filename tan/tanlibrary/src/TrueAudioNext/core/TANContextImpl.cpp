@@ -31,6 +31,23 @@
 
 #include "tanlibrary/src/clFFT-master/src/include/clFFT.h"
 
+#ifndef CLQUEUE_REFCOUNT
+#define CLQUEUE_REFCOUNT( clqueue ) { \
+		cl_uint refcount = 0; \
+		clGetCommandQueueInfo(clqueue, CL_QUEUE_REFERENCE_COUNT, sizeof(refcount), &refcount, NULL); \
+		printf("\nFILE:%s line:%d Queue %llX ref count: %d\r\n", __FILE__ , __LINE__, clqueue, refcount); \
+}
+#endif
+
+#ifndef DBG_CLRELEASE
+#define DBG_CLRELEASE( clqueue, qname ) { \
+		cl_uint refcount = 0; \
+		clReleaseCommandQueue(clqueue); \
+		clGetCommandQueueInfo(clqueue, CL_QUEUE_REFERENCE_COUNT, sizeof(refcount), &refcount, NULL); \
+		printf("\nFILE:%s line:%d %s %llX ref count: %d\r\n", __FILE__ , __LINE__,qname, clqueue, refcount); \
+}
+#endif
+
 typedef unsigned int uint;
 #include "tanlibrary/src/Graal/GraalConv.hpp"
 
@@ -173,25 +190,24 @@ AMF_RESULT AMF_STD_CALL TANContextImpl::Terminate()
     m_pComputeGeneral.Release();
     m_pComputeConvolution.Release();
 
-    m_oclGeneralContext = 0;
-    m_oclConvContext = 0;
-    m_oclGeneralDeviceId = 0;
-    m_oclConvDeviceId = 0;
+    //m_oclGeneralContext = 0;
+    //m_oclConvContext = 0;
 
     if (m_oclGeneralQueue)
     {
         printf("Release TANContext queue %llX\r\n", m_oclGeneralQueue);
-        clReleaseCommandQueue(m_oclGeneralQueue);
+        //clReleaseCommandQueue(m_oclGeneralQueue);
+		DBG_CLRELEASE(m_oclGeneralQueue,"m_oclGeneralQueue");
+		m_oclGeneralQueue = NULL;
     }
     
     if (m_oclConvQueue)
     {
         printf("Release TANContext queue %llX", m_oclConvQueue);
-        clReleaseCommandQueue(m_oclConvQueue);
+        //clReleaseCommandQueue(m_oclConvQueue);
+		DBG_CLRELEASE(m_oclConvQueue,"m_oclConvQueue");
+		m_oclConvQueue = NULL;
     }
-
-    m_oclGeneralQueue = NULL;
-    m_oclConvQueue = NULL;
 
     if (m_oclGeneralContext != 0)
     {
@@ -201,7 +217,11 @@ AMF_RESULT AMF_STD_CALL TANContextImpl::Terminate()
     {
         clReleaseContext(m_oclConvContext);
     }
-    return AMF_OK;
+
+    m_oclGeneralDeviceId = 0;
+    m_oclConvDeviceId = 0;
+
+   return AMF_OK;
 }
 
 bool TANContextImpl::checkOpenCL2_XCompatibility(cl_command_queue cmdQueue)
@@ -346,7 +366,10 @@ AMF_RESULT amf::TANContextImpl::InitOpenCLInt(cl_command_queue pQueue, QueueType
     AMFComputePtr& pCompute = (queueType == eConvQueue) 
         ? m_pComputeConvolution 
         : m_pComputeGeneral;
-    queue = pQueue;
+
+	//CLQUEUE_REFCOUNT(pQueue);
+
+	queue = pQueue;
 
     clGetCommandQueueInfo(queue, CL_QUEUE_DEVICE, sizeof(device), &device, NULL);
     cl_device_type clDeviceType = CL_DEVICE_TYPE_GPU;
@@ -367,7 +390,11 @@ AMF_RESULT amf::TANContextImpl::InitOpenCLInt(cl_command_queue pQueue, QueueType
         pAMFContext->GetCompute(AMF_MEMORY_OPENCL, &pAMFCompute);
         AMF_RETURN_IF_FALSE(pAMFCompute != NULL, AMF_FAIL, L"Could not get the AMFCompute.");
         pCompute = pAMFCompute;
-    }
+	}
+	else {
+		clRetainCommandQueue(pQueue);
+	}
+	CLQUEUE_REFCOUNT(pQueue);
 
     return AMF_OK;
 }

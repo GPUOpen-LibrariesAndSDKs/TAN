@@ -1,7 +1,5 @@
 //
-// MIT license
-//
-// Copyright (c) 2019 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2016 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +19,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-
 #pragma once
 #pragma pack(push,1)
 
@@ -122,6 +119,8 @@ bool WriteWaveFileS
 #include <string>
 #include <chrono>
 
+#define STEREO_CHANNELS_COUNT 2
+
 struct WavContent
 {
 	uint16_t	ChannelsCount;
@@ -151,13 +150,14 @@ struct WavContent
 		Data.resize(0);
 	}
 
-	inline bool Valid() const
+	inline bool IsValid() const
 	{
 		return Data.size() && Data.size() == ChannelsCount * SamplesCount * BitsPerSample / 8;
 	}
 
 	bool ReadWaveFile(const std::string & fileName);
-	bool Convert2Stereo16Bit(); //not implemented
+	bool Convert2Stereo16Bit();
+	bool JoinChannels();
 
 	inline bool IsSameFormat(const WavContent & other)
 	{

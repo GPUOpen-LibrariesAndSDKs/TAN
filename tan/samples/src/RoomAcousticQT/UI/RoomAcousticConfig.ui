@@ -895,7 +895,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="groupBox_9">
+            <widget class="QGroupBox" name="RoomOptions">
              <property name="title">
               <string>Options</string>
              </property>
@@ -915,38 +915,14 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="CB_UseGPU4Room">
-                    <item>
-                     <property name="text">
-                      <string>CPU</string>
-                     </property>
-                    </item>
-                   </widget>
+                   <widget class="QComboBox" name="CB_RoomDevice"/>
                   </item>
                  </layout>
                 </item>
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_5">
                   <item>
-                   <layout class="QVBoxLayout" name="verticalLayout_9">
-                    <item>
-                     <widget class="QRadioButton" name="CL_CPU">
-                      <property name="text">
-                       <string>CL/CPU</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QRadioButton" name="CL_GPU">
-                      <property name="text">
-                       <string>CL/GPU</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_18">
+                   <widget class="QLabel" name="CULabelRoom">
                     <property name="layoutDirection">
                      <enum>Qt::LeftToRight</enum>
                     </property>
@@ -986,16 +962,16 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QRadioButton" name="RB_MPr4Room">
+                  <widget class="QRadioButton" name="RB_RTQ4Room">
                    <property name="text">
-                    <string>Medium Priority</string>
+                    <string>Real Time 1</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QRadioButton" name="RB_RTQ4Room">
+                  <widget class="QRadioButton" name="RB_MPr4Room">
                    <property name="text">
-                    <string>Real Time</string>
+                    <string>Real Time 2</string>
                    </property>
                   </widget>
                  </item>
@@ -1009,7 +985,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox_11">
+         <widget class="QGroupBox" name="ConvolutionSettings">
           <property name="title">
            <string>Convolution</string>
           </property>
@@ -1131,13 +1107,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QComboBox" name="CB_UseGPU4Conv">
-                  <item>
-                   <property name="text">
-                    <string>CPU</string>
-                   </property>
-                  </item>
-                 </widget>
+                 <widget class="QComboBox" name="CB_ConvolutionDevice"/>
                 </item>
                 <item row="1" column="0">
                  <widget class="QLabel" name="label_35">
@@ -1157,7 +1127,7 @@
                  </widget>
                 </item>
                 <item row="2" column="0">
-                 <widget class="QLabel" name="label_29">
+                 <widget class="QLabel" name="CULabelConvolution">
                   <property name="layoutDirection">
                    <enum>Qt::LeftToRight</enum>
                   </property>
@@ -1195,23 +1165,23 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QRadioButton" name="RB_MPr4Conv">
+                  <widget class="QRadioButton" name="RB_RTQ4Conv">
                    <property name="text">
-                    <string>Medium Priority</string>
+                    <string>Real Time 1</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QRadioButton" name="RB_RTQ4Conv">
+                  <widget class="QRadioButton" name="RB_MPr4Conv">
                    <property name="text">
-                    <string>Real Time</string>
+                    <string>Real Time 2</string>
                    </property>
                   </widget>
                  </item>
                 </layout>
                 <zorder>RB_RTQ4Conv</zorder>
-                <zorder>RB_MPr4Conv</zorder>
                 <zorder>RB_DEF4Conv</zorder>
+                <zorder>RB_MPr4Conv</zorder>
                </widget>
               </item>
              </layout>
@@ -1291,7 +1261,7 @@
      <x>0</x>
      <y>0</y>
      <width>1800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
