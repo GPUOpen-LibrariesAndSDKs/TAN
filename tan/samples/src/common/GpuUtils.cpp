@@ -140,10 +140,6 @@ int listGpuDeviceNamesWrapper(char *devNames[], unsigned int count) {
 */
 int listCpuDeviceNamesWrapper(char *devNames[], unsigned int count) {
 
-#ifndef _WIN32
-	return AMF_NOT_INITIALIZED;
-#endif
-
     int foundCount = 0;
     AMF_RESULT res = g_AMFFactory.Init();   // initialize AMF
     if (AMF_OK == res)
@@ -221,17 +217,21 @@ AMF_RESULT CreateCommandQueuesVIAamf(int deviceIndex, int32_t flag1, cl_command_
 {
     bool AllIsOK = true;
 
-    if (NULL != pcmdQueue1)
+	if (pcmdQueue1 == NULL || pcmdQueue2 == NULL) {
+		return AMF_INVALID_ARG;
+	}
+
+    if (NULL != *pcmdQueue1)
     {
         printf("Queue release %llX\r\n", *pcmdQueue1);
-        clReleaseCommandQueue(*pcmdQueue1);
-        *pcmdQueue1 = NULL;
+		DBG_CLRELEASE(*pcmdQueue1,"*pcmdQueue1");
+       *pcmdQueue1 = NULL;
     }
-    if (NULL != pcmdQueue2)
+    if (NULL != *pcmdQueue2)
     {
         printf("Queue release %llX\r\n", *pcmdQueue2);
-        clReleaseCommandQueue(*pcmdQueue2);
-        *pcmdQueue2 = NULL;
+		DBG_CLRELEASE(*pcmdQueue2,"*pcmdQueue2");
+		*pcmdQueue2 = NULL;
     }
 
     AMF_RESULT res = g_AMFFactory.Init();   // initialize AMF
@@ -290,8 +290,7 @@ AMF_RESULT CreateCommandQueuesVIAamf(int deviceIndex, int32_t flag1, cl_command_
                                 AllIsOK = false;
                             }
                             clRetainCommandQueue(tempQueue);
-                            printf("Queue %llX +1\r\n", tempQueue);
-
+							CLQUEUE_REFCOUNT(tempQueue);
                             *pcmdQueue1 = tempQueue;
                         }
 
@@ -323,8 +322,7 @@ AMF_RESULT CreateCommandQueuesVIAamf(int deviceIndex, int32_t flag1, cl_command_
                                 AllIsOK = false;
                             }
                             clRetainCommandQueue(tempQueue);
-                            printf("Queue %llX +1\r\n", tempQueue);
-
+							CLQUEUE_REFCOUNT(tempQueue);
                             *pcmdQueue2 = tempQueue;
                         }
 
@@ -352,7 +350,7 @@ AMF_RESULT CreateCommandQueuesVIAamf(int deviceIndex, int32_t flag1, cl_command_
             if (NULL != *pcmdQueue1)
             {
                 printf("Queue release %llX\r\n", pcmdQueue1);
-                clReleaseCommandQueue(*pcmdQueue1);
+				DBG_CLRELEASE(*pcmdQueue1,"*pcmdQueue1");
                 *pcmdQueue1 = NULL;
             }
         }
@@ -361,13 +359,15 @@ AMF_RESULT CreateCommandQueuesVIAamf(int deviceIndex, int32_t flag1, cl_command_
             if (NULL != *pcmdQueue2)
             {
                 printf("Queue release %llX\r\n", pcmdQueue2);
-                clReleaseCommandQueue(*pcmdQueue2);
-                *pcmdQueue2 = NULL;
+				DBG_CLRELEASE(*pcmdQueue2,"*pcmdQueue2");
+				*pcmdQueue2 = NULL;
             }
         }
     }
 
-    return res;
+	CLQUEUE_REFCOUNT(*pcmdQueue1);
+	CLQUEUE_REFCOUNT(*pcmdQueue2);
+	return res;
 }
 
 //bool GetDeviceFromIndex(int deviceIndex, cl_device_id *device, cl_device_type clDeviceType);
@@ -492,7 +492,7 @@ bool CreateCommandQueuesVIAocl(int deviceIndex, int32_t flag1, cl_command_queue*
             if (NULL != *pcmdQueue1)
             {
                 printf("Queue release %llX\r\n", pcmdQueue1);
-                clReleaseCommandQueue(*pcmdQueue1);
+				DBG_CLRELEASE(*pcmdQueue1,"*pcmdQueue1");
                 *pcmdQueue1 = NULL;
             }
         }
@@ -501,8 +501,8 @@ bool CreateCommandQueuesVIAocl(int deviceIndex, int32_t flag1, cl_command_queue*
             if (NULL != *pcmdQueue2)
             {
                 printf("Queue release %llX\r\n", pcmdQueue2);
-                clReleaseCommandQueue(*pcmdQueue2);
-                *pcmdQueue2 = NULL;
+				DBG_CLRELEASE(*pcmdQueue2,"*pcmdQueue2");
+				*pcmdQueue2 = NULL;
             }
         }
     }

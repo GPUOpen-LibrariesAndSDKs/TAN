@@ -21,7 +21,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-
 #pragma once
 
 #include "../common/SimpleVRaudio.h"
@@ -66,6 +65,8 @@ enum execMode {
 	OCL_CPU = 0x10
 };
 
+
+
 class RoomAcousticQT
 {
 public:
@@ -73,15 +74,18 @@ public:
 	virtual ~RoomAcousticQT();
 
 	void initialize();															// Initialize the Room Acoustic
-	int start();																// Start the demo
-	void stop();												// Stop the demo
+	bool start();																// Start the demo
+	void stop();																// Stop the demo
+	
+	std::string getLastError() const 
+	{
+		return mLastError;
+	}															
 
 	void loadConfiguration(const std::string& xmlfilename);						// Load the configuration from the xml file
 	void saveConfiguraiton(const std::string& xmlfilename);						// Save all the configruation in xml file named by the parameter
 
 	int addSoundSource(const std::string& sourcename);							// Add a sound source in the audio engine
-	bool replaceSoundSource(const std::string& sourcename, int id);				// Replace a sound source in the audio engine given its ID. Return true if success
-	bool removeSoundSource(const std::string& sourcename);						// Remove a sound source in the audio engine, return true if success
 	bool removeSoundSource(int id);
 	int  findSoundSource(const std::string& sourcename);						// Given the sound source name, find the corresponding soundsource ID,
 
@@ -93,8 +97,8 @@ public:
 
 	float getConvolutionTime();													// Based on the convolution length, calculate the convoltion time
 	float getBufferTime();														// Based on the buffer length, calculate the buffer tiem
-	void getCPUConvMethod(std::string** _out, int* _num);						// Get the name of the supported CPU convolution method
-	void getGPUConvMethod(std::string** _out, int* _num);						// Get the name of the supported GPU convolution method
+	std::vector<std::string> getCPUConvMethod() const;							// Get the name of the supported CPU convolution method
+	std::vector<std::string> getGPUConvMethod() const;							// Get the name of the supported GPU convolution method
 	amf::TAN_CONVOLUTION_METHOD getConvMethodFlag(const std::string& _name);	// Convert a convolution method's name in to internal flag that can be used in runtime
 	/*Run time - these function should be used only when engine is running*/
 	void updateAllSoundSourcesPosition();										// update all the sound source position
@@ -112,13 +116,16 @@ private:
 	void initializeAudioEngine();												// Initialize TAN Audio3D Engine
 	
 	void initializeRoom();														// Initialize TAN Room definition
+	void initializeConvolution();
 	void initializeListener();													// Initialize TAN listener profile
 	void initializeAudioPosition(int index);
 
-	void initializeDevice();													// Initialize TAN device (Convolution, FFT, etc.)
+	//void initializeDevice();													// Initialize TAN device (Convolution, FFT, etc.)
 	bool parseElement(char *start, char *end, struct element *elem);			// Function used to parse XML file. Used in load configruation
 	bool findElement(char **start, char **end, char *name);						// Function used to parse XML file
-	void portInfoToEngine();													// Port all the configuration to engine
+	//void portInfoToEngine();													// Port all the configuration to engine
+
+	void enumDevices();															// Initialize TAN device (Convolution, FFT, etc.)
 
 //todo: make accessors
 public:
@@ -128,6 +135,7 @@ public:
 
 	std::string mWavFileNames[MAX_SOURCES];
 	char*  m_cpWavFileNames[MAX_SOURCES];
+
 	int m_iNumOfWavFile = 0;
 
 	Audio3D* m_pAudioEngine;											// Pointer to the main audio3d engine
@@ -138,45 +146,38 @@ public:
 	/*Sound Source*/
 	MonoSource m_SoundSources[MAX_SOURCES];								// All of the sound sources
 	bool mSoundSourceEnable[MAX_SOURCES];								// sound sources' enable
-	int m_iSoundSourceMap[MAX_SOURCES];
-	int m_bSrcTrackHead[MAX_SOURCES];
+	bool mSrcTrackHead[MAX_SOURCES];
 	bool mSrc1EnableMic = false;
 	int m_isrc1MuteDirectPath = 0;
 	int m_isrc1TrackHeadPos = 0;
+
 	/*Device*/
 	char* m_cpDeviceName[MAX_DEVICES];									// Device names
-	int m_iDeviceCount = 0;												// Device count
+	int mCPUDevicesCount = 0;												// Device count
+	int mGPUDevicesCount = 0;												// Device count
+	std::string mCPUDevicesNames[MAX_DEVICES];								// Device names
+	std::string mGPUDevicesNames[MAX_DEVICES];
+	
 	/*Convolution*/
 	amf::TAN_CONVOLUTION_METHOD m_eConvolutionMethod =					// TAN Convolution method
 		amf::TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD;
 	int m_iConvolutionLength = 0;
 	int m_iBufferSize = 0;
-	int m_iConvolutionDeviceID = 0;
 
-	int m_iuseGPU4Conv = 0;
-	int m_iuseMPr4Conv = 0;
-#ifdef RTQ_ENABLED
-	int m_iConvolutionCUCount = 0;
-	int m_iuseRTQ4Conv = 0;
-#endif // RTQ_ENABLED
+	bool mConvolutionOverCL = false;
+	bool mConvolutionOverGPU = false;
+	int mConvolutionDeviceIndex = 0;
+	int mConvolutionPriority = 0;
+	int mConvolutionCUCount = 0;
 
 	/*Room*/
-
-	int m_iuseGPU4Room = 0;
-	int m_iRoomDeviceID = 0;											// the device that the room generator is running on
-	int m_iuseMPr4Room = 0;
-#ifdef RTQ_ENABLED
-	int m_iRoomCUCount = 0;
-	int m_iuseRTQ4Room = 0;
-#endif // RTQ_ENABLED
+	bool mRoomOverCL = false;
+	bool mRoomOverGPU = false;
+	int mRoomDeviceIndex = 0;
+	int mRoomPriority = 0;
+	int mRoomCUCount = 0;
 
 	std::string mPlayerName;
-	
-	bool mCLRoomOverGPU = false;
-	bool mCLConvolutionOverGPU = false;
 
-private:
-	std::string mWavFileNamesInternal[MAX_SOURCES];							// Internal wav file name, used to pass valid source file into Audio3D engine
-	int m_iNumOfWavFileInternal = 0;
+	std::string mLastError;
 };
-

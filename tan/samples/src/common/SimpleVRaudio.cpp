@@ -214,23 +214,36 @@ int Audio3D::Close()
     // release smart pointers:
     m_spFft.Release();
     m_spConvolution.Release();
-    m_spConverter.Release();
     m_spMixer.Release();
+    m_spConverter.Release();
     mTANRoomContext.Release();
     mTANConvolutionContext.Release();
 
-    /*
-    why this called here too? queues was released inside convolution processor first!
+    
+    // Retain/release counts must match. 
+	// Each component that is initialized with a clQueue should increment the ref count (clRetain) in init, and release on terminate.
+	// This component (SimpleVR creates the queues (ref = 1 on create) so does not need a retain, but still needs to release one close.
+
+	/************** WARNING MIS-MATCHED clRetain / clRelease CAN CAUSE KERNEL MODE HANG for RTQs ****************************
+	 *                                                                                                                      *
+	 *  When using AMD Real Time Queues (RTQ) There can be only one of each type of queue RTQ1, RTQ2.                       *
+	 *  If these are not released, it will be impossible to create another RTQ.                                             *
+	 *  The kernel mode driver (KMD) will HANG  waiting for the existing RTQ queue to be released,                          *
+	 *  before it will create a new one.                                                                                    *
+	 *                                                                                                                      *
+	 *  [All queues are released when the process exits, however.]                                                          *
+	 ************************************************************************************************************************/
+
     if (mCmdQueue1 != NULL){
-        clReleaseCommandQueue(mCmdQueue1);
+		DBG_CLRELEASE(mCmdQueue1,"mCmdQueue1");
     }
     if (mCmdQueue2 != NULL){
-        clReleaseCommandQueue(mCmdQueue2);
-    }
-    if (mCmdQueue3 != NULL && mCmdQueue3 != mCmdQueue2){
-        clReleaseCommandQueue(mCmdQueue3);
-    }
-    */
+		DBG_CLRELEASE(mCmdQueue2,"mCmdQueue2");
+	}
+    if (mCmdQueue3 != NULL ){
+		DBG_CLRELEASE(mCmdQueue3,"mCmdQueue3");
+	}
+    
 
     mCmdQueue1 = NULL;
     mCmdQueue2 = NULL;
@@ -259,21 +272,21 @@ int Audio3D::Init
     bool                    useGPU_ConvQueue,
     int                     devIdx_Conv,
 
-#ifdef RTQ_ENABLED
+//#ifdef RTQ_ENABLED
 	bool                    useHPr_Conv,
     bool                    useRTQ_Conv,
     int                     cuRes_Conv,
-#endif
+//#endif
 
     bool                    useGPU_IRGen,
     bool                    useGPU_IRGenQueue,
     int                     devIdx_IRGen,
 
-#ifdef RTQ_ENABLED
+//#ifdef RTQ_ENABLED
 	bool                    useHPr_IRGen,
     bool                    useRTQ_IRGen,
     int                     cuRes_IRGen,
-#endif
+//#endif
 
     amf::TAN_CONVOLUTION_METHOD
                             convMethod,
@@ -516,7 +529,7 @@ int Audio3D::Init
         //CL convolution on GPU
         if(useGPU_Conv && useGPU_ConvQueue)
         {
-    #ifdef RTQ_ENABLED
+ //   #ifdef RTQ_ENABLED
 
     #define QUEUE_MEDIUM_PRIORITY                   0x00010000
 
@@ -536,42 +549,57 @@ int Audio3D::Init
             else if (useRTQ_IRGen){
                 flagsQ2 = QUEUE_REAL_TIME_COMPUTE_UNITS | cuRes_IRGen;
             }
-    #endif // RTQ_ENABLED
+//    #endif // RTQ_ENABLED
+
+			// Retain/release counts must match. 
+			 // Each component that is initialized with a clQueue should increment the ref count (clRetain) in init, and release on terminate.
+			 // This component (SimpleVR creates the queues (ref = 1 on create) so does not need a retain, but still needs to release one close.
 
             CreateGpuCommandQueues(devIdx_Conv, flagsQ1, &mCmdQueue1, flagsQ2, &mCmdQueue2);
-            
-            //to does not rewrite existing deallocation sources
-            //todo: use CL queue smartpointers
-            clRetainCommandQueue(mCmdQueue1);
-            clRetainCommandQueue(mCmdQueue2);
+			//CLQUEUE_REFCOUNT(mCmdQueue1);
+			//CLQUEUE_REFCOUNT(mCmdQueue2);
 
+
+			/************** WARNING MIS-MATCHED clRetain / clRelease CAN CAUSE KERNEL MODE HANG for RTQs ****************************
+			 *                                                                                                                      *
+			 *  When using AMD Real Time Queues (RTQ) There can be only one of each type of queue RTQ1, RTQ2.                       *
+			 *  If these are not released, it will be impossible to create another RTQ.                                             *
+			 *  The kernel mode driver (KMD) will HANG  waiting for the existing RTQ queue to be released,                          *
+			 *  before it will create a new one.                                                                                    *
+			 *                                                                                                                      *
+			 *  [All queues are released when the process exits, however.]                                                          *
+			 ************************************************************************************************************************/
+ 
             if((devIdx_Conv == devIdx_IRGen) && useGPU_IRGen)
             {
                 mCmdQueue3 = mCmdQueue2;
+				clRetainCommandQueue(mCmdQueue3);
+				CLQUEUE_REFCOUNT(mCmdQueue3);
             }
         }
 
-        //CL convolution on CPU
-        else if(useGPU_Conv && !useGPU_ConvQueue)
-        {
-    #ifdef RTQ_ENABLED
-            // For " core "reservation" on CPU" -ToDo test and enable
-            if (cuRes_Conv > 0 && cuRes_IRGen > 0)
-            {
-                cl_int err = CreateCommandQueuesWithCUcount(devIdx_Conv, &mCmdQueue1, &mCmdQueue2, cuRes_Conv, cuRes_IRGen);
-            }
-            //else
-            //{
-            //    CreateCpuCommandQueues(devIdx_Conv, 0, &mCmdQueue1, 0, &mCmdQueue2);
-            //}
-    #endif // RTQ_ENABLED
+	// OpenCL on CPU is deprecated
+    //    //CL convolution on CPU
+    //    else if(useGPU_Conv && !useGPU_ConvQueue)
+    //    {
+    //#ifdef RTQ_ENABLED
+    //        // For " core "reservation" on CPU" -ToDo test and enable
+    //        if (cuRes_Conv > 0 && cuRes_IRGen > 0)
+    //        {
+    //            cl_int err = CreateCommandQueuesWithCUcount(devIdx_Conv, &mCmdQueue1, &mCmdQueue2, cuRes_Conv, cuRes_IRGen);
+    //        }
+    //        //else
+    //        //{
+    //        //    CreateCpuCommandQueues(devIdx_Conv, 0, &mCmdQueue1, 0, &mCmdQueue2);
+    //        //}
+    //#endif // RTQ_ENABLED
 
-            //CL room on CPU
-            if((devIdx_Conv == devIdx_IRGen) && !useGPU_IRGenQueue)
-            {
-                mCmdQueue3 = mCmdQueue2;
-            }
-        }
+    //        //CL room on CPU
+    //        if((devIdx_Conv == devIdx_IRGen) && !useGPU_IRGenQueue)
+    //        {
+    //            mCmdQueue3 = mCmdQueue2;
+    //        }
+    //    }
 
         //room queue not yet created
         if(!mCmdQueue3)
@@ -592,20 +620,29 @@ int Audio3D::Init
     RETURN_IF_FAILED(TANCreateContext(TAN_FULL_VERSION, &mTANConvolutionContext));
     RETURN_IF_FAILED(TANCreateContext(TAN_FULL_VERSION, &mTANRoomContext));
 
+	//CLQUEUE_REFCOUNT(mCmdQueue1);
+	//CLQUEUE_REFCOUNT(mCmdQueue2);
+
     //convolution over OpenCL
     if(useGPU_Conv) 
     {
         RETURN_IF_FAILED(mTANConvolutionContext->InitOpenCL(mCmdQueue1, mCmdQueue2));
     }
+	CLQUEUE_REFCOUNT(mCmdQueue1);
+	CLQUEUE_REFCOUNT(mCmdQueue2);
 
     //room processing over OpenCL
     if(useGPU_IRGen) 
     {
         RETURN_IF_FAILED(mTANRoomContext->InitOpenCL(mCmdQueue3, mCmdQueue3));
     }
+	CLQUEUE_REFCOUNT(mCmdQueue1);
+	CLQUEUE_REFCOUNT(mCmdQueue2);
 
     RETURN_IF_FAILED(TANCreateConvolution(mTANConvolutionContext, &m_spConvolution));
-    
+	CLQUEUE_REFCOUNT(mCmdQueue1);
+	CLQUEUE_REFCOUNT(mCmdQueue2);
+
     //don't use OpenCL at all
     if(!useGPU_Conv) 
     {        
@@ -812,7 +849,7 @@ int Audio3D::Init
 
     mRunning = true;
 
-    return 0;
+    return mRunning;
 }
 
 int Audio3D::updateHeadPosition(float x, float y, float z, float yaw, float pitch, float roll)
@@ -926,7 +963,7 @@ int Audio3D::Run()
     mUpdateThread = std::thread(updateThreadProc, this);
 
     mUpdateParams = true;
-    return 0;
+    return true;
 }
 
 bool Audio3D::Stop()
@@ -1095,8 +1132,9 @@ int Audio3D::ProcessProc()
     std::array<int16_t, STEREO_CHANNELS_COUNT * FILTER_SAMPLE_RATE> outputBuffer;
 
     //FifoBuffer recFifo(STEREO_CHANNELS_COUNT * FILTER_SAMPLE_RATE * sizeof(int16_t));
-    Fifo recordFifo;
-    recordFifo.Reset(STEREO_CHANNELS_COUNT * FILTER_SAMPLE_RATE * mWavFiles[0].GetSampleSizeInBytes());
+	// for mic input mode
+    // Fifo recordFifo;
+    //recordFifo.Reset(STEREO_CHANNELS_COUNT * FILTER_SAMPLE_RATE * mWavFiles[0].GetSampleSizeInBytes());
 
     int16_t *pWaves[MAX_SOURCES] = {nullptr};
     int16_t *pWaveStarts[MAX_SOURCES] = {nullptr};
@@ -1131,6 +1169,7 @@ int Audio3D::ProcessProc()
     {
         uint32_t bytes2Play(0);
 
+#if 0 // To Do fix mic input mode
         if(mSrc1EnableMic)
         {
             while
@@ -1182,6 +1221,7 @@ int Audio3D::ProcessProc()
             }
         }
         else
+#endif
         {
             //todo: this is not correct for common case, add size calculation
             bytes2Play = mBufferSizeInBytes;

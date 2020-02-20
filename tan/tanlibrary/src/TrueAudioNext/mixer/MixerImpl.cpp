@@ -37,6 +37,23 @@
 #include <immintrin.h>
 #endif
 
+#ifndef CLQUEUE_REFCOUNT
+#define CLQUEUE_REFCOUNT( clqueue ) { \
+		cl_uint refcount = 0; \
+		clGetCommandQueueInfo(clqueue, CL_QUEUE_REFERENCE_COUNT, sizeof(refcount), &refcount, NULL); \
+		printf("\nFILE:%s line:%d Queue %llX ref count: %d\r\n", __FILE__ , __LINE__, clqueue, refcount); \
+}
+#endif
+
+#ifndef DBG_CLRELEASE
+#define DBG_CLRELEASE( clqueue, qname ) { \
+		cl_uint refcount = 0; \
+		clReleaseCommandQueue(clqueue); \
+		clGetCommandQueueInfo(clqueue, CL_QUEUE_REFERENCE_COUNT, sizeof(refcount), &refcount, NULL); \
+		printf("\nFILE:%s line:%d %s %llX ref count: %d\r\n", __FILE__ , __LINE__,qname, clqueue, refcount); \
+}
+#endif
+
 using namespace amf;
 
 bool TANMixerImpl::useSSE2 = true; // InstructionSet::SSE2();
@@ -127,7 +144,7 @@ AMF_RESULT  AMF_STD_CALL TANMixerImpl::InitGpu()
 
     // Retain the queue for use
     ret = clRetainCommandQueue(m_pCommandQueueCl);
-    printf("Queue %llX +1\r\n", m_pCommandQueueCl);
+	CLQUEUE_REFCOUNT(m_pCommandQueueCl);
 
     AMF_RETURN_IF_CL_FAILED(ret, L"Failed to retain command queue.");
 
@@ -163,8 +180,7 @@ AMF_RESULT  AMF_STD_CALL TANMixerImpl::Terminate()
     if (m_pCommandQueueCl)
     {
         printf("Queue release %llX\r\n", m_pCommandQueueCl);
-        cl_int ret = clReleaseCommandQueue(m_pCommandQueueCl);
-        AMF_RETURN_IF_CL_FAILED(ret, L"Failed to release command queue.");
+        DBG_CLRELEASE(m_pCommandQueueCl,"m_pCommandQueueCl");
     }
     m_pCommandQueueCl = NULL;
     m_pContextAMF = NULL;

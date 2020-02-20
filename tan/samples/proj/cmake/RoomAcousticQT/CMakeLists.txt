@@ -87,7 +87,10 @@ include_directories(../../../../common)
 
 include_directories(../../../src/RoomAcousticQT/QTObject)
 
-#ADD_DEFINITIONS(-DRTQ_ENABLED)
+if(WIN32)
+ADD_DEFINITIONS(-DRTQ_ENABLED)
+endif()
+
 ADD_DEFINITIONS(-D_DEBUG)
 
 if(CMAKE_BUILD_TYPE EQUAL "Debug")
@@ -167,7 +170,7 @@ endif()
 set(
   UI_FILES
   ../../../src/RoomAcousticQT/UI/RoomAcousticConfig.ui
-  ../../../src/RoomAcousticQT/UI/RoomAcousticConfig_NoRTQ.ui
+ # ../../../src/RoomAcousticQT/UI/RoomAcousticConfig_NoRTQ.ui
   ../../../src/RoomAcousticQT/UI/ExportResponse.ui
   )
 
