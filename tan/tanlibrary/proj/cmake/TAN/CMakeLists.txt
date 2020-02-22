@@ -164,6 +164,7 @@ generateCLKernel(
   Tan_CL_Directories
   Tan_CL_Files
   Tan_CL_Output
+  TAN
   )
 
 #add_dependencies(TrueAudioNext Graal)
@@ -196,7 +197,7 @@ if(NOT WIN32)
   if(CMAKE_BUILD_TYPE MATCHES "Debug" OR CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
     target_compile_options(TrueAudioNext PUBLIC -g)
   endif()
-  
+
   if(NOT APPLE)
     target_compile_options(TrueAudioNext PUBLIC -Wpsabi)
   endif()

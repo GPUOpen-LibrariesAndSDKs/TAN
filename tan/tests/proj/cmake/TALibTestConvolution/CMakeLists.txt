@@ -61,3 +61,13 @@ add_executable(
 
 target_link_libraries(TALibTestConvolution TrueAudioNext)
 target_link_libraries(TALibTestConvolution GPUUtilities)
+
+#copy runtime dll to the binary dir
+if(WIN32)
+  add_custom_command(
+    TARGET TALibTestConvolution
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioNext_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TALibTestConvolution>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${GPUUtilities_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TALibTestConvolution>
+    )
+endif()

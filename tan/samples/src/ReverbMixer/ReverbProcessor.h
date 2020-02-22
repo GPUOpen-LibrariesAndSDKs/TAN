@@ -74,7 +74,10 @@ public:
 		SAVE_DELETE_BUFFER(m_pfConvolutionInputBufferFloat, m_iNumOfChannels);
 		SAVE_DELETE_BUFFER(m_pfConvolutionOutputBuffer, m_iNumOfChannels);		
 		
-		m_WASAPIPlayer->Close();
+		if(m_WASAPIPlayer)
+		{
+			m_WASAPIPlayer->Close();
+		}
 	};
 	/**
 	 * \brief Play input file with filter applied

@@ -12,26 +12,6 @@ include(../../../../tanlibrary/proj/cmake/utils/OpenCL.cmake)
 # cl kernel preprocessor
 include(../../../../samples/proj/cmake/CLKernelPreprocessor/CLKernelPreprocessor.cmake)
 
-#cl-helper
-#SET(clHelper_DIR ../../../../../OpenCLHelper/clHelper)
-# this builds the clHelper library (optional, if you want
-# to manually access the globally generated symbols)
-#ADD_SUBDIRECTORY(${clHelper_DIR} cmake-clHelper-bin)
-# specify include paths for #include's in opencl files:
-#OPENCL_INCLUDE_DIRECTORIES(${OpenCL_INCLUDE_DIRS})
-
-# compile some opencl kernels. This properly preprocessor-exapands
-# and test-compiles the given .cl files (once to asm, once to llvm),
-# and puts the preprocessor-expanded code (as a char[] array)
-# into dedicated .c files (that can be accessed through the
-# implicit EMBEDDED_OPENCL_KERNELS variable
-#COMPILE_OPENCL(
-#  ../../../src/Graal2/amdFFT_conv_kernels.cl
-#  ../../../src/Graal2/amdFIR_kernels.cl
-#  ../../../src/Graal2/GraalFHT.cl
-#  ../../../src/Graal2/GraalUtil.cl
-#  )
-
 include_directories(../../../../../amf)
 include_directories(../../../..)
 include_directories(../../../../common)
@@ -77,16 +57,16 @@ set(
 
 # cl kernels compilation
 set(
-  Graal_CL_Directories
+  Graal2_CL_Directories
   "${TAN_ROOT}/tan/tanlibrary/src/Graal2"
   "${TAN_ROOT}/tan/tanlibrary/src/Graal2"
   "${TAN_ROOT}/tan/tanlibrary/src/Graal2"
   "${TAN_ROOT}/tan/tanlibrary/src/Graal2"
   "${TAN_ROOT}/tan/tanlibrary/src/Graal2"
   "${TAN_ROOT}/tan/tanlibrary/src/Graal2"
-  )									   
+  )
 set(
-  Graal_CL_Files
+  Graal2_CL_Files
   "amdFHT_kernels.cl"
   "amdFHT2_kernels.cl"
   "amdFHTbig_kernels.cl"
@@ -95,7 +75,7 @@ set(
   "Util_kernels.cl"
   )
 set(
-  Graal_CL_Output
+  Graal2_CL_Output
   "OclKernels/CLKernel_amdFHT_kernels.h"
   "OclKernels/CLKernel_amdFHT2_kernels.h"
   "OclKernels/CLKernel_amdFHTbig_kernels.h"
@@ -105,9 +85,10 @@ set(
   )
 
 markGenerated(
-  Graal_CL_Directories
-  Graal_CL_Output
+  Graal2_CL_Directories
+  Graal2_CL_Output
   OutHeaders
+  Graal2
   )
 
 #append generated headers
@@ -130,9 +111,10 @@ add_library(
 
 generateCLKernel(
   Graal2
-  Graal_CL_Directories
-  Graal_CL_Files
-  Graal_CL_Output
+  Graal2_CL_Directories
+  Graal2_CL_Files
+  Graal2_CL_Output
+  Graal2
   )
 
 add_dependencies(Graal2 CLKernelPreprocessor)

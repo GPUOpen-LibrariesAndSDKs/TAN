@@ -18,18 +18,16 @@ set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 enable_language(CXX)
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
 if(NOT WIN32)
-if(APPLE)
-#SET (CMAKE_CXX_COMPILER "/usr/bin/c++")
-set(CMAKE_CXX_FLAGS_DEBUG "-Xpreprocessor -fopenmp -lomp")
-set(CMAKE_CXX_FLAGS "-Xpreprocessor -fopenmp -lomp")
-#set(CMAKE_SHARED_LINKER_FLAGS " -lomp" )
-else()
-set(CMAKE_CXX_FLAGS_DEBUG "-fopenmp")
-set(CMAKE_CXX_FLAGS "-fopenmp")
+  if(APPLE)
+    #SET (CMAKE_CXX_COMPILER "/usr/bin/c++")
+    set(CMAKE_CXX_FLAGS_DEBUG "-Xpreprocessor -fopenmp -lomp")
+    set(CMAKE_CXX_FLAGS "-Xpreprocessor -fopenmp -lomp")
+    #set(CMAKE_SHARED_LINKER_FLAGS " -lomp" )
+  else()
+    set(CMAKE_CXX_FLAGS_DEBUG "-fopenmp")
+    set(CMAKE_CXX_FLAGS "-fopenmp")
+  endif()
 endif()
-endif()
-
-
 
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
@@ -72,7 +70,7 @@ if(PortAudio_DIR)
     )
 
   add_subdirectory(${PortAudio_DIR} cmake-portaudio-bin EXCLUDE_FROM_ALL)
-  
+
   ADD_DEFINITIONS(-DENABLE_PORTAUDIO)
   include_directories(${PortAudio_DIR}/include)
 endif()
@@ -94,7 +92,7 @@ endif()
 ADD_DEFINITIONS(-D_DEBUG)
 
 if(CMAKE_BUILD_TYPE EQUAL "Debug")
-    ADD_DEFINITIONS(-D_DEBUG)
+  ADD_DEFINITIONS(-D_DEBUG)
 endif()
 
 # sources
@@ -124,10 +122,9 @@ set(
 if(WIN32)
   list(APPEND SOURCE_EXE ../../../src/common/WASAPIPlayer.cpp)
 else()
-if(NOT APPLE)
-  list(APPEND SOURCE_EXE ../../../src/common/AlsaPlayer.cpp)
-endif()
-
+  if(NOT APPLE)
+    list(APPEND SOURCE_EXE ../../../src/common/AlsaPlayer.cpp)
+  endif()
 endif()
 
 set(
@@ -151,7 +148,7 @@ set(
   ../../../src/RoomAcousticQT/QTObject/AdvanceGraphicView.h
   ../../../src/RoomAcousticQT/Resources/resource.h
   ../../../src/RoomAcousticQT/RoomAcousticQT.h
-)
+  )
 
 if(WIN32)
   list(APPEND HEADER_EXE ../../../src/common/WASAPIPlayer.h)
@@ -202,8 +199,8 @@ add_executable(
   )
 
 target_link_libraries(RoomAcousticsQT amf)
-target_link_libraries(RoomAcousticsQT TrueAudioNext)
 target_link_libraries(RoomAcousticsQT TrueAudioVR)
+target_link_libraries(RoomAcousticsQT TrueAudioNext)
 target_link_libraries(RoomAcousticsQT GPUUtilities)
 target_link_libraries(RoomAcousticsQT ${OpenCL_LIBRARY})
 target_link_libraries(RoomAcousticsQT Qt5::Widgets)
@@ -238,5 +235,31 @@ if(NOT WIN32)
 
   if(NOT APPLE)
     target_compile_options(RoomAcousticsQT PUBLIC -Wpsabi)
+  endif()
+endif()
+
+#copy runtime dll to the binary dir
+if(WIN32)
+  add_custom_command(
+    TARGET RoomAcousticsQT
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioNext_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioVR_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${GPUUtilities_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${RoomAcousticsQT_BINARY_DIR}/cmake-portaudio-bin/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
+
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Core> $<TARGET_FILE_DIR:RoomAcousticsQT>
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Gui> $<TARGET_FILE_DIR:RoomAcousticsQT>
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Widgets> $<TARGET_FILE_DIR:RoomAcousticsQT>
+
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${TAN_ROOT}/tan/tanlibrary/src/fftw-3.3.5-dll64/libfftw3f-3.dll $<TARGET_FILE_DIR:RoomAcousticsQT>
+    )
+
+  if(PortAudio_DIR)
+    add_custom_command(
+      TARGET RoomAcousticsQT
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy_directory "${RoomAcousticsQT_BINARY_DIR}/cmake-portaudio-bin/$<CONFIGURATION>" $<TARGET_FILE_DIR:RoomAcousticsQT>
+      )
   endif()
 endif()

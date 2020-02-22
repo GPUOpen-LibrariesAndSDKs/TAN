@@ -42,24 +42,6 @@ get_filename_component(ABSOLUTE_PATH "${PROJECT_SOURCE_DIR}/../../../" ABSOLUTE)
 set(TAN_ROOT ${ABSOLUTE_PATH})
 message("TAN_ROOT: ${TAN_ROOT}")
 
-#examples
-add_subdirectory(../../samples/proj/cmake/GPUUtilities cmake-GPUUtilities-bin)
-#add_subdirectory(../../samples/proj/cmake/Ambisonic1stOrderDecoder cmake-Ambisonic1stOrderDecoder-bin)
-#add_subdirectory(../../samples/proj/cmake/Ambisonic1stOrderEncoder cmake-Ambisonic1stOrderEncoder-bin)
-#add_subdirectory(../../samples/proj/cmake/Ambisonic2ndOrderEncoder cmake-Ambisonic2ndOrderEncoder-bin)
-#add_subdirectory(../../samples/proj/cmake/AmbisonicVRDecoder cmake-AmbisonicVRDecoder-bin)
-add_subdirectory(../../samples/proj/cmake/CLKernelPreprocessor cmake-CLKernelPreprocessor-bin)
-add_subdirectory(../../samples/proj/cmake/FileToHeader cmake-FileToHeader-bin)
-add_subdirectory(../../samples/proj/cmake/TrueAudioVR cmake-TrueAudioVR-bin)
-add_subdirectory(../../samples/proj/cmake/RoomAcousticQT cmake-RoomAcousticQT-bin)
-
-add_subdirectory(../../samples/proj/cmake/ReverbMixer cmake-ReverbMixer-bin)
-
-if(WIN32)
-  #not implemented yet: add_subdirectory(../../samples/proj/cmake/OculusRoomTAN cmake-OculusRoomTAN-bin)
-  #migration to new player not yet done: add_subdirectory(../../samples/proj/cmake/RoomAcoustics cmake-RoomAcoustics-bin)
-endif()
-
 #libraries
 add_subdirectory(../../tanlibrary/proj/cmake/amf cmake-amf-bin)
 add_subdirectory(../../tanlibrary/proj/cmake/Graal cmake-Graal-bin)
@@ -67,9 +49,26 @@ add_subdirectory(../../tanlibrary/proj/cmake/Graal2 cmake-Graal2-bin)
 add_subdirectory(../../tanlibrary/proj/cmake/clFFT cmake-clFFT-bin)
 add_subdirectory(../../tanlibrary/proj/cmake/TAN cmake-TAN-bin)
 
+#examples
+add_subdirectory(../../samples/proj/cmake/GPUUtilities cmake-GPUUtilities-bin)
+add_subdirectory(../../samples/proj/cmake/Ambisonic1stOrderDecoder cmake-Ambisonic1stOrderDecoder-bin)
+add_subdirectory(../../samples/proj/cmake/Ambisonic1stOrderEncoder cmake-Ambisonic1stOrderEncoder-bin)
+add_subdirectory(../../samples/proj/cmake/Ambisonic2ndOrderEncoder cmake-Ambisonic2ndOrderEncoder-bin)
+add_subdirectory(../../samples/proj/cmake/AmbisonicVRDecoder cmake-AmbisonicVRDecoder-bin)
+add_subdirectory(../../samples/proj/cmake/CLKernelPreprocessor cmake-CLKernelPreprocessor-bin)
+add_subdirectory(../../samples/proj/cmake/FileToHeader cmake-FileToHeader-bin)
+add_subdirectory(../../samples/proj/cmake/TrueAudioVR cmake-TrueAudioVR-bin)
+add_subdirectory(../../samples/proj/cmake/RoomAcousticQT cmake-RoomAcousticQT-bin)
+add_subdirectory(../../samples/proj/cmake/ReverbMixer cmake-ReverbMixer-bin)
+
+if(WIN32)
+  #not implemented yet: add_subdirectory(../../samples/proj/cmake/OculusRoomTAN cmake-OculusRoomTAN-bin)
+  #migration to new player not yet done: add_subdirectory(../../samples/proj/cmake/RoomAcoustics cmake-RoomAcoustics-bin)
+endif()
+
 #tests
 add_subdirectory(../../tests/proj/cmake/TALibDopplerTest cmake-TALibDopplerTest-bin)
 add_subdirectory(../../tests/proj/cmake/TALibTestConvolution cmake-TALibTestConvolution-bin)
 add_subdirectory(../../tests/proj/cmake/TALibTestDynamicChannelConvolution cmake-TALibTestDynamicChannelConvolution-bin)
 add_subdirectory(../../tests/proj/cmake/TALibVRTest cmake-TALibVRTest-bin)
-#add_subdirectory(../../tests/proj/cmake/TanDeviceResourcesTest cmake-TanDeviceResourcesTest-bin)
+add_subdirectory(../../tests/proj/cmake/TanDeviceResourcesTest cmake-TanDeviceResourcesTest-bin)
