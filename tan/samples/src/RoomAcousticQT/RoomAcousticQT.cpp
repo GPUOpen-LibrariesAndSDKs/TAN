@@ -211,8 +211,7 @@ void RoomAcousticQT::initializeEnvironment()
 
 void RoomAcousticQT::initializeAudioEngine()
 {
-	m_pAudioEngine = new Audio3D();
-
+	m_pAudioEngine.reset(new Audio3D());
 }
 
 void RoomAcousticQT::initializeRoom()
@@ -833,7 +832,7 @@ bool RoomAcousticQT::removeSoundSource(int id)
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 

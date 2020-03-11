@@ -106,11 +106,11 @@ public:
 	TANConverterPtr getTANConverter();
 
 	void UpdateSoundSourcesPositions();
-	
+
 private:
 	void initializeEnvironment();												// Initialize TAN DLL
 	void initializeAudioEngine();												// Initialize TAN Audio3D Engine
-	
+
 	void initializeRoom();														// Initialize TAN Room definition
 	void initializeListener();													// Initialize TAN listener profile
 	void initializeAudioPosition(int index);
@@ -130,11 +130,11 @@ public:
 	char*  m_cpWavFileNames[MAX_SOURCES];
 	int m_iNumOfWavFile = 0;
 
-	Audio3D* m_pAudioEngine;											// Pointer to the main audio3d engine
+	std::unique_ptr<Audio3D> m_pAudioEngine;							// Pointer to the main audio3d engine
 	RoomDefinition m_RoomDefinition;									// Roombox definition, contains damping and dimension
 	StereoListener m_Listener;											// Listener configuration
 	int m_iHeadAutoSpin = 0;
-	
+
 	/*Sound Source*/
 	MonoSource m_SoundSources[MAX_SOURCES];								// All of the sound sources
 	bool mSoundSourceEnable[MAX_SOURCES];								// sound sources' enable
@@ -171,7 +171,7 @@ public:
 #endif // RTQ_ENABLED
 
 	std::string mPlayerName;
-	
+
 	bool mCLRoomOverGPU = false;
 	bool mCLConvolutionOverGPU = false;
 
@@ -179,4 +179,3 @@ private:
 	std::string mWavFileNamesInternal[MAX_SOURCES];							// Internal wav file name, used to pass valid source file into Audio3D engine
 	int m_iNumOfWavFileInternal = 0;
 };
-
