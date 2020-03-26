@@ -33,6 +33,11 @@ ADD_DEFINITIONS(-D_LIB)
 ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)
 
+if(IS_DIRECTORY ${IPP_DIR})
+# enable IPP
+ link_directories(${IPP_DIR}/lib/intel64_win)
+endif()
+
 # sources
 set(
   SOURCE_EXE

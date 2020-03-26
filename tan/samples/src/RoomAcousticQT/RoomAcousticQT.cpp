@@ -209,7 +209,7 @@ void RoomAcousticQT::initializeEnvironment()
 
 void RoomAcousticQT::initializeAudioEngine()
 {
-	m_pAudioEngine = new Audio3D();
+	m_pAudioEngine.reset(new Audio3D());
 }
 
 void RoomAcousticQT::initializeRoom()
