@@ -32,6 +32,11 @@ ADD_DEFINITIONS(-D_UNICODE)
 include_directories(../../../../../amf)
 include_directories(../../../../../tan)
 
+if(IS_DIRECTORY ${IPP_DIR})
+# enable IPP
+ link_directories(${IPP_DIR}/lib/intel64_win)
+endif()
+
 # sources
 set(
   SOURCE_EXE
@@ -61,3 +66,10 @@ add_executable(
 
 target_link_libraries(TALibTestConvolution TrueAudioNext)
 target_link_libraries(TALibTestConvolution GPUUtilities)
+if(IS_DIRECTORY ${IPP_DIR})
+# enable IPP
+ target_link_libraries(TALibTestConvolution ippimt)
+ target_link_libraries(TALibTestConvolution ippsmt)
+ target_link_libraries(TALibTestConvolution ippvmmt)
+ target_link_libraries(TALibTestConvolution ippcoremt)
+endif()

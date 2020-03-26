@@ -80,6 +80,11 @@ endif()
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 link_directories(${Qt5Widgets_LIBRARY})
 
+if(IS_DIRECTORY ${IPP_DIR})
+# enable IPP
+ link_directories(${IPP_DIR}/lib/intel64_win)
+endif()
+
 include_directories(../../../../../amf)
 include_directories(../../../../../tan)
 include_directories(../../../src/common)
@@ -227,6 +232,14 @@ if(PortAudio_DIR)
   #target_link_libraries(RoomAcousticsQT portaudio-static)
 endif()
 
+if(IS_DIRECTORY ${IPP_DIR})
+# enable IPP
+ target_link_libraries(RoomAcousticsQT ippimt)
+ target_link_libraries(RoomAcousticsQT ippsmt)
+ target_link_libraries(RoomAcousticsQT ippvmmt)
+ target_link_libraries(RoomAcousticsQT ippcoremt)
+endif()
+
 if(NOT WIN32)
   target_compile_options(RoomAcousticsQT PUBLIC -mavx2)
   target_compile_options(RoomAcousticsQT PUBLIC -mfma)
@@ -240,3 +253,4 @@ if(NOT WIN32)
     target_compile_options(RoomAcousticsQT PUBLIC -Wpsabi)
   endif()
 endif()
+

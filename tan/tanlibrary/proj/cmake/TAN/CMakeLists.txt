@@ -48,6 +48,14 @@ ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)
 ADD_DEFINITIONS(-DNMC_VECTORIZE_TARGET=AVX2)
 
+#if(IS_DIRECTORY /Users/gpark/TAN-CPB/tan/thirdparty/IntelSWTools/compilers_and_libraries_2019.4.245/windows/ipp)
+if(IS_DIRECTORY ${IPP_DIR})
+# enable IPP
+ADD_DEFINITIONS(-DUSE_IPP)
+include_directories(${IPP_DIR}/include)
+link_directories(${IPP_DIR}/lib/intel64_win)
+endif()
+
 include_directories(../../../../../amf)
 include_directories(../../../..)
 
@@ -176,6 +184,14 @@ target_link_libraries(TrueAudioNext amf)
 target_link_libraries(TrueAudioNext Graal)
 target_link_libraries(TrueAudioNext Graal2)
 target_link_libraries(TrueAudioNext clFFT-master)
+if(IS_DIRECTORY ${IPP_DIR})
+# enable IPP
+ target_link_libraries(TrueAudioNext ippimt)
+ target_link_libraries(TrueAudioNext ippsmt)
+ target_link_libraries(TrueAudioNext ippvmmt)
+ target_link_libraries(TrueAudioNext ippcoremt)
+endif()
+
 
 # Declare public API of your library.
 # This API will be installed for third-party application.

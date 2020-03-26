@@ -32,6 +32,11 @@ ADD_DEFINITIONS(-D_UNICODE)
 include_directories(../../../../../amf)
 include_directories(../../../../../tan)
 
+if(IS_DIRECTORY ${IPP_DIR})
+# enable IPP
+ link_directories(${IPP_DIR}/lib/intel64_win)
+endif()
+
 # sources
 set(
   SOURCE_EXE

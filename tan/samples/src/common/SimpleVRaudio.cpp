@@ -351,11 +351,12 @@ int Audio3D::Init
 
             if(content.ChannelsCount != 2)
             {
-                std::cerr
-                    << "Error: file " << fileName << " is not a stereo file. Currently only stereo files are supported!"
-                    << std::endl;
+                //std::cerr
+                //    << "Error: file " << fileName << " is not a stereo file. Currently only stereo files are supported!"
+                //    << std::endl;
 
-                return -1;
+                //return -1;
+				content.Convert16bMonoTo16BitStereo();//Convert2Stereo16Bit();
             }
 
             if(content.SamplesCount < mBufferSizeInSamples)

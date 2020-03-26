@@ -232,7 +232,7 @@ bool 			ReadWaveFile
 			k = sampleNumber*channelsCount;
 			for (int n = 0; n < channelsCount; n++)
 			{
-				(*pfSamples)[n][sampleNumber] = (float)(((uint16_t *)*pSamples)[k + n]) / 32768.0f;
+				(*pfSamples)[n][sampleNumber] = (float)(((short *)*pSamples)[k + n]) / 32768.0f;
 			}
 		}
 		break;
@@ -524,6 +524,29 @@ bool WavContent::ReadWaveFile(const std::string & fileName)
 	return IsValid();
 }
 
+bool WavContent::Convert16bMonoTo16BitStereo()
+{
+	if (ChannelsCount == 2 && BitsPerSample == 16) {
+		return true;
+	}
+
+	if (ChannelsCount != 1 || BitsPerSample != 16) {
+		return false;
+	}
+	int16_t *dataAsShortsArray((int16_t *)&Data.front());
+
+	std::vector<uint8_t> converted(2 * SamplesCount * 2);
+	int16_t *outDataAsShortsArray((int16_t *)&converted.front());
+
+	for (unsigned int i = 0; i < SamplesCount; i++) {
+		outDataAsShortsArray[2*i] = outDataAsShortsArray[2*i + 1] = dataAsShortsArray[i];
+	}
+
+	Data.swap(converted);
+	ChannelsCount = 2;
+}
+
+
 bool WavContent::Convert2Stereo16Bit()
 {
 	if(STEREO_CHANNELS_COUNT == ChannelsCount && 16 == BitsPerSample)
@@ -666,6 +689,7 @@ bool WavContent::Convert2Stereo16Bit()
 
 	return true;
 }
+
 
 bool WavContent::JoinChannels()
 {

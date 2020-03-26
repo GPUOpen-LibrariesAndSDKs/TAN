@@ -1,4 +1,6 @@
 *CLKernel_*.h
+!CLKernel_amdFIR_kernels.h
+True Audio Next SDK Build Instructions.docx
 /.vscode/c_cpp_properties.json
 /.vscode/settings.json
 /.vscode/tasks.json

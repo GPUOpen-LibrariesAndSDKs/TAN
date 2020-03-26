@@ -138,7 +138,7 @@ public:
 
 	int m_iNumOfWavFile = 0;
 
-	Audio3D* m_pAudioEngine;											// Pointer to the main audio3d engine
+	std::unique_ptr<Audio3D> m_pAudioEngine;											// Pointer to the main audio3d engine
 	RoomDefinition m_RoomDefinition;									// Roombox definition, contains damping and dimension
 	StereoListener m_Listener;											// Listener configuration
 	int m_iHeadAutoSpin = 0;

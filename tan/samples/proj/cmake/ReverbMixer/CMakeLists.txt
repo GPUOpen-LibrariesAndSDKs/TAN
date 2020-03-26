@@ -62,6 +62,11 @@ endif()
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 link_directories(${Qt5Widgets_LIBRARY})
 
+if(IS_DIRECTORY ${IPP_DIR})
+# enable IPP
+ link_directories(${IPP_DIR}/lib/intel64_win)
+endif()
+
 include_directories(../../../../common)
 include_directories(../../../../../amf)
 include_directories(../../../../../tan)
