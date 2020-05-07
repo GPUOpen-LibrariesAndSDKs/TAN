@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 
     #ifdef _WIN32
         HMODULE GPUUtilitiesDll = NULL;
-		typedef int(__cdecl * listTanDevicesAndCapsType)(TanDeviceCapabilities **deviceList, int *count);
+        typedef int(__cdecl * listTanDevicesAndCapsType)(TanDeviceCapabilities **deviceList, int *count);
 		listTanDevicesAndCapsType listTanDevicesAndCaps = nullptr;
 
         GPUUtilitiesDll = LoadLibraryA("GPUUtilities.dll");
@@ -117,9 +117,9 @@ int main(int argc, char* argv[])
 
     }
 
-    // Usage: 
+    // Usage:
     // 1) add code to select device based on reported properties.
-    // 2) call clRetainDevice(devId) for selected device.       
+    // 2) call clRetainDevice(devId) for selected device.
     // 3) delete devCapsList
 
     delete[] devCapsList;

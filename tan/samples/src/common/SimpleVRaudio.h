@@ -85,21 +85,21 @@ public:
         bool                    useGPU_ConvQueue,
         int                     devIdx_Conv,
 
-#ifdef RTQ_ENABLED
+//#ifdef RTQ_ENABLED
 		bool                    useHPr_Conv,
         bool                    useRTQ_Conv,
         int                     cuRes_Conv,
-#endif // RTQ_ENABLED
+//#endif // RTQ_ENABLED
 
         bool                    useGPU_IRGen,
         bool                    useCPU_IRGenQueue,
         int                     devIdx_IRGen,
 
-#ifdef RTQ_ENABLED
+//#ifdef RTQ_ENABLED
 		bool                    useHPr_IRGen,
         bool                    useRTQ_IRGen,
         int                     cuRes_IRGen,
-#endif
+//#endif
 
         amf::TAN_CONVOLUTION_METHOD
                                 convMethod,

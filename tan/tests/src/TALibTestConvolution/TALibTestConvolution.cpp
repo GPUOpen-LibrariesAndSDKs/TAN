@@ -33,8 +33,10 @@
   #include <SDKDDKVer.h>
 #endif
 
+#include <stdlib.h>
 #include <memory.h>
 #include <math.h>
+#include <thread>
 
 #if !defined(__APPLE__) && !defined(__MACOSX)
     #include <omp.h>
@@ -82,7 +84,8 @@ int main(int argc, char* argv[])
 		{"GPU-NU",TAN_CONVOLUTION_METHOD_FHT_NONUNIFORM_PARTITIONED, true },
 	};
 
-	getchar();
+	// uncomment to pause for debugger attach: 
+	//getchar();
 
 	char *inFileName, *outFileName, *responseFileName, *responseFileName2;
 	//std::vector<std::string> outFileNm(2);
@@ -197,24 +200,35 @@ int main(int argc, char* argv[])
 
 	int n_IR_updates = 10;
 	int update_interv = n_blocks / n_IR_updates;
-	int mismatch = 0;
 	int b = 0;
 	int ns = 0;
 	float ** pfResp = NULL;
 
-	for (ns = 0; ns < NSamples && !mismatch; ns += n_samples, b++)
+	if (gpu)
+	{
+		convGPU->UpdateResponseTD(pfResponse, NResSamples, NULL, TAN_CONVOLUTION_OPERATION_FLAG_BLOCK_UNTIL_READY);
+	}
+	else {
+		convCPU->UpdateResponseTD(pfResponse, NResSamples, NULL, TAN_CONVOLUTION_OPERATION_FLAG_BLOCK_UNTIL_READY);
+	}
+
+	printf("UPLOAD: %d\n", ns);
+	//Sleep(1);
+	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+	for (ns = 0; ns < NSamples; ns += n_samples, b++)
 	{
 		if (b % update_interv == 0)
 		{
 			pfResp = ((b & 1) == 0 || !pfResponse2) ? pfResponse : pfResponse2;
 			if (!gpu)
 			{
-				convCPU->UpdateResponseTD(pfResp, NResSamples,NULL,NULL);
+				convCPU->UpdateResponseTD(pfResp, NResSamples,NULL, TAN_CONVOLUTION_OPERATION_FLAG_BLOCK_UNTIL_READY);
 				printf("UPLOAD: %d\n", ns);
 			}
 			if (gpu)
 			{
-				convGPU->UpdateResponseTD(pfResp, NResSamples,NULL,NULL);
+				convGPU->UpdateResponseTD(pfResp, NResSamples,NULL, TAN_CONVOLUTION_OPERATION_FLAG_BLOCK_UNTIL_READY);
 				printf("UPLOAD: %d\n", ns);
 			}
 
@@ -228,6 +242,9 @@ int main(int argc, char* argv[])
 			oh++;
 		}
 
+		//Sleep(1);
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
 		if (!gpu)
 		{
 			convCPU->Process(pfInTemp, pfOutTemp, actual_samples, flags,NULL);
@@ -239,7 +256,7 @@ int main(int argc, char* argv[])
 			convGPU->Process(pfInTemp, pfOutTemp, actual_samples, flags,NULL);
 		}
 
-		for (int nch = 0; nch < NChannels && !mismatch; nch++){
+		for (int nch = 0; nch < NChannels; nch++){
 
 			if (!gpu)
 			{
@@ -271,6 +288,7 @@ int main(int argc, char* argv[])
 
 
 	WriteWaveFileF(outFileName, SamplesPerSec, NChannels, BitsPerSample, NSamples, pfOutSamples);
+	WriteWaveFileF("in.wav", SamplesPerSec, NChannels, BitsPerSample, NSamples, pfSamples);
 
 
 	delete[] pResponse;

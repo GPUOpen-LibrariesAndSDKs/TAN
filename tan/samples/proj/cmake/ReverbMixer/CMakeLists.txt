@@ -16,19 +16,33 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 enable_language(CXX)
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
-if(NOT WIN32)
-if(APPLE)
-#SET (CMAKE_CXX_COMPILER "/usr/bin/c++")
-set(CMAKE_CXX_FLAGS_DEBUG "-Xpreprocessor -fopenmp -lomp")
-set(CMAKE_CXX_FLAGS "-Xpreprocessor -fopenmp -lomp")
-#set(CMAKE_SHARED_LINKER_FLAGS " -lomp" )
+
+find_package(OpenMP)
+if(OpenMP_FOUND)
+  ADD_DEFINITIONS(-DOMP_ENABLED)
 else()
-set(CMAKE_CXX_FLAGS_DEBUG "-fopenmp")
-set(CMAKE_CXX_FLAGS "-fopenmp")
-endif()
+  find_path(OMP_INCLUDE_DIR NAMES omp.h)
+  find_library(OpenMP_LIBRARY NAMES omp)
+
+  if(OMP_INCLUDE_DIR AND OpenMP_LIBRARY)
+    ADD_DEFINITIONS(-DOMP_ENABLED)
+    set(OpenMP_FOUND 1)
+    message("OMP_INCLUDE_DIR: ${OMP_INCLUDE_DIR}")
+    message("OpenMP_LIBRARY: ${OpenMP_LIBRARY}")
+  endif()
 endif()
 
+if(OpenMP_FOUND)
+  if(NOT WIN32)
+    if(APPLE OR XCODE)
+      set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Xpreprocessor -fopenmp -lomp")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor -fopenmp -lomp")
+    else()
+      set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fopenmp")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+    endif()
+  endif()
+endif()
 
 include(../../../../tanlibrary/proj/cmake/utils/OpenCL.cmake)
 
@@ -62,6 +76,11 @@ endif()
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 link_directories(${Qt5Widgets_LIBRARY})
 
+if(${IPP_DIR} AND IS_DIRECTORY ${IPP_DIR})
+  # enable IPP
+  link_directories(${IPP_DIR}/lib/intel64_win)
+endif()
+
 include_directories(../../../../common)
 include_directories(../../../../../amf)
 include_directories(../../../../../tan)
@@ -70,6 +89,10 @@ include_directories(../../../src/common)
 include_directories(../../../src/ReverbMixer)
 include_directories(../../../src/ReverbMixer/UI)
 include_directories(../../../src/ReverbMixer/QTObject)
+
+if(OpenMP_FOUND)
+  include_directories(${OMP_INCLUDE_DIR})
+endif()
 
 ADD_DEFINITIONS(-D_CONSOLE)
 ADD_DEFINITIONS(-D_LIB)
@@ -163,6 +186,18 @@ target_link_libraries(ReverbMixer TrueAudioNext)
 target_link_libraries(ReverbMixer GPUUtilities)
 target_link_libraries(ReverbMixer Qt5::Widgets)
 
+if(IPP_DIR AND IS_DIRECTORY ${IPP_DIR})
+  # enable IPP
+  target_link_libraries(ReverbMixer ippimt)
+  target_link_libraries(ReverbMixer ippsmt)
+  target_link_libraries(ReverbMixer ippvmmt)
+  target_link_libraries(ReverbMixer ippcoremt)
+endif()
+
+if(OpenMP_FOUND)
+  target_link_libraries(ReverbMixer ${OpenMP_LIBRARY})
+endif()
+
 if(WIN32)
   target_link_libraries(ReverbMixer "version.lib")
   target_link_libraries(ReverbMixer "shlwapi.lib")
@@ -188,7 +223,7 @@ if(WIN32)
     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Core> $<TARGET_FILE_DIR:ReverbMixer>
     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Gui> $<TARGET_FILE_DIR:ReverbMixer>
     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Widgets> $<TARGET_FILE_DIR:ReverbMixer>
-    
+
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${TAN_ROOT}/tan/tanlibrary/src/fftw-3.3.5-dll64/libfftw3f-3.dll $<TARGET_FILE_DIR:ReverbMixer>
     )
 

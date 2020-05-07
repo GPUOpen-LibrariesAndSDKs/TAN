@@ -72,8 +72,8 @@ public:
 		SAVE_DELETE_BUFFER(m_pInternalProcessedFilterTDBuffer, m_iNumOfChannels);
 		SAVE_DELETE_BUFFER(m_pInternalProcessedFilterFDBuffer, m_iNumOfChannels);
 		SAVE_DELETE_BUFFER(m_pfConvolutionInputBufferFloat, m_iNumOfChannels);
-		SAVE_DELETE_BUFFER(m_pfConvolutionOutputBuffer, m_iNumOfChannels);		
-		
+		SAVE_DELETE_BUFFER(m_pfConvolutionOutputBuffer, m_iNumOfChannels);
+
 		if(m_WASAPIPlayer)
 		{
 			m_WASAPIPlayer->Close();
@@ -123,7 +123,7 @@ public:
 	/**
 	 * \brief add a time domain filter into the processor from WAV file
 	 * \param FilePath path to the wav file
-	 * \param AMFErr 
+	 * \param AMFErr
 	 * \return AMF_OK if no error occurs
 	 */
 	int addFilterTDFromWAV(char* FilePath, AMF_RESULT* AMFErr);
@@ -131,14 +131,14 @@ public:
 	 * \brief Update a frequency domain filter with filter position
 	 * \param position : index of the filter
 	 * \param filter : frequency domain data of the fitler
-	 * \return 
+	 * \return
 	 */
 	AMF_RESULT updateFilterFD(int position, float** filter);
 	AMF_RESULT writeToWAV(void* in_pBuffer, int in_ChannelCount, int in_iSampleRate, int in_iBitsPerSample, int in_iNumOfSamples, const char* FilePath);
 	AMF_RESULT writeFilterToWAV(size_t in_iFilterIndex, int in_ChannelCount, int in_iSampleRate, int in_iBitsPerSample, int in_iNumOfSamples, char* FilePath);
 	/**
 	 * \brief process the filters in the filter chains and update the combined filter response
-	 * \return 
+	 * \return
 	 */
 	AMF_RESULT processFilter();
 	AMF_RESULT deleteFilter(int filterIndex);
@@ -170,7 +170,7 @@ private:
 	int							m_iDeviceIDx = 0;
 	bool						m_bIsPlaying = false;
 	bool						m_bIsRecording = false;
-	
+
 	// Filters
 	float**						m_pInternalProcessedFilterFDBuffer = nullptr;
 	float**						m_pInternalProcessedFilterTDBuffer = nullptr;
@@ -179,7 +179,7 @@ private:
 	size_t						m_iFilterLengthInComplexLog2 = 0;
 	size_t						m_iFilterLengthInComplex = 0;
 	size_t						m_iNumOfFilterBufferChannels = 0;
-	
+
 	std::vector<float**>		m_vFDFilterList;
 	// Inputs
 	unsigned char*				m_pInputRawBuffer = nullptr;
@@ -189,7 +189,7 @@ private:
 	long						m_iInputSizeInBytesPerChannel = 0;
 	size_t						m_iInputSizeInFloatPerChannel = 0;
 	size_t						m_iNumOfConvBufferChannels = 0;
-	
+
 	// Output
 	unsigned char*				m_pOutputBuffer = nullptr;
 	size_t						m_iInternalInputBufferLengthInSample = 0;

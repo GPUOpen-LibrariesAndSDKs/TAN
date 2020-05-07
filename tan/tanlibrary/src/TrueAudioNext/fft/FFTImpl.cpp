@@ -249,6 +249,10 @@ AMF_RESULT  AMF_STD_CALL TANFFTImpl::InitCpu()
 	omp_set_num_threads(numThreads);
 	numThreads = omp_get_max_threads();
 
+    m_doProcessingOnGpu = false;
+
+    void * FFTWDll = NULL;
+    bFFTWavailable = false;
 
 #ifdef USE_IPP
 	/* Init IPP library */
@@ -278,10 +282,6 @@ AMF_RESULT  AMF_STD_CALL TANFFTImpl::InitCpu()
     AMF_RETURN_IF_FALSE( (NULL != m_pContextTAN), AMF_WRONG_STATE,
     L"Cannot initialize after termination");
 
-    m_doProcessingOnGpu = false;
-
-    void * FFTWDll = NULL;
-    bFFTWavailable = false;
 
 	/*
 		GetModuleFileNameA(NULL, Path, PATH_MAX);

@@ -27,10 +27,10 @@
 ///-------------------------------------------------------------------------
 #pragma once
 #ifdef USE_IPP
-#include "ipp.h"
+#include <ipp.h>
 //#include "ippcore_tl.h"
-#include "ippcore.h"
-#include "ippversion.h"
+#include <ippcore.h>
+#include <ippversion.h>
 //#include "tbb/task.h"
 //#include "tbb/task_scheduler_init.h"
 //#include "tbb/tick_count.h"

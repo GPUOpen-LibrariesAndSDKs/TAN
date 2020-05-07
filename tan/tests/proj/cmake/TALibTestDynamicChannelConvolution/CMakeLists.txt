@@ -33,6 +33,11 @@ ADD_DEFINITIONS(-D_LIB)
 ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)
 
+if(IS_DIRECTORY ${IPP_DIR})
+  # enable IPP
+  link_directories(${IPP_DIR}/lib/intel64_win)
+endif()
+
 # sources
 set(
   SOURCE_EXE
@@ -61,3 +66,13 @@ add_executable(
 
 target_link_libraries(TAlibTestDynamicChannelConvolution TrueAudioNext)
 target_link_libraries(TAlibTestDynamicChannelConvolution GPUUtilities)
+
+#copy runtime dll to the binary dir
+if(WIN32)
+  add_custom_command(
+    TARGET TAlibTestDynamicChannelConvolution
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioNext_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TAlibTestDynamicChannelConvolution>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${GPUUtilities_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TAlibTestDynamicChannelConvolution>
+    )
+endif()

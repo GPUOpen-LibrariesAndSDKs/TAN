@@ -27,7 +27,6 @@ function(markGenerated InputDirectories OutputNames OutHeaders)
 endfunction()
 
 function(generateCLKernelHeader OutputTarget InputDirectories InputFiles OutputNames NamePrefix)
-  #message("generateCLKernelHeader: ${OutputTarget} ${InputDirectories} ${InputFiles} ${OutputNames} ${NamePrefix}")
 
   list(LENGTH ${InputFiles} CL_FilesCount)
   math(EXPR CL_Files_MaxIndex ${CL_FilesCount}-1)
@@ -38,7 +37,6 @@ function(generateCLKernelHeader OutputTarget InputDirectories InputFiles OutputN
     list(GET ${OutputNames} ${CL_FILE_INDEX} CL_OUTPUT)
     #message("create commands to convert file ${CL_DIRECTORY}/${CL_FILE} to ${CL_OUTPUT}")
 
-    #message("TARGET NAME: ${NamePrefix}_${CL_FILE}")
     set(TARGET_NAME ${NamePrefix}_${CL_FILE})
 
     if(NOT TARGET ${TARGET_NAME})
@@ -50,7 +48,8 @@ function(generateCLKernelHeader OutputTarget InputDirectories InputFiles OutputN
         ${CL_DIRECTORY}
         DEPENDS
         #${CL_FILE}
-        #{TARGET_NAME}
+        ${TARGET_NAME}
+
         COMMAND
         #CLKernelPreprocessor ${CL_FILE} ${CL_OUTPUT}
         FileToHeader ${CL_FILE} ${CL_OUTPUT}
@@ -68,7 +67,6 @@ function(generateCLKernelHeader OutputTarget InputDirectories InputFiles OutputN
         DEPENDS
         ${CL_OUTPUT}
         COMMENT
-        #"TARGET ${CL_FILE}"
         "TARGET ${TARGET_NAME}"
         #BYPRODUCTS ${CL_FILE}
         )

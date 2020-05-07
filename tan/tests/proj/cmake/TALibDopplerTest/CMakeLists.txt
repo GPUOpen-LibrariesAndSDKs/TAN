@@ -32,6 +32,11 @@ ADD_DEFINITIONS(-D_UNICODE)
 include_directories(../../../../../amf)
 include_directories(../../../../../tan)
 
+if(IPP_DIR AND IS_DIRECTORY ${IPP_DIR})
+  # enable IPP
+  link_directories(${IPP_DIR}/lib/intel64_win)
+endif()
+
 # sources
 set(
   SOURCE_EXE
@@ -63,3 +68,14 @@ add_executable(
 target_link_libraries(TALibDopplerTest TrueAudioVR)
 target_link_libraries(TALibDopplerTest TrueAudioNext)
 target_link_libraries(TALibDopplerTest GPUUtilities)
+
+#copy runtime dll to the binary dir
+if(WIN32)
+  add_custom_command(
+    TARGET TALibDopplerTest
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioVR_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TALibDopplerTest>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioNext_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TALibDopplerTest>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${GPUUtilities_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TALibDopplerTest>
+    )
+endif()

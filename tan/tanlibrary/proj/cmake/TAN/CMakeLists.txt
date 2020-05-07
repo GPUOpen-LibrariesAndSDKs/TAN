@@ -16,16 +16,32 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 enable_language(CXX)
-if(NOT WIN32)
-if(APPLE)
-#SET (CMAKE_CXX_COMPILER "/usr/bin/c++")
-set(CMAKE_CXX_FLAGS_DEBUG "-Xpreprocessor -fopenmp -lomp")
-set(CMAKE_CXX_FLAGS "-Xpreprocessor -fopenmp -lomp")
-#set(CMAKE_SHARED_LINKER_FLAGS " -lomp" )
+
+find_package(OpenMP)
+if(OpenMP_FOUND)
+  ADD_DEFINITIONS(-DOMP_ENABLED)
 else()
-set(CMAKE_CXX_FLAGS_DEBUG "-fopenmp")
-set(CMAKE_CXX_FLAGS "-fopenmp")
+  find_path(OMP_INCLUDE_DIR NAMES omp.h)
+  find_library(OpenMP_LIBRARY NAMES omp)
+
+  if(OMP_INCLUDE_DIR AND OpenMP_LIBRARY)
+    ADD_DEFINITIONS(-DOMP_ENABLED)
+    set(OpenMP_FOUND 1)
+    message("OMP_INCLUDE_DIR: ${OMP_INCLUDE_DIR}")
+    message("OpenMP_LIBRARY: ${OpenMP_LIBRARY}")
+  endif()
 endif()
+
+if(OpenMP_FOUND)
+  if(NOT WIN32)
+    if(APPLE OR XCODE)
+      set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Xpreprocessor -fopenmp -lomp")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor -fopenmp -lomp")
+    else()
+      set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fopenmp")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+    endif()
+  endif()
 endif()
 
 include(../../../../tanlibrary/proj/cmake/utils/OpenCL.cmake)
@@ -48,8 +64,19 @@ ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)
 ADD_DEFINITIONS(-DNMC_VECTORIZE_TARGET=AVX2)
 
+if(IPP_DIR AND IS_DIRECTORY ${IPP_DIR})
+  # enable IPP
+  ADD_DEFINITIONS(-DUSE_IPP)
+  include_directories(${IPP_DIR}/include)
+  link_directories(${IPP_DIR}/lib/intel64_win)
+endif()
+
 include_directories(../../../../../amf)
 include_directories(../../../..)
+
+if(OpenMP_FOUND)
+  include_directories(${OMP_INCLUDE_DIR})
+endif()
 
 # sources
 set(
@@ -177,6 +204,18 @@ target_link_libraries(TrueAudioNext amf)
 target_link_libraries(TrueAudioNext Graal)
 target_link_libraries(TrueAudioNext Graal2)
 target_link_libraries(TrueAudioNext clFFT-master)
+
+if(IPP_DIR AND IS_DIRECTORY ${IPP_DIR})
+  # enable IPP
+  target_link_libraries(TrueAudioNext ippimt)
+  target_link_libraries(TrueAudioNext ippsmt)
+  target_link_libraries(TrueAudioNext ippvmmt)
+  target_link_libraries(TrueAudioNext ippcoremt)
+endif()
+
+if(OpenMP_FOUND)
+  target_link_libraries(TrueAudioNext ${OpenMP_LIBRARY})
+endif()
 
 # Declare public API of your library.
 # This API will be installed for third-party application.

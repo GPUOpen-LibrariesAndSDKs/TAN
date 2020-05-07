@@ -27,9 +27,9 @@
 ///-------------------------------------------------------------------------
 #pragma once
 #ifdef USE_IPP
-#include "ipp.h"
-#include "ippcore_tl.h"
-#include "ippversion.h"
+#include <ipp.h>
+#include <ippcore_tl.h>
+#include <ippversion.h>
 #endif
 #include "tanlibrary/include/TrueAudioNext.h"	//TAN
 #include "public/include/core/Context.h"        //AMF

@@ -16,17 +16,32 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 enable_language(CXX)
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
-if(NOT WIN32)
-if(APPLE)
-#SET (CMAKE_CXX_COMPILER "/usr/bin/c++")
-set(CMAKE_CXX_FLAGS_DEBUG "-Xpreprocessor -fopenmp -lomp")
-set(CMAKE_CXX_FLAGS "-Xpreprocessor -fopenmp -lomp")
-#set(CMAKE_SHARED_LINKER_FLAGS " -lomp" )
+
+find_package(OpenMP)
+if(OpenMP_FOUND)
+  ADD_DEFINITIONS(-DOMP_ENABLED)
 else()
-set(CMAKE_CXX_FLAGS_DEBUG "-fopenmp")
-set(CMAKE_CXX_FLAGS "-fopenmp")
+  find_path(OMP_INCLUDE_DIR NAMES omp.h)
+  find_library(OpenMP_LIBRARY NAMES omp)
+
+  if(OMP_INCLUDE_DIR AND OpenMP_LIBRARY)
+    ADD_DEFINITIONS(-DOMP_ENABLED)
+    set(OpenMP_FOUND 1)
+    message("OMP_INCLUDE_DIR: ${OMP_INCLUDE_DIR}")
+    message("OpenMP_LIBRARY: ${OpenMP_LIBRARY}")
+  endif()
 endif()
+
+if(OpenMP_FOUND)
+  if(NOT WIN32)
+    if(APPLE OR XCODE)
+      set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Xpreprocessor -fopenmp -lomp")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor -fopenmp -lomp")
+    else()
+      set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fopenmp")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+    endif()
+  endif()
 endif()
 
 include(../../../../tanlibrary/proj/cmake/utils/OpenCL.cmake)
@@ -46,6 +61,10 @@ ADD_DEFINITIONS(-DTAN_SDK_EXPORTS)
 include_directories(../../../../../amf)
 include_directories(../../../..)
 include_directories(../../../../common)
+
+if(OpenMP_FOUND)
+  include_directories(${OMP_INCLUDE_DIR})
+endif()
 
 # sources
 set(
@@ -109,6 +128,10 @@ generateCLKernelHeader(
 # linking
 target_link_libraries(TrueAudioVR ${OpenCL_LIBRARY})
 target_link_libraries(TrueAudioVR amf)
+
+if(OpenMP_FOUND)
+  target_link_libraries(TrueAudioVR ${OpenMP_LIBRARY})
+endif()
 
 if(NOT WIN32)
   target_compile_options(TrueAudioVR PUBLIC -mavx2)

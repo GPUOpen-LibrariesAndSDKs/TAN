@@ -2098,8 +2098,9 @@ void TANConvolutionImpl::UpdateThreadProc(AMFThread *pThread)
                 RETURN_IF_FALSE(graalConv->updateConv(m_updateArgs.updatesCnt,
                                                       m_updateArgs.versions,
                                                       m_updateArgs.channels,
-                                                      m_updateArgs.lens, false) == GRAAL_SUCCESS,
-                                ret, AMF_UNEXPECTED);
+                                                      m_updateArgs.lens, true) == GRAAL_SUCCESS,
+													//m_updateArgs.lens, false) == GRAAL_SUCCESS,
+					ret, AMF_UNEXPECTED);
 
                 // Copy data to the new slot, as this channel can be still processed (user doesn't
                 // pass Stop flag to Process() method) and we may start doing cross-fading.

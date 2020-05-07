@@ -27,7 +27,6 @@ function(markGenerated InputDirectories OutputNames OutHeaders)
 endfunction()
 
 function(generateCLKernel OutputTarget InputDirectories InputFiles OutputNames NamePrefix)
-  #message("generateCLKernel: ${OutputTarget} ${InputDirectories} ${InputFiles} ${OutputNames} ${NamePrefix}")
 
   list(LENGTH ${InputFiles} CL_FilesCount)
   math(EXPR CL_Files_MaxIndex ${CL_FilesCount}-1)
@@ -39,7 +38,6 @@ function(generateCLKernel OutputTarget InputDirectories InputFiles OutputNames N
     list(GET ${OutputNames} ${CL_FILE_INDEX} CL_OUTPUT)
     #message("create commands to compile ${CL_DIRECTORY}/${CL_FILE} to ${CL_OUTPUT}")
 
-    #message("TARGET NAME: ${NamePrefix}_${CL_FILE}")
     set(TARGET_NAME ${NamePrefix}_${CL_FILE})
 
     if(NOT TARGET ${TARGET_NAME})

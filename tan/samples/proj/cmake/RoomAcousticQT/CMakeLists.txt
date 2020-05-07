@@ -16,16 +16,31 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 enable_language(CXX)
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
-if(NOT WIN32)
-  if(APPLE)
-    #SET (CMAKE_CXX_COMPILER "/usr/bin/c++")
-    set(CMAKE_CXX_FLAGS_DEBUG "-Xpreprocessor -fopenmp -lomp")
-    set(CMAKE_CXX_FLAGS "-Xpreprocessor -fopenmp -lomp")
-    #set(CMAKE_SHARED_LINKER_FLAGS " -lomp" )
-  else()
-    set(CMAKE_CXX_FLAGS_DEBUG "-fopenmp")
-    set(CMAKE_CXX_FLAGS "-fopenmp")
+
+find_package(OpenMP)
+if(OpenMP_FOUND)
+  ADD_DEFINITIONS(-DOMP_ENABLED)
+else()
+  find_path(OMP_INCLUDE_DIR NAMES omp.h)
+  find_library(OpenMP_LIBRARY NAMES omp)
+
+  if(OMP_INCLUDE_DIR AND OpenMP_LIBRARY)
+    ADD_DEFINITIONS(-DOMP_ENABLED)
+    set(OpenMP_FOUND 1)
+    message("OMP_INCLUDE_DIR: ${OMP_INCLUDE_DIR}")
+    message("OpenMP_LIBRARY: ${OpenMP_LIBRARY}")
+  endif()
+endif()
+
+if(OpenMP_FOUND)
+  if(NOT WIN32)
+    if(APPLE OR XCODE)
+      set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Xpreprocessor -fopenmp -lomp")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor -fopenmp -lomp")
+    else()
+      set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fopenmp")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+    endif()
   endif()
 endif()
 
@@ -78,18 +93,30 @@ endif()
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 link_directories(${Qt5Widgets_LIBRARY})
 
+if(IPP_DIR AND IS_DIRECTORY ${IPP_DIR})
+  # enable IPP
+  link_directories(${IPP_DIR}/lib/intel64_win)
+endif()
+
 include_directories(../../../../../amf)
 include_directories(../../../../../tan)
 include_directories(../../../src/common)
 include_directories(../../../../common)
 
+if(OpenMP_FOUND)
+  include_directories(${OMP_INCLUDE_DIR})
+endif()
+
 include_directories(../../../src/RoomAcousticQT/QTObject)
 
-#ADD_DEFINITIONS(-DRTQ_ENABLED)
+if(WIN32)
+  ADD_DEFINITIONS(-DRTQ_ENABLED)
+endif()
+
 ADD_DEFINITIONS(-D_DEBUG)
 
 if(CMAKE_BUILD_TYPE EQUAL "Debug")
-  ADD_DEFINITIONS(-D_DEBUG)
+    ADD_DEFINITIONS(-D_DEBUG)
 endif()
 
 # sources
@@ -119,9 +146,10 @@ set(
 if(WIN32)
   list(APPEND SOURCE_EXE ../../../src/common/WASAPIPlayer.cpp)
 else()
-  if(NOT APPLE)
-    list(APPEND SOURCE_EXE ../../../src/common/AlsaPlayer.cpp)
-  endif()
+if(NOT APPLE)
+  list(APPEND SOURCE_EXE ../../../src/common/AlsaPlayer.cpp)
+endif()
+
 endif()
 
 set(
@@ -145,7 +173,7 @@ set(
   ../../../src/RoomAcousticQT/QTObject/AdvanceGraphicView.h
   ../../../src/RoomAcousticQT/Resources/resource.h
   ../../../src/RoomAcousticQT/RoomAcousticQT.h
-  )
+)
 
 if(WIN32)
   list(APPEND HEADER_EXE ../../../src/common/WASAPIPlayer.h)
@@ -164,7 +192,7 @@ endif()
 set(
   UI_FILES
   ../../../src/RoomAcousticQT/UI/RoomAcousticConfig.ui
-  ../../../src/RoomAcousticQT/UI/RoomAcousticConfig_NoRTQ.ui
+ # ../../../src/RoomAcousticQT/UI/RoomAcousticConfig_NoRTQ.ui
   ../../../src/RoomAcousticQT/UI/ExportResponse.ui
   )
 
@@ -196,8 +224,8 @@ add_executable(
   )
 
 target_link_libraries(RoomAcousticsQT amf)
-target_link_libraries(RoomAcousticsQT TrueAudioVR)
 target_link_libraries(RoomAcousticsQT TrueAudioNext)
+target_link_libraries(RoomAcousticsQT TrueAudioVR)
 target_link_libraries(RoomAcousticsQT GPUUtilities)
 target_link_libraries(RoomAcousticsQT ${OpenCL_LIBRARY})
 target_link_libraries(RoomAcousticsQT Qt5::Widgets)
@@ -219,6 +247,18 @@ endif()
 if(PortAudio_DIR)
   target_link_libraries(RoomAcousticsQT portaudio)
   #target_link_libraries(RoomAcousticsQT portaudio-static)
+endif()
+
+if(IPP_DIR AND IS_DIRECTORY ${IPP_DIR})
+  # enable IPP
+  target_link_libraries(RoomAcousticsQT ippimt)
+  target_link_libraries(RoomAcousticsQT ippsmt)
+  target_link_libraries(RoomAcousticsQT ippvmmt)
+  target_link_libraries(RoomAcousticsQT ippcoremt)
+endif()
+
+if(OpenMP_FOUND)
+  target_link_libraries(RoomAcousticsQT ${OpenMP_LIBRARY})
 endif()
 
 if(NOT WIN32)

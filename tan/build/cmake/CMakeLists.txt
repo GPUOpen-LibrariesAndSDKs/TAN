@@ -29,7 +29,6 @@ set(CMAKE_CXX_FLAGS "-fopenmp")
 endif()
 endif()
 
-
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
   message("Build type was not set, Debug will be forced")
