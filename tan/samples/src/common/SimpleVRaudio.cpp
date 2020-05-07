@@ -998,7 +998,6 @@ int Audio3D::Process(int16_t *pOut, int16_t *pChan[MAX_SOURCES], uint32_t sample
                     1.f
                     )
                 );
-            PrintFloatArray("::Process, after Convert", mInputFloatBufs[idx * 2 + chan], sampleCount * sizeof(float));
         }
     }
 
@@ -1009,9 +1008,6 @@ int Audio3D::Process(int16_t *pOut, int16_t *pChan[MAX_SOURCES], uint32_t sample
         // Mixing and short conversion is done on GPU.
 
         RETURN_IF_FAILED(m_spConvolution->Process(mInputFloatBufs, mOutputCLBufs, sampleCount, nullptr, nullptr));
-
-        PrintCLArray("::Convolution->Process[0]", mOutputCLBufs[0], mCmdQueue1, sampleCount * sizeof(float));
-        PrintCLArray("::Convolution->Process[1]", mOutputCLBufs[1], mCmdQueue1, sampleCount * sizeof(float));
 
         cl_mem outputCLBufLeft[MAX_SOURCES];
         cl_mem outputCLBufRight[MAX_SOURCES];
@@ -1028,9 +1024,6 @@ int Audio3D::Process(int16_t *pOut, int16_t *pChan[MAX_SOURCES], uint32_t sample
         ret = m_spMixer->Mix(outputCLBufRight, mOutputMixCLBufs[1]);
         RETURN_IF_FALSE(ret == AMF_OK);
 
-        PrintCLArray("::Mixer->Mix[0]", mOutputMixCLBufs[0], mCmdQueue1, sampleCount * sizeof(float));
-        PrintCLArray("::Mixer->Mix[1]", mOutputMixCLBufs[1], mCmdQueue1, sampleCount * sizeof(float));
-
         ret = m_spConverter->Convert(mOutputMixCLBufs[0], 1, 0, TAN_SAMPLE_TYPE_FLOAT,
             mOutputShortBuf, 2, 0, TAN_SAMPLE_TYPE_SHORT, sampleCount, 1.f);
         RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED);
@@ -1038,9 +1031,6 @@ int Audio3D::Process(int16_t *pOut, int16_t *pChan[MAX_SOURCES], uint32_t sample
         ret = m_spConverter->Convert(mOutputMixCLBufs[1], 1, 0, TAN_SAMPLE_TYPE_FLOAT,
             mOutputShortBuf, 2, 1, TAN_SAMPLE_TYPE_SHORT, sampleCount, 1.f);
         RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED);
-
-        PrintCLArray("::Convolution->Process[0]", mOutputMixCLBufs[0], mCmdQueue1, sampleCount * sizeof(float));
-        PrintCLArray("::Convolution->Process[1]", mOutputMixCLBufs[1], mCmdQueue1, sampleCount * sizeof(float));
 
         cl_int clErr = clEnqueueReadBuffer(mTANConvolutionContext->GetOpenCLConvQueue(), mOutputShortBuf, CL_TRUE,
              0, sampleCountBytes, pOut, NULL, NULL, NULL);
@@ -1081,9 +1071,6 @@ int Audio3D::Process(int16_t *pOut, int16_t *pChan[MAX_SOURCES], uint32_t sample
         ret = m_spConverter->Convert(mOutputMixFloatBufs[1], 1, sampleCount, pOut + 1, 2, 1.f);
         RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED);
     }
-
-    PrintShortArray("::Process, out[0]", pOut, sampleCount * sizeof(float));
-    PrintShortArray("::Process, out[1]", pOut + 1, sampleCount * sizeof(float));
 
 	// Call the processFinalize() method after all the post processing is enqueued on the convolution queue
 	//if method & TAN_CONVOLUTION_METHOD_USE_PROCESS_FINALIZE
@@ -1134,15 +1121,6 @@ int Audio3D::Process(int16_t *pOut, int16_t *pChan[MAX_SOURCES], uint32_t sample
     ret = m_spConverter->Convert(outputFloatBufs[1], 1, sampleCount, pOut + 1, 2, 1.f);
     RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED);
 #endif
-
-    static int counter(0);
-
-    std::cout << "Process " << counter << std::endl;
-
-    if(++counter == 2)
-    {
-        assert(false);
-    }
 
     return 0;
 }
