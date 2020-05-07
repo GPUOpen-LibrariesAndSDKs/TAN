@@ -158,7 +158,10 @@ if(NOT WIN32)
   target_compile_options(Graal2 PUBLIC -mavx2)
   target_compile_options(Graal2 PUBLIC -mfma)
   target_compile_options(Graal2 PUBLIC -msse4.2)
-  target_compile_options(Graal2 PUBLIC -g) #todo: to Debug only
+
+  if(CMAKE_BUILD_TYPE MATCHES "Debug" OR CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
+    target_compile_options(Graal2 PUBLIC -g)
+  endif()
 
   if(NOT APPLE)
     target_compile_options(Graal2 PUBLIC -Wpsabi)
