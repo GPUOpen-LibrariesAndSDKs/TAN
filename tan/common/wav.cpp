@@ -1,5 +1,7 @@
 //
-// Copyright (c) 2016 Advanced Micro Devices, Inc. All rights reserved.
+// MIT license
+//
+// Copyright (c) 2019 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
 #include "wav.h"
 #include "FileUtility.h"
 
@@ -573,7 +576,7 @@ bool WavContent::Convert2Stereo16Bit()
 			float floatValue(.0f);
 
 			auto sourceChannelSampleIndex(sampleNumber * ChannelsCount + channelNumber);
-			
+
 			if(8 == BitsPerSample)
 			{
 				floatValue = (Data[sourceChannelSampleIndex] - 127) / 256.0f;
@@ -605,7 +608,7 @@ bool WavContent::Convert2Stereo16Bit()
 			{
 				if(channelNumber & 1)
 				{
-					outDataAsShortsArray[outRightChannelSampleIndex] = intValue;	
+					outDataAsShortsArray[outRightChannelSampleIndex] = intValue;
 				}
 				else
 				{
@@ -615,12 +618,12 @@ bool WavContent::Convert2Stereo16Bit()
 			else
 			{
 				return false;
-				
+
 				//todo: implement the following scheme
 				//Lo = 1.0 * L + clev * C + slev * Ls ;
 				//Ro = 1.0 * R + clev * C + slev * Rs ;
 
-				//ps. usually clev === slev === 0.7 
+				//ps. usually clev === slev === 0.7
 			}
 		}
 	}
@@ -709,8 +712,8 @@ bool WavContent::JoinChannels()
 		  outDataAsShortsArray[outRightChannelSampleIndex] =
 		    int16_t(
 				(
-					int32_t(outDataAsShortsArray[outLeftChannelSampleIndex]) 
-					+ 
+					int32_t(outDataAsShortsArray[outLeftChannelSampleIndex])
+					+
 					int32_t(outDataAsShortsArray[outRightChannelSampleIndex])
 				) / 2
 				);
