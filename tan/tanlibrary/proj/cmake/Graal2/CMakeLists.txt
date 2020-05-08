@@ -12,35 +12,15 @@ include(../../../../tanlibrary/proj/cmake/utils/OpenCL.cmake)
 # cl kernel preprocessor
 include(../../../../samples/proj/cmake/CLKernelPreprocessor/CLKernelPreprocessor.cmake)
 
-find_package(OpenMP)
-if(OpenMP_FOUND)
+find_package(OpenMP REQUIRED)
+if(OpenMP_CXX_FOUND)
+  message("OpenMP_LIBRARY: ${OpenMP_CXX}")
   ADD_DEFINITIONS(-DOMP_ENABLED)
+
+  #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${OpenMP_CXX}")
+  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor ${OpenMP_CXX}")
 else()
-  find_path(OMP_INCLUDE_DIR NAMES omp.h)
-  find_library(OpenMP_LIBRARY NAMES omp)
-
-  if(OMP_INCLUDE_DIR AND OpenMP_LIBRARY)
-    ADD_DEFINITIONS(-DOMP_ENABLED)
-    set(OpenMP_FOUND 1)
-    message("OMP_INCLUDE_DIR: ${OMP_INCLUDE_DIR}")
-    message("OpenMP_LIBRARY: ${OpenMP_LIBRARY}")
-  endif()
-endif()
-
-if(OpenMP_FOUND)
-  if(NOT WIN32)
-    if(APPLE OR XCODE)
-      set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Xpreprocessor -fopenmp -lomp")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor -fopenmp -lomp")
-    else()
-      set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fopenmp")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-    endif()
-  endif()
-endif()
-
-if(OpenMP_FOUND)
-  include_directories(${OMP_INCLUDE_DIR})
+  message("OMP not found")
 endif()
 
 include_directories(../../../../../amf)
@@ -149,8 +129,6 @@ generateCLKernel(
   )
 
 add_dependencies(Graal2 CLKernelPreprocessor)
-
-target_link_libraries(Graal2 amf)
 
 set_property(TARGET Graal2 PROPERTY POSITION_INDEPENDENT_CODE ON)
 
