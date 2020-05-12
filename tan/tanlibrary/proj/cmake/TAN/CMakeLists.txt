@@ -18,7 +18,7 @@ set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 enable_language(CXX)
 
 find_package(OpenMP)
-if(OpenMP_FOUND)
+if(OpenMP_FOUND AND OMP_INCLUDE_DIR AND OpenMP_LIBRARY)
   ADD_DEFINITIONS(-DOMP_ENABLED)
 else()
   find_path(OMP_INCLUDE_DIR NAMES omp.h)
@@ -32,7 +32,6 @@ endif()
 if(OpenMP_FOUND)
   message("OMP_INCLUDE_DIR: ${OMP_INCLUDE_DIR}")
   message("OpenMP_LIBRARY: ${OpenMP_LIBRARY}")
-  message("CMAKE_CXX_FLAGS_DEBUG: ${CMAKE_CXX_FLAGS_DEBUG}")
 
   if((NOT OpenMP_CXX) OR (NOT OpenMP_C))
     set(OpenMP_C "-fopenmp")
@@ -219,12 +218,8 @@ if(IPP_DIR AND IS_DIRECTORY ${IPP_DIR})
   target_link_libraries(TrueAudioNext ippcoremt)
 endif()
 
-#if(OpenMP_FOUND)
-#  target_link_libraries(TrueAudioNext ${OpenMP_LIBRARY})
-#endif()
-
 if(OpenMP_FOUND)
-  target_link_libraries(TrueAudioNext OpenMP::OpenMP_CXX)
+  target_link_libraries(TrueAudioNext ${OpenMP_LIBRARY})
 endif()
 
 # Declare public API of your library.
