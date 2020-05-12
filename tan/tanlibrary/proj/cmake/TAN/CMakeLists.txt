@@ -17,7 +17,7 @@ set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 enable_language(CXX)
 
-find_package(OpenMP)
+find_package(OpenMP REQUIRED)
 if(OpenMP_FOUND AND OMP_INCLUDE_DIR AND OpenMP_LIBRARY)
   ADD_DEFINITIONS(-DOMP_ENABLED)
 else()
