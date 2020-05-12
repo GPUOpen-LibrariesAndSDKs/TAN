@@ -17,7 +17,7 @@ set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 enable_language(CXX)
 
-find_package(OpenMP REQUIRED)
+find_package(OpenMP)
 message("OpenMP_VERSION: ${OpenMP_VERSION}")
 message("OpenMP_CXX_FOUND: ${OpenMP_CXX_FOUND}")
 message("OpenMP_CXX_FLAGS: ${OpenMP_CXX_FLAGS}")
@@ -28,16 +28,16 @@ message("OpenMP_CXX_LIBRARIES: ${OpenMP_CXX_LIBRARIES}")
 if(OpenMP_FOUND AND OpenMP_CXX_LIBRARIES)
   ADD_DEFINITIONS(-DOMP_ENABLED)
 else()
-  find_path(OMP_INCLUDE_DIR NAMES omp.h)
+  #find_path(OMP_INCLUDE_DIR NAMES omp.h)
   find_library(OpenMP_CXX_LIBRARIES NAMES omp)
 
-  if(OMP_INCLUDE_DIR AND OpenMP_CXX_LIBRARIES)
+  if(OpenMP_CXX_LIBRARIES)
     set(OpenMP_FOUND 1)
   endif()
 endif()
 
 if(OpenMP_FOUND)
-  message("OMP_INCLUDE_DIR: ${OMP_INCLUDE_DIR}")
+  #message("OMP_INCLUDE_DIR: ${OMP_INCLUDE_DIR}")
   message("OpenMP_CXX_LIBRARIES: ${OpenMP_CXX_LIBRARIES}")
 
   if((NOT OpenMP_CXX_FLAGS) OR (NOT OpenMP_C_FLAGS))
@@ -76,7 +76,7 @@ include_directories(../../../..)
 include_directories(../../../../common)
 
 if(OpenMP_FOUND)
-  include_directories(${OMP_INCLUDE_DIR})
+  #include_directories(${OMP_INCLUDE_DIR})
 endif()
 
 # sources
