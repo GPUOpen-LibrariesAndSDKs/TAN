@@ -17,21 +17,20 @@ set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 enable_language(CXX)
 
-find_package(OpenMP REQUIRED)
-if(OpenMP_FOUND AND OMP_INCLUDE_DIR AND OpenMP_LIBRARY)
+if(OpenMP_FOUND AND OpenMP_CXX_LIBRARIES)
   ADD_DEFINITIONS(-DOMP_ENABLED)
 else()
   find_path(OMP_INCLUDE_DIR NAMES omp.h)
-  find_library(OpenMP_LIBRARY NAMES omp)
+  find_library(OpenMP_CXX_LIBRARIES NAMES omp)
 
-  if(OMP_INCLUDE_DIR AND OpenMP_LIBRARY)
+  if(OMP_INCLUDE_DIR AND OpenMP_CXX_LIBRARIES)
     set(OpenMP_FOUND 1)
   endif()
 endif()
 
 if(OpenMP_FOUND)
   message("OMP_INCLUDE_DIR: ${OMP_INCLUDE_DIR}")
-  message("OpenMP_LIBRARY: ${OpenMP_LIBRARY}")
+  message("OpenMP_CXX_LIBRARIES: ${OpenMP_CXX_LIBRARIES}")
 
   if((NOT OpenMP_CXX_FLAGS) OR (NOT OpenMP_C_FLAGS))
     set(OpenMP_C_FLAGS "-fopenmp")
@@ -136,7 +135,7 @@ target_link_libraries(TrueAudioVR ${OpenCL_LIBRARY})
 target_link_libraries(TrueAudioVR amf)
 
 if(OpenMP_FOUND)
-  target_link_libraries(TrueAudioVR ${OpenMP_LIBRARY})
+  target_link_libraries(TrueAudioVR ${OpenMP_CXX_LIBRARIES})
 endif()
 
 if(NOT WIN32)
