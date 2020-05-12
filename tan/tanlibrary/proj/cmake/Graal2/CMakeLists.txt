@@ -7,25 +7,50 @@ set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 enable_language(CXX)
 
+find_package(OpenMP)
+if(OpenMP_FOUND)
+  ADD_DEFINITIONS(-DOMP_ENABLED)
+else()
+  find_path(OMP_INCLUDE_DIR NAMES omp.h)
+  find_library(OpenMP_LIBRARY NAMES omp)
+
+  if(OMP_INCLUDE_DIR AND OpenMP_LIBRARY)
+    set(OpenMP_FOUND 1)
+  endif()
+endif()
+
+if(OpenMP_FOUND)
+  message("OMP_INCLUDE_DIR: ${OMP_INCLUDE_DIR}")
+  message("OpenMP_LIBRARY: ${OpenMP_LIBRARY}")
+
+  if((NOT OpenMP_CXX) OR (NOT OpenMP_C))
+    set(OpenMP_C "-fopenmp")
+    set(OpenMP_CXX "-fopenmp")
+
+    if(APPLE OR XCODE)
+      set(OpenMP_C "${OpenMP_C} -Xpreprocessor")
+      set(OpenMP_CXX "${OpenMP_CXX} -Xpreprocessor")
+    endif()
+  endif()
+
+  #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${OpenMP_CXX}")
+  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX}")
+else()
+  message("omp not found")
+endif()
+
 include(../../../../tanlibrary/proj/cmake/utils/OpenCL.cmake)
 
 # cl kernel preprocessor
 include(../../../../samples/proj/cmake/CLKernelPreprocessor/CLKernelPreprocessor.cmake)
 
-find_package(OpenMP REQUIRED)
-if(OpenMP_CXX_FOUND)
-  message("OpenMP_LIBRARY: ${OpenMP_CXX}")
-  ADD_DEFINITIONS(-DOMP_ENABLED)
-
-  #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${OpenMP_CXX}")
-  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor ${OpenMP_CXX}")
-else()
-  message("OMP not found")
-endif()
-
 include_directories(../../../../../amf)
 include_directories(../../../..)
 include_directories(../../../../common)
+
+if(OpenMP_FOUND)
+  include_directories(${OMP_INCLUDE_DIR})
+endif()
 
 ADD_DEFINITIONS(-DTAN_SDK_EXPORTS)
 ADD_DEFINITIONS(-DCLFFT_EXPORTS)

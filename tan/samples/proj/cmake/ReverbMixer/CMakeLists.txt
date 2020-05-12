@@ -17,17 +17,6 @@ set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 enable_language(CXX)
 
-find_package(OpenMP REQUIRED)
-if(OpenMP_CXX_FOUND)
-  message("OpenMP_LIBRARY: ${OpenMP_CXX}")
-  ADD_DEFINITIONS(-DOMP_ENABLED)
-
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${OpenMP_CXX}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor ${OpenMP_CXX}")
-else()
-  message("OMP not found")
-endif()
-
 include(../../../../tanlibrary/proj/cmake/utils/OpenCL.cmake)
 
 # Find includes in corresponding build directories
@@ -172,10 +161,6 @@ if(IPP_DIR AND IS_DIRECTORY ${IPP_DIR})
   target_link_libraries(ReverbMixer ippsmt)
   target_link_libraries(ReverbMixer ippvmmt)
   target_link_libraries(ReverbMixer ippcoremt)
-endif()
-
-if(OpenMP_CXX_FOUND)
-  target_link_libraries(ReverbMixer PUBLIC OpenMP::OpenMP_CXX)
 endif()
 
 if(WIN32)

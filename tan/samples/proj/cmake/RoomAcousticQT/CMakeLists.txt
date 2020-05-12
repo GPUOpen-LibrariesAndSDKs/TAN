@@ -17,17 +17,6 @@ set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 enable_language(CXX)
 
-find_package(OpenMP REQUIRED)
-if(OpenMP_CXX_FOUND)
-  message("OpenMP_LIBRARY: ${OpenMP_CXX}")
-  ADD_DEFINITIONS(-DOMP_ENABLED)
-
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${OpenMP_CXX}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor ${OpenMP_CXX}")
-else()
-  message("OMP not found")
-endif()
-
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
 include(../../../../tanlibrary/proj/cmake/utils/OpenCL.cmake)
@@ -86,10 +75,6 @@ include_directories(../../../../../amf)
 include_directories(../../../../../tan)
 include_directories(../../../src/common)
 include_directories(../../../../common)
-
-if(OpenMP_FOUND)
-  include_directories(${OMP_INCLUDE_DIR})
-endif()
 
 include_directories(../../../src/RoomAcousticQT/QTObject)
 
@@ -233,10 +218,6 @@ if(IPP_DIR AND IS_DIRECTORY ${IPP_DIR})
   target_link_libraries(RoomAcousticsQT ippsmt)
   target_link_libraries(RoomAcousticsQT ippvmmt)
   target_link_libraries(RoomAcousticsQT ippcoremt)
-endif()
-
-if(OpenMP_CXX_FOUND)
-  target_link_libraries(RoomAcousticsQT PUBLIC OpenMP::OpenMP_CXX)
 endif()
 
 if(NOT WIN32)
