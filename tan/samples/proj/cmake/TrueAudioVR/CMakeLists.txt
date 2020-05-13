@@ -28,8 +28,14 @@ message("OpenMP_CXX_LIBRARIES: ${OpenMP_CXX_LIBRARIES}")
 if(OpenMP_FOUND AND OpenMP_CXX_LIBRARIES)
   ADD_DEFINITIONS(-DOMP_ENABLED)
 else()
-  #find_path(OMP_INCLUDE_DIR NAMES omp.h)
+  find_path(OMP_INCLUDE_DIR NAMES omp.h)
   find_library(OpenMP_CXX_LIBRARIES NAMES omp)
+
+  string(FIND "${OMP_INCLUDE_DIR}" "-NOTFOUND" notFoundPosition)
+
+  if(-1 != notFoundPosition)
+    set(OMP_INCLUDE_DIR "")
+  endif()
 
   if(OpenMP_CXX_LIBRARIES)
     set(OpenMP_FOUND 1)
@@ -37,7 +43,7 @@ else()
 endif()
 
 if(OpenMP_FOUND)
-  #message("OMP_INCLUDE_DIR: ${OMP_INCLUDE_DIR}")
+  message("OMP_INCLUDE_DIR: ${OMP_INCLUDE_DIR}")
   message("OpenMP_CXX_LIBRARIES: ${OpenMP_CXX_LIBRARIES}")
 
   if((NOT OpenMP_CXX_FLAGS) OR (NOT OpenMP_C_FLAGS))
@@ -75,8 +81,8 @@ include_directories(../../../../../amf)
 include_directories(../../../..)
 include_directories(../../../../common)
 
-if(OpenMP_FOUND)
-  #include_directories(${OMP_INCLUDE_DIR})
+if(OpenMP_FOUND AND OMP_INCLUDE_DIR)
+  include_directories(${OMP_INCLUDE_DIR})
 endif()
 
 # sources
