@@ -18,12 +18,6 @@ set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 enable_language(CXX)
 
 find_package(OpenMP)
-message("OpenMP_VERSION: ${OpenMP_VERSION}")
-message("OpenMP_CXX_FOUND: ${OpenMP_CXX_FOUND}")
-message("OpenMP_CXX_FLAGS: ${OpenMP_CXX_FLAGS}")
-message("OpenMP_CXX_LIB_NAMES: ${OpenMP_CXX_LIB_NAMES}")
-message("OpenMP_CXX_LIBRARY: ${OpenMP_CXX_LIBRARY}")
-message("OpenMP_CXX_LIBRARIES: ${OpenMP_CXX_LIBRARIES}")
 
 if(OpenMP_FOUND AND OpenMP_CXX_LIBRARIES)
   ADD_DEFINITIONS(-DOMP_ENABLED)
