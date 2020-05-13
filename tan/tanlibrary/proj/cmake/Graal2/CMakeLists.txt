@@ -23,7 +23,7 @@ else()
 
   string(FIND "${OMP_INCLUDE_DIR}" "-NOTFOUND" notFoundPosition)
 
-  if(-1 != notFoundPosition)
+  if(NOT(notFoundPosition EQUAL -1))
     set(OMP_INCLUDE_DIR "")
   endif()
 
