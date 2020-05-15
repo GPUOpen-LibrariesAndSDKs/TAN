@@ -44,6 +44,7 @@ if(PortAudio_DIR)
   INCLUDE(ExternalProject)
   ExternalProject_Add(
     thirdparty_portaudio
+    #URl                 "http://www.portaudio.com/archives/pa_stable_v190600_20161030.tgz"
     SOURCE_DIR          ${PortAudio_DIR}
     #GIT_REPOSITORY      https://git.assembla.com/portaudio.git
     PREFIX              thirdparty_portaudio
@@ -55,6 +56,9 @@ if(PortAudio_DIR)
     #BUILD_COMMAND       make
     BUILD_COMMAND       ""
     INSTALL_COMMAND     "" #sudo make install
+    CMAKE_ARGS
+      -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+      --debug-output
     )
 
   add_subdirectory(${PortAudio_DIR} cmake-portaudio-bin EXCLUDE_FROM_ALL)
