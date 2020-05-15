@@ -40,6 +40,7 @@ project(RoomAcousticsQT DESCRIPTION "RoomAcousticsQT")
 
 if(PortAudio_DIR)
   message("PortAudio_DIR: " ${PortAudio_DIR})
+  message("PortAudio argument: -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}")
 
   INCLUDE(ExternalProject)
   ExternalProject_Add(
@@ -56,9 +57,7 @@ if(PortAudio_DIR)
     #BUILD_COMMAND       make
     BUILD_COMMAND       ""
     INSTALL_COMMAND     "" #sudo make install
-    CMAKE_ARGS
-      -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-      --debug-output
+    CMAKE_ARGS          -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     )
 
   add_subdirectory(${PortAudio_DIR} cmake-portaudio-bin EXCLUDE_FROM_ALL)
