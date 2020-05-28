@@ -645,17 +645,19 @@ cl_kernel CreateOCLKernel2(ProjPlan *plan, const char * kernel_nm, int prog_inde
     cl_kernel resultKernel = nullptr;
 
     auto result = GetOclKernel(
-      resultKernel,
-      nullptr,
-      config->OCLqueue[0] ? config->OCLqueue[0] : config->OCLqueue[1],
+        resultKernel,
+        compute,
+        compute
+            ? cl_command_queue(compute->GetNativeCommandQueue())
+            : (config->OCLqueue[0] ? config->OCLqueue[0] : config->OCLqueue[1]),
 
-      config->program_nm[prog_index],
-      config->program_src[prog_index],
-      config->program_src_sz[prog_index],
-      kernel_nm,
+        config->program_nm[prog_index],
+        config->program_src[prog_index],
+        config->program_src_sz[prog_index],
+        kernel_nm,
 
-      config->options[prog_index]
-      );
+        config->options[prog_index]
+        );
 
     if(result)
     {

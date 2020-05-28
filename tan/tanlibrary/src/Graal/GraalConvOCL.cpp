@@ -170,7 +170,8 @@ cl_kernel CGraalConvOCL:: getKernel(
     b = build_prog_map_.find(key);
 
     cl_program prog = b->second->program;
-        // get a kernel object handle for a kernel with the given name
+
+    // get a kernel object handle for a kernel with the given name
     ret = clCreateKernel(prog, _kernel_name.c_str(), &status);
     CHECK_OPENCL_ERROR_MSG(status, "clCreateKernel failed.");
 
@@ -235,7 +236,6 @@ cl_command_queue CGraalConvOCL::getClQueue(cl_command_queue_properties * _prop, 
                                             devices_[_deviceId],
                                             _prop,
                                             &status);
-        printf("Queue created %llX\r\n", commandQueue);
         //ASSERT_CL_RETURN(status, "clCreateCommandQueue failed.");
         if (status != CL_SUCCESS)
         {
