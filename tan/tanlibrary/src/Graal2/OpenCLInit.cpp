@@ -33,8 +33,9 @@
 #include "OclKernels/CLKernel_amdFHTbig_kernels.h"
 #include "OclKernels/CLKernel_amdFIR_kernels.h"
 #include "OclKernels/CLKernel_Util_kernels.h"
-#include "public/common/AMFFactory.h"   
+#include "public/common/AMFFactory.h"
 #include "../clFFT-master/src/include/sharedLibrary.h"
+#include "../common/OCLHelper.h"
 
 typedef char * LPSTR;
 
@@ -42,7 +43,7 @@ typedef char * LPSTR;
 typedef void * HMODULE;
 #endif
 
-#ifndef _WIN32 
+#ifndef _WIN32
     #define WINAPI
 #endif
 
@@ -55,7 +56,7 @@ typedef unsigned long DWORD;
 int OCLInit(ProjPlan *plan, uint init_flags,  amf::AMFComputePtr amf_compute_conv, amf::AMFComputePtr amf_compute_update) {
 int ret = 0;
 // TODO: mutex
-	if (0 == OclCounter++ ) { 
+	if (0 == OclCounter++ ) {
 		SetupHSAOpenCL(&OCLConfig, init_flags, (cl_context)amf_compute_conv->GetNativeContext(), (cl_command_queue)amf_compute_conv->GetNativeCommandQueue(), (cl_command_queue)amf_compute_update->GetNativeCommandQueue());
 
 		CreateScheduler(&AmdScheduler, init_flags);
@@ -67,7 +68,7 @@ int ret = 0;
 	plan->AmdSched = AmdScheduler;
 	plan->OclConfig = OCLConfig;
 
-	
+
 	if ( !(SchedGetInitFlags(GetScheduler(plan)) & __INIT_FLAG_GLOBAL_QUEUES__) ) {
         if (amf_compute_conv->GetNativeContext() == 0)
         {
@@ -123,17 +124,17 @@ int ret = 0;
         // Qeueus are passed from the user does not need to be cleaned and released here
 		if ( !(SchedGetInitFlags(GetScheduler(plan)) & __INIT_FLAG_GLOBAL_QUEUES__) ) {
 			for (int i = 0; i < __NUM_OCL_QUEUES__; i++) {
-	
+
 				if(plan->OCLqueue[i] != 0) {
 					clReleaseCommandQueue(plan->OCLqueue[i]);
 					plan->OCLqueue[i] = 0;
 				}
 			}
 		}
-#endif	
+#endif
 	if ( 0 >= --OclCounter ) {
 		DestructScheduler(&AmdScheduler);
-		CleanupHSAOpenCL(&OCLConfig);	
+		CleanupHSAOpenCL(&OCLConfig);
 	}
 
 
@@ -264,7 +265,7 @@ int CleanupHSAOpenCL(HSA_OCL_ConfigS** OCLConfigs)
   // TODO: clean up OpenCL here
 
 	for (int i = 0; i < __NUM_OCL_QUEUES__; i++) {
-	
+
        if((*OCLConfigs)->OCLqueue[i] != 0) {
 		   clReleaseCommandQueue((*OCLConfigs)->OCLqueue[i]);
 		   (*OCLConfigs)->OCLqueue[i] = 0;
@@ -368,7 +369,7 @@ int listGpuDeviceNames(char *devNames[], unsigned int count)
 {
 
     int foundCount = 0;
-    
+
 #ifdef __linux__
     typedef int(*listGpuDeviceNamesType)(char *devNames[], unsigned int count);
 #else
@@ -439,7 +440,7 @@ int CreateStreamsQueue(HSA_OCL_ConfigS *config, cl_command_queue * Ques, int n_q
 cl_int err = 0;
 #if 0
     cl_command_queue single_q = clCreateCommandQueue(config->context, config->dev_id, NULL, NULL);
-	
+
 	Ques[0] = single_q; //clCreateCommandQueue(config->context, config->dev_id, NULL, NULL);
 #else
 	for ( int i = 0; i < n_ques; i++) {
@@ -457,7 +458,7 @@ int CreateCommandQueue(HSA_OCL_ConfigS *config)
   cl_int errNum;
   cl_device_id *devices;
   size_t deviceBufferSize = -1;
-  
+
 
   errNum = clGetContextInfo(config->context, CL_CONTEXT_DEVICES, 0, NULL, &deviceBufferSize);
   if(errNum != CL_SUCCESS) return errNum;
@@ -478,7 +479,7 @@ int CreateCommandQueue(HSA_OCL_ConfigS *config)
 
 		return errNum;
   }
-  
+
 
   //GetInstanceInfo(config);
 
@@ -560,14 +561,15 @@ int CreateProgram(HSA_OCL_ConfigS *config, const char *program_nm, int index, ch
       config->program_src_sz[index] = 0;
       return -1;
   }
-  if (!config->amf_compute_conv || !config->amf_compute_update)
+
+  /*
+  if(!config->amf_compute_conv || !config->amf_compute_update)
   {
       // if AMF compute device is not provided compile programs here
       const char* c_string = srcStr.c_str();
       config->program[index] = clCreateProgramWithSource(config->context, 1, (const char**)(&c_string), NULL, NULL);
 
-
-      if (config->program == NULL)
+      if (config->program[index] == NULL)
       {
           printf("Failed to create CL program from source\n");
           return -99999999;
@@ -585,6 +587,7 @@ int CreateProgram(HSA_OCL_ConfigS *config, const char *program_nm, int index, ch
           printf("with options: %s\n", options);
       }
 #endif
+
       errNum = clBuildProgram(config->program[index], 0, NULL, p_build_options, NULL, NULL);
       if (errNum != CL_SUCCESS)
       {
@@ -596,6 +599,8 @@ int CreateProgram(HSA_OCL_ConfigS *config, const char *program_nm, int index, ch
           return errNum;
       }
   }
+  */
+
   int len = (int)strlen(program_nm);
   config->program_nm[index] = (char*)malloc(len+1);
   if ( config->program_nm[index] ) {
@@ -628,8 +633,41 @@ int CreateProgram2(ProjPlan *plan, const char *program_nm, int index, char * opt
   return ret;
 }
 
-cl_kernel CreateOCLKernel2(ProjPlan *plan, const char * kernel_nm, int prog_index, ComputeDeviceIdx compDevIdx) {
-	cl_kernel ret = 0;
+cl_kernel CreateOCLKernel2(ProjPlan *plan, const char * kernel_nm, int prog_index, ComputeDeviceIdx compDevIdx)
+{
+    auto *config(GetOclConfig(plan));
+
+    amf::AMFComputePtr compute(
+        compDevIdx == ComputeDeviceIdx::COMPUTE_DEVICE_CONV
+            ? config->amf_compute_conv
+            : config->amf_compute_update
+        );
+    cl_kernel resultKernel = nullptr;
+
+    auto result = GetOclKernel(
+      resultKernel,
+      nullptr,
+      config->OCLqueue[0] ? config->OCLqueue[0] : config->OCLqueue[1],
+
+      config->program_nm[prog_index],
+      config->program_src[prog_index],
+      config->program_src_sz[prog_index],
+      kernel_nm,
+
+      config->options[prog_index]
+      );
+
+    if(result)
+    {
+        return resultKernel;
+    }
+
+    printf("\nERROR: Cannot get the kernel %s from the AMF program %s\n", kernel_nm, config->program_nm[prog_index]);
+
+    return nullptr;
+
+    /*
+    cl_kernel ret = 0;
 	int err = 0;
     if (!GetOclConfig(plan)->amf_compute_conv  || !GetOclConfig(plan)->amf_compute_update)
     {
@@ -668,7 +706,7 @@ cl_kernel CreateOCLKernel2(ProjPlan *plan, const char * kernel_nm, int prog_inde
                     case ComputeDeviceIdx::COMPUTE_DEVICE_CONV:
                     {
                         GetOclConfig(plan)->amf_compute_conv->GetKernel(amfKernelId, &pAMFComputeKernel);
-                    } 
+                    }
                     break;
                     case ComputeDeviceIdx::COMPUTE_DEVICE_UPDATE:
                     {
@@ -676,7 +714,7 @@ cl_kernel CreateOCLKernel2(ProjPlan *plan, const char * kernel_nm, int prog_inde
                     }
                     break;
                 }
-                
+
                 if (nullptr != pAMFComputeKernel)
                 {
                     return (cl_kernel)pAMFComputeKernel->GetNative();
@@ -686,10 +724,11 @@ cl_kernel CreateOCLKernel2(ProjPlan *plan, const char * kernel_nm, int prog_inde
                     printf("ERROR: Cannot get the kernel from the AMF program object: %s\n", kernel_nm);
                     return 0;
                 }
-                
+
             }
         }
     }
+    */
 }
 
 void GetInstanceInfo(HSA_OCL_ConfigS *config)
@@ -698,7 +737,7 @@ void GetInstanceInfo(HSA_OCL_ConfigS *config)
   config->gpu_max_mem_alloc_sz = 0;
   config->gpu_max_memory_sz = 0;
   char dev_nm[128];
-  err = clGetDeviceInfo(config->dev_id, CL_DEVICE_MAX_MEM_ALLOC_SIZE, 
+  err = clGetDeviceInfo(config->dev_id, CL_DEVICE_MAX_MEM_ALLOC_SIZE,
 			sizeof(config->gpu_max_mem_alloc_sz), &config->gpu_max_mem_alloc_sz, NULL);
 
   err |= clGetDeviceInfo(config->dev_id, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(config->gpu_max_memory_sz), &config->gpu_max_memory_sz, NULL);
@@ -707,8 +746,8 @@ void GetInstanceInfo(HSA_OCL_ConfigS *config)
   // TODO: PARAMETERIZE
   config->gpu_wavefront_ln_log2 = 6;
   if(err == CL_SUCCESS)
-   printf("AMD GPU: %s CUs: %d, max memory, max alloc size (MBytes): %d, %d\n", dev_nm, config->gpu_max_cus, (int)(config->gpu_max_memory_sz/(1024*1024)), (int)(config->gpu_max_mem_alloc_sz/(1024*1024)));
- 
+   printf("\nAMD GPU: %s CUs: %d, max memory, max alloc size (MBytes): %d, %d\n", dev_nm, config->gpu_max_cus, (int)(config->gpu_max_memory_sz/(1024*1024)), (int)(config->gpu_max_mem_alloc_sz/(1024*1024)));
+
 
  return;
 }
@@ -768,7 +807,7 @@ int CreateOCLBuffer(cl_context context,OCLBuffer * buf, uint buffer_flags)
       printf("error creating bufffer: %d\n", err);
       return err;
    }
- 
+
  	buf->context = context;
 
    return err;
@@ -895,7 +934,7 @@ int err;
 		printf("wrong data\n");
 		return(-1);
 	}
-  
+
 	err = clEnqueueWriteBuffer(commandQueue, buf->mem, force,0, buf->len, buf->sys, 0, NULL, NULL);
 
 	if(err != CL_SUCCESS) {
@@ -914,7 +953,7 @@ int err;
 		printf("wrong data\n");
 		return(-1);
 	}
-  
+
 	err = clEnqueueWriteBuffer(commandQueue, buf->mem, force, offset, sys_len, sys, 0, NULL, NULL);
 
 	if(err != CL_SUCCESS) {

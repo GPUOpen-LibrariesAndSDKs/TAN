@@ -26,7 +26,7 @@
 #define __IIRLOWLAT_OCL__
 
 #include "IIRLowLat.h"
-#include "public/common/AMFFactory.h"  
+#include "public/common/AMFFactory.h"
 #define __NUM_OCL_QUEUES__ 2
 #define __NUM_STREAMS__ 2
 #define __MAX_N_INSTNCES__ 2048
@@ -41,13 +41,13 @@ double subtractTimes( double endTime, double startTime )
 {
     double difference = endTime - startTime;
     static double conversion = 0.0;
-    
+
     if( conversion == 0.0 )
     {
 #if __APPLE__
   //      mach_timebase_info_data_t info;
   //      kern_return_t err = mach_timebase_info( &info );
-  //      
+  //
 		////Convert the timebase into seconds
   //      if( err == 0  )
   //	conversion = 1e-9 * (double) info.numer / (double) info.denom;
@@ -57,7 +57,7 @@ double subtractTimes( double endTime, double startTime )
 		conversion = 1.;
 #endif
     }
-    
+
     return conversion * (double) difference;
 }
 
@@ -101,7 +101,7 @@ typedef struct _HSA_OCL_ConfigS
   char *kernel_nm[__MAX_N_PROGS__][__MAX_N_KERNELS__];
 
 // TO DO:
-  void * schedulers[1]; // pointers on schedulers froma different initialization threads
+  void * schedulers[1]; // pointers on schedulers from a different initialization threads
   amf::AMFComputePtr amf_compute_conv;
   amf::AMFComputePtr amf_compute_update;
 } HSA_OCL_ConfigS;

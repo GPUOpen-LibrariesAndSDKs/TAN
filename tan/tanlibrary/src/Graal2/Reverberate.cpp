@@ -124,7 +124,7 @@ ProjPlan * plan = NULL;
 
 static
 void CompileAllKernels( ProjPlan * plan) {
- 	CreateProgram2(plan, "amdFHT_kernels", __AMD_FHT_PROGRAM_INDEX__, "-cl-fp32-correctly-rounded-divide-sqrt");
+    CreateProgram2(plan, "amdFHT_kernels", __AMD_FHT_PROGRAM_INDEX__, "-cl-fp32-correctly-rounded-divide-sqrt");
 	CreateProgram2(plan, "amdFHTbig_kernels", __AMD_FHTBIG_PROGRAM_INDEX__, "-cl-fp32-correctly-rounded-divide-sqrt");
 	CreateProgram2(plan, "amdFHTmad_kernels", __AMD_FHTMAD_PROGRAM_INDEX__, "-cl-fp32-correctly-rounded-divide-sqrt");
 	CreateProgram2(plan, "amdFHT2_kernels", __AMD_FHT2_PROGRAM_INDEX__, "-cl-fp32-correctly-rounded-divide-sqrt");
@@ -135,7 +135,7 @@ void CompileAllKernels( ProjPlan * plan) {
 
 int ReverbOCLInitialize(ProjPlan * plan, amdOCLRvrb *new_plan, const char * ocl_kernels_path, int init_flags,
                                  amf::AMFComputePtr amf_compute_conv, amf::AMFComputePtr amf_compute_update) {
-int err = 0;	
+int err = 0;
 	err = OCLInit(plan, init_flags , amf_compute_conv, amf_compute_update);
 	plan->Stat = (StatisticsPerRun *)malloc(sizeof(StatisticsPerRun));
 	if (err || !plan->Stat)  {
@@ -218,7 +218,7 @@ int ReverbOCLTerminateDeffered(ProjPlan * plan) {
 		}
 
 	ReverbSetState(plan,(ReverbGetState(plan) & ~( __STATE_UNSETUP_FIR__ | __STATE_UNSETUP_RVRB__) ));
-	
+
 
 
 	return err;
@@ -269,11 +269,11 @@ int ReverbSetBlockSize2(ProjPlan * plan, int flame2_ln) {
 
 int ReverbOCLIsActive(ProjPlan * plan) {
 	int ret = 0;
-  
+
 	int init_flags = SchedGetInitFlags(GetScheduler(plan));
 
 	int active = ((init_flags & __INIT_FLAG_FIR__) && !(init_flags & __INIT_FLAG_FHT__)) ?
-					(ReverbGetState(plan) & __STATE_ACTIVE_FIR__) 
+					(ReverbGetState(plan) & __STATE_ACTIVE_FIR__)
 					: (ReverbGetState(plan) & __STATE_ACTIVE__);
 
 	ret = active;
@@ -281,11 +281,11 @@ int ReverbOCLIsActive(ProjPlan * plan) {
 	return ret;
 }
 
-int ReverbGetNConvBlocks(ProjPlan * plan) { 
+int ReverbGetNConvBlocks(ProjPlan * plan) {
 int ret = 0;
 	if ( plan ) {
 		amdAudShcheduler * sched = GetScheduler(plan);
-		bool ffts2 = (SchedGetInitFlags(sched) & __INIT_FLAG_2FFT_STREAMS__)? true:false;	
+		bool ffts2 = (SchedGetInitFlags(sched) & __INIT_FLAG_2FFT_STREAMS__)? true:false;
 		int frame_ln = (ffts2) ? plan->frame2_ln : plan->frame_ln;
 		ret = (((plan->conv_kernel_ln + frame_ln) - 1) / (frame_ln));
 	}
@@ -304,21 +304,21 @@ int ReverbGetNDataBlocksToFFT(ProjPlan * plan) {
 int ret = 0;
 
 	ret = plan->nmb_channels;
-	
+
 	return(ret);
 }
 
 
 __int64 GetRunCounter(ProjPlan *plan) {
 __int64 ret = -1;
-	ret = plan->run;		
+	ret = plan->run;
 	return (ret);
 }
 
 void SetRunCounter(ProjPlan *plan, __int64 new_val) {
 
 	plan->run = new_val;
-	
+
 }
 
 
@@ -375,7 +375,7 @@ int err = 0;
 
 	if ( ReverbGetState(plan) & __STATE_SETUP_RVRB__ ) {
 
- // CPU processing presetup	
+ // CPU processing presetup
 		err |= DirectConvCPUSetup(plan);
         plan->xfade_state = 0;
         plan->first_ir_upload = 1;
@@ -448,10 +448,21 @@ int err = 0;
             sprintf(fromq_kernel_nm,"amdFHT%dFromQ", block_sz);
             sprintf(froms_kernel_nm,"amdFHT%dFromS", block_sz);
             sprintf(froms_xfade_kernel_nm, "amdFHT%dFromSXFade", block_sz);
-            fht_plan->fht_kernels[FHT1_OCL] = CreateOCLKernel2(plan, ir_kernel_nm, __AMD_FHT_PROGRAM_INDEX__, ComputeDeviceIdx::COMPUTE_DEVICE_UPDATE);
-            fht_plan->fht_kernels[FHT1_OCL_FROMQUE] = CreateOCLKernel2(plan, fromq_kernel_nm, __AMD_FHT_PROGRAM_INDEX__);
+            fht_plan->fht_kernels[FHT1_OCL] = CreateOCLKernel2(
+                plan,
+                ir_kernel_nm,
+                block_sz > 2048 ? __AMD_FHTBIG_PROGRAM_INDEX__ : __AMD_FHT_PROGRAM_INDEX__,
+                ComputeDeviceIdx::COMPUTE_DEVICE_UPDATE
+                );
+            fht_plan->fht_kernels[FHT1_OCL_FROMQUE] = CreateOCLKernel2(
+                plan,
+                fromq_kernel_nm,
+                block_sz > 2048 ? __AMD_FHTBIG_PROGRAM_INDEX__ : __AMD_FHT_PROGRAM_INDEX__
+                );
             // for 2 streams the second stream's addition is inside FHT inverse
-            int out_strm_src = (init_flags & __INIT_FLAG_2STREAMS__) ? __AMD_FHT2_PROGRAM_INDEX__ : __AMD_FHT_PROGRAM_INDEX__;
+            int out_strm_src = block_sz > 2048
+                ? __AMD_FHTBIG_PROGRAM_INDEX__
+                : (init_flags & __INIT_FLAG_2STREAMS__) ? __AMD_FHT2_PROGRAM_INDEX__ : __AMD_FHT_PROGRAM_INDEX__;
             fht_plan->fht_kernels[FHT1_OCL_FROMSTREAM] = CreateOCLKernel2(plan, froms_kernel_nm, out_strm_src);
             fht_plan->fht_kernels[FHT1_OCL_FROMSTREAM_XFADE] = CreateOCLKernel2(plan, froms_xfade_kernel_nm, out_strm_src);
 
@@ -462,7 +473,7 @@ int err = 0;
 
             size_t long_strm_chnl_stride = frame_ln * plan->conv_blocks * 2;
             size_t long_stream_sz = plan->conv_NumChannels* long_strm_chnl_stride * sizeof(__FLOAT__);
-            
+
             //double* sum_sq = (double*)malloc(sizeof(double) * plan->conv_NumChannels);
 
             fht_plan->IR1 = new OCLBuffer[plan->num_IR_buffers];
@@ -543,14 +554,14 @@ int err = 0;
                 fht_plan->fht_kernels[FHT1_OCL_MAD] = CreateOCLKernel2(plan, "FHTMultAddAccum", __AMD_FHTMAD_PROGRAM_INDEX__);
             }
 
-            
+
             fht_plan->fht_kernels[FHT1_OCL_MAD_HEAD] = CreateOCLKernel2(plan, "FHTMultAddHead", __AMD_FHTMAD_PROGRAM_INDEX__);
             fht_plan->fht_kernels[FHT1_OCL_MAD_HEAD_XFADE] = CreateOCLKernel2(plan, "FHTMultAddHeadXFade", __AMD_FHTMAD_PROGRAM_INDEX__);
             fht_plan->fht_kernels[FHT1_OCL_MAD_DEVIDED] = CreateOCLKernel2(plan, "FHTMultAddHeadDevided", __AMD_FHTMAD_PROGRAM_INDEX__);
             fht_plan->fht_kernels[FHT1_OCL_MAD_DEVIDED_XFADE] = CreateOCLKernel2(plan, "FHTMultAddHeadDevidedXFade", __AMD_FHTMAD_PROGRAM_INDEX__);
             fht_plan->fht_kernels[FHT1_OCL_MAD_TAIL] = CreateOCLKernel2(plan, "FHTMultAddTail", __AMD_FHTMAD_PROGRAM_INDEX__);
             fht_plan->fht_kernels[FHT1_OCL_MAD_TAIL_XFADE] = CreateOCLKernel2(plan, "FHTMultAddTailXFade", __AMD_FHTMAD_PROGRAM_INDEX__);
-                
+
             // it keeps partial sums in 1 stream case
             int n_sums = (n_conv_blocks + fht_plan->accum_loops - 1) / fht_plan->accum_loops;
 
@@ -572,7 +583,7 @@ int err = 0;
                     SetValue(queue, &fht_plan->accum11[i], 0.0);
                 }
             }
-            
+
             fht_plan->fht_kernels[PARTITION_KERNEL] = CreateOCLKernel2(plan, "partitionIR", __UTIL_PROGRAM_INDEX__ , ComputeDeviceIdx::COMPUTE_DEVICE_UPDATE);
 
             if (init_flags & __INIT_FLAG_2STREAMS__)
@@ -639,7 +650,7 @@ int err = 0;
                     SetValue(plan, &fht_plan->syncs, 0);
                 }
 #endif
-                // fht mad kerenl setup
+                // fht mad kernel setup
 
                 fht_plan->fht_kernels[FHT2_OCL_MAD] = CreateOCLKernel2(plan, "FHTMultAddAccum", __AMD_FHTMAD_PROGRAM_INDEX__);
                 fht_plan->fht_kernels[FHT2_OCL_FROMSTREAM_REVERSE] = CreateOCLKernel2(plan, "amdFromQReverse", __AMD_FHT2_PROGRAM_INDEX__);
@@ -655,7 +666,7 @@ int err = 0;
 	if ( ReverbGetState(plan) & __STATE_SETUP_FIR__ ) {
 		firDirectSetup(plan);
 	}
-    
+
 	return err;
 }
 
@@ -663,7 +674,7 @@ int err = 0;
 // major parameters setup
 ///////////////////////////////////
 void graalSetupParams(ProjPlan * plan, int init_flags) {
-	bool s2 = (init_flags & __INIT_FLAG_2FFT_STREAMS__)? true:false;	
+	bool s2 = (init_flags & __INIT_FLAG_2FFT_STREAMS__)? true:false;
 	plan->frame_ln_log2 = (int)ceil(log((double)plan->frame_max_ln)/log(2.));
 	plan->frame_ln = (1 << plan->frame_ln_log2);
     plan->in_que_ln = (s2) ? (1 << ( plan->frame2_ln_log2 - plan->frame_ln_log2)) * 2 : 2;
@@ -682,10 +693,10 @@ int ReverbOCLSetupInternal(ProjPlan * plan) {
 	int err = 0;
 
 	amdAudShcheduler * sched = GetScheduler(plan);
-// release all resources from a previous kernel dowwload if it ever happpened	
+// release all resources from a previous kernel dowwload if it ever happpened
 //	ReverbOCLUnsetup(plan);
 
-// move a new block size from a cached state into actuallity 
+// move a new block size from a cached state into actuallity
 // here there might be some heurisric to switch from a 2 streams to a 1 stream pipline and back.
 	ReverbSetBlockSize2(plan, 0);
 
@@ -694,7 +705,7 @@ int ReverbOCLSetupInternal(ProjPlan * plan) {
 
 // the rest of the real setup
 	err = ReverbOCLSetupProcess(plan);
-	
+
 
 	return err;
 }
@@ -749,13 +760,13 @@ int ReverbFlushHistory(ProjPlan* plan, int channelId)
     int ret = 0;
     cl_command_queue queue = plan->OCLqueue[0];
     STREAM_INOUT * in_out_plan = (STREAM_INOUT *)plan->streamBlockInOutpass;
-    
+
     amdFHT_OCL *fht_plan = (amdFHT_OCL *)plan->GPUConvpass;
 
     //1- Clearing the input staging buffer (time domain samples)  clear the whole circular buffer for the requested channel
     int chnl_stride = plan->frame_ln * plan->in_que_ln * sizeof(__FLOAT__);
     SetValue(queue, &in_out_plan->stream_in[0], 0.0, chnl_stride * channelId, chnl_stride);
-   
+
     // 2- Cleaning the FHT history buffers
     uint init_flags = SchedGetInitFlags(GetScheduler(plan));
     {
@@ -783,12 +794,12 @@ int ReverbFlushHistory(ProjPlan* plan, int channelId)
         SetValue(queue, &fht_plan->accum21[0], 0.0, channelId * block_sz * sizeof(__FLOAT__), block_sz * sizeof(__FLOAT__));
         SetValue(queue, &fht_plan->accum21[1], 0.0, channelId * block_sz * sizeof(__FLOAT__), block_sz * sizeof(__FLOAT__));
         //
-        SetValue(queue, &fht_plan->invFHT20[1], 0.0, channelId * block_sz * sizeof(__FLOAT__), block_sz * sizeof(__FLOAT__));        
+        SetValue(queue, &fht_plan->invFHT20[1], 0.0, channelId * block_sz * sizeof(__FLOAT__), block_sz * sizeof(__FLOAT__));
         SetValue(queue, &fht_plan->invFHT20[0], 0.0, channelId * block_sz * sizeof(__FLOAT__), block_sz * sizeof(__FLOAT__));
         //
         SetValue(queue, &in_out_plan->stream2_out[0], 0.0, channelId * plan->frame2_ln * sizeof(__FLOAT__), plan->frame2_ln * sizeof(__FLOAT__));
         SetValue(queue, &in_out_plan->stream2_out[1], 0.0, channelId * plan->frame2_ln * sizeof(__FLOAT__), plan->frame2_ln * sizeof(__FLOAT__));
-        
+
 
     }
     return ret;
