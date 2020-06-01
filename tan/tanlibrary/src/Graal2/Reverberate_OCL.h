@@ -73,7 +73,7 @@ extern uint _amd_tracer_ptr;
 #define __AMD_FHTMAD_PROGRAM_INDEX__     8
 #define __AMD_FHT2_PROGRAM_INDEX__		 9
 #define __AMD_FIR_PROGRAM_INDEX__        10
-// uniq shared pipeline id 
+// uniq shared pipeline id
 #define __OCLREVERB_PIPELINE_ID__		(uint)-2
 #define __OCLREVERB_TERMINATED_ID__  (uint)-1
 // preallocated number of cahnnels (blocks)
@@ -134,7 +134,7 @@ typedef struct _ProjPlan {
 	int *fir_sz_staged;
 	void ** fir_ptr_staged;
 	int n_firs_staged;
-	int local_mem_buffer_log2; 
+	int local_mem_buffer_log2;
 	__int64 run;
 	int run_flags;
 	int nmb_loops;
@@ -170,11 +170,11 @@ typedef struct _ProjPlan {
 } ProjPlan;
 
 void ReverbDebugOutput(ProjPlan *plan, char * msg);
-int OCLInit(ProjPlan *plan, uint init_flags, amf::AMFComputePtr amf_compute_conv=0, amf::AMFComputePtr amf_compute_update=0);
+int OCLInit(ProjPlan *plan, uint init_flags, const amf::AMFComputePtr & amf_compute_conv, const amf::AMFComputePtr & amf_compute_update);
 int OCLInit(ProjPlan *plan, uint init_flags, cl_command_queue OCLqueue_conv = 0, cl_command_queue OCLqueue_update = 0);
 int OCLTerminate(ProjPlan *plan);
 void DecreaseGlobalReferenceCounter(ProjPlan *plan);
-int ReverbOCLInitialize(ProjPlan * plan, amdOCLRvrb *new_plan, const char * ocl_kernels_path, int init_flags, amf::AMFComputePtr amf_compute_conv = 0, amf::AMFComputePtr amf_compute_update = 0);
+int ReverbOCLInitialize(ProjPlan * plan, amdOCLRvrb *new_plan, const char * ocl_kernels_path, int init_flags, const amf::AMFComputePtr & amf_compute_conv, const amf::AMFComputePtr & amf_compute_update);
 int ReverbOCLInitialize(ProjPlan * plan, amdOCLRvrb *new_plan, const char * ocl_kernels_path, int init_flags, cl_command_queue OCLqueue_conv = 0, cl_command_queue OCLqueue_update = 0);
 int ReverbOCLTerminateDeffered(ProjPlan * plan);
 

@@ -49,31 +49,38 @@ StatisticsPerRun * GetStat(amdOCLRvrb rvrb) {
 	return ret;
 }
 
-
-
-
-int graalInitialize(graalHandle *new_plan, const char * ocl_kernels_path, int init_flags, 
-                    amf::AMFComputePtr amf_compute_conv, amf::AMFComputePtr amf_compute_update){
-int err = 0;
-ProjPlan * plan = NULL;
+int graalInitialize(
+    graalHandle * new_plan,
+    const char * ocl_kernels_path,
+    int init_flags,
+    const amf::AMFComputePtr & amf_compute_conv,
+    const amf::AMFComputePtr & amf_compute_update
+    )
+{
+    int err = 0;
+    ProjPlan * plan = NULL;
 
     if ( !new_plan ) {
 		err = -1;
 		return(err);
 	}
 
-
 	plan = CreatePlan(init_flags);
-// reverbirate conv kernel initialization
-	
-	ReverbOCLInitialize(plan, new_plan, ocl_kernels_path, init_flags, amf_compute_conv, amf_compute_update);
+    // reverbirate conv kernel initialization
 
+	ReverbOCLInitialize(plan, new_plan, ocl_kernels_path, init_flags, amf_compute_conv, amf_compute_update);
 
     return(err);
 }
 
-int graalInitialize(graalHandle *new_plan, const char * ocl_kernels_path, int init_flags,
-	cl_command_queue OCLqueue_conv, cl_command_queue OCLqueue_update) {
+int graalInitialize(
+    graalHandle * new_plan,
+    const char * ocl_kernels_path,
+    int init_flags,
+	cl_command_queue OCLqueue_conv,
+    cl_command_queue OCLqueue_update
+    )
+{
 	int err = 0;
 	ProjPlan * plan = NULL;
 
@@ -82,18 +89,13 @@ int graalInitialize(graalHandle *new_plan, const char * ocl_kernels_path, int in
 		return(err);
 	}
 
-
 	plan = CreatePlan(init_flags);
 	// reverbirate conv kernel initialization
 
 	ReverbOCLInitialize(plan, new_plan, ocl_kernels_path, init_flags, OCLqueue_conv, OCLqueue_update);
 
-
 	return(err);
 }
-
-
-
 
 int graalTerminate(graalHandle rvrb) {
 	int err = 0;
@@ -106,7 +108,7 @@ int graalTerminate(graalHandle rvrb) {
 
 	OCLTerminate(plan);
 
-	free(plan);	
+	free(plan);
 	return err;
 }
 
@@ -155,7 +157,7 @@ int ret = 0;
 ///////////////////////////////////////////////////////////////
 //
 // the main entry point.
-// calls different pipeline inplemetetion depending on the 
+// calls different pipeline inplemetetion depending on the
 // instansiation flags and (possiblly) on some hueristics
 //
 //////////////////////////////////////////////////////////////////
@@ -228,7 +230,7 @@ int graalReverbSetupKernelFromContiguousOCLBuffer(
     int _n_channels,
     int* _channel_ids,
     unsigned int _ir_version,
-    const cl_mem  _conv_ptr,  
+    const cl_mem  _conv_ptr,
     const int  _max_conv_lens
 )
 {
@@ -266,7 +268,7 @@ int graalInit(amdOCLRvrb rvrb, int kernelSize, int numChannels, unsigned int n_i
 
 ///////////////////////////////////////////////////////////////////
 //
-// 
+//
 ////////////////////////////////////////////////////////////////////
 /*
 * Must NOT be called asynchronously with the convolution process function calls

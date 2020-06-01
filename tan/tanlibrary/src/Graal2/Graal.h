@@ -26,7 +26,7 @@
 #define __AMDGRAAL_OCL__
 
 #include <CL/cl.h>
-#include "public/common/AMFFactory.h"  
+#include "public/common/AMFFactory.h"
 
 #define __FLOAT__ float
 typedef unsigned int uint;
@@ -62,9 +62,9 @@ typedef graalHandle firHandle;
 /**
 ***************************************************************************************************
 *   graalInitialize
-* 
+*
 *   @brief
-*		Initializes reverberation pipeline. 
+*		Initializes reverberation pipeline.
 *		Each new reverberation or FIR filter has to have its own initalization.
 **
 *   @return
@@ -72,13 +72,13 @@ typedef graalHandle firHandle;
 *
 ***************************************************************************************************
 */
- 
+
 int graalInitialize(
 	graalHandle * handle,				///< [out] handle to the pipeline.
 	const char * ocl_kernels_path,		///< [in]  path to the set of OCL kernels. Default - working directory.
 	int init_flags,						///< [in] initialization flags (see below).
-    amf::AMFComputePtr amf_compute_conv= 0,       ///< [in] the AMF compute device used for passing the convolution queue and compiling and caching the kernels, if not provided will use ocl API to compile
-    amf::AMFComputePtr amf_compute_update = 0       ///< [in] the AMF compute device used for passing the general queue and compiling and caching the kernels, if not provided will use ocl API to compile
+    const amf::AMFComputePtr & amf_compute_conv,       ///< [in] the AMF compute device used for passing the convolution queue and compiling and caching the kernels, if not provided will use ocl API to compile
+    const amf::AMFComputePtr & amf_compute_update      ///< [in] the AMF compute device used for passing the general queue and compiling and caching the kernels, if not provided will use ocl API to compile
 	);
 
 int graalInitialize(
@@ -86,14 +86,15 @@ int graalInitialize(
 	const char * ocl_kernels_path,		///< [in]  path to the set of OCL kernels. Default - working directory.
 	int init_flags,						///< [in] initialization flags (see below).
 	cl_command_queue OCLqueue_conv = 0,       ///< [in] the OpenCL queue used for passing the convolution queue and compiling and caching the kernels, if not provided will use ocl API to compile
-	cl_command_queue OCLqueue_update = 0       ///< [in] the OpenCL queue device used for passing the general queue and compiling and caching the kernels, if not provided will use ocl API to compile
-);
+	cl_command_queue OCLqueue_update = 0      ///< [in] the OpenCL queue device used for passing the general queue and compiling and caching the kernels, if not provided will use ocl API to compile
+	);
+
 /**
 **************************************************************************************************
 Possible initialization flag combinations:
-__INIT_FLAG_FHT__  - uniform convolution.| 
+__INIT_FLAG_FHT__  - uniform convolution.|
 __INIT_FLAG_FHT__ | __INIT_FLAG_HETEROGEN__ - uniform heterogeneous convolution.
-__INIT_FLAG_FHT__ | __INIT_FLAG_2STREAMS__  - non-uniform convolution. 
+__INIT_FLAG_FHT__ | __INIT_FLAG_2STREAMS__  - non-uniform convolution.
 __INIT_FLAG_FHT__ | __INIT_FLAG_2STREAMS__ | __INIT_FLAG_HETEROGEN__ - non-uniform heterogeneous convolution.
 __INIT_FLAG_FIR__ - FIR pipeline.
 *************************************************************************************************
@@ -103,9 +104,9 @@ __INIT_FLAG_FIR__ - FIR pipeline.
 /**
 ***************************************************************************************************
 *   graalTerminate
-* 
+*
 *   @brief
-*		Terminate the reverberation pipeline. 
+*		Terminate the reverberation pipeline.
 *		Each reverberation or FIR filter has to be terminated.
 **
 *   @return
@@ -121,7 +122,7 @@ int graalTerminate(
 /**
 ***************************************************************************************************
 *   graalReverbSetBlockSize
-* 
+*
 *   @brief
 *		Set an input block size - number of samples that an application is going to pass to the reverberation pipeline in a single round.
 *		The same block size - number of samples - an appplication is expected to get back after convolution.
@@ -133,13 +134,13 @@ int graalTerminate(
 */
 int graalReverbSetBlockSize(
 	graalHandle handle,			///< [in] handle to the pipeline.
-	int block_size				///< [in] block size in samples.		
+	int block_size				///< [in] block size in samples.
 	);
 
 /**
 ***************************************************************************************************
 *   graalReverbSetNChannels
-* 
+*
 *   @brief
 *		Set a combination of input/output channels and subchannels.
 *       Supported combination:
@@ -152,9 +153,9 @@ int graalReverbSetBlockSize(
 */
 int graalReverbSetNChannels(
 	graalHandle handle,			///< [in] handle to the pipeline.
-	int n_input_channels,		///< [in] # of input streams.		
+	int n_input_channels,		///< [in] # of input streams.
 	int n_input_subchannels,	///< [in] # of input channels.
-	int n_output_channels,		///< [in] # of output streams.	
+	int n_output_channels,		///< [in] # of output streams.
 	int n_output_subchannels	///< [in] # of output channels.
 	);
 
@@ -165,7 +166,7 @@ int graalReverbGetNChannels(graalHandle handle);
 /**
 ***************************************************************************************************
 *   graalReverbSetupReverbKernelFromFile
-* 
+*
 *   @brief
 *		Loads a reveberation kernel from an audio file.
 *       Supported file format:
@@ -216,9 +217,9 @@ int graalReverbSetupReverbKernelFromHostBuffers(
 //////////////////////////////////////////////////////////////////////////
 
 int graalInit(
-    amdOCLRvrb rvrb, 
-    int kernelSize, 
-    int numChannels, 
+    amdOCLRvrb rvrb,
+    int kernelSize,
+    int numChannels,
     unsigned int n_ir_buffers
 );
 
@@ -235,9 +236,9 @@ int graalFlush(
 
 /**
 ***************************************************************************************************
-*   
-*	graalReverbIsActive 
-* 
+*
+*	graalReverbIsActive
+*
 *   @brief
 *		Indicates that all activities related to the reverberation filrer loading are complete.
 **
@@ -253,9 +254,9 @@ int graalReverbIsActive(
 
 /**
 ***************************************************************************************************
-*   
-*	graalReverbProcessing 
-* 
+*
+*	graalReverbProcessing
+*
 *   @brief
 *		Processes an audio stream block (with sub-channels) and returns the convolved data to the caller.
 *		this is the library's main entry point.
@@ -284,11 +285,11 @@ int graalReverbIsActive(
 * stream 2 - gathers a multiplier number of input blocks then:
 *            does the forward transform over a large block;
 *            every round does the MAD with only the (filter length in blocks / multiplier) number of large blocks, staring frpm 2nd large block;
-*            does the inverse transform over resulting sum of the previous stream 2 large block. 
+*            does the inverse transform over resulting sum of the previous stream 2 large block.
 *            sum up a subblock of a large block at index round % multiplier with the stream 1 sum.
 **
 *   @return
-*       If successful then 1 is returned. Any other value is an error condition. 
+*       If successful then 1 is returned. Any other value is an error condition.
 *
 ***************************************************************************************************
 */
@@ -312,9 +313,9 @@ int graalCopyPrevIRsProc(amdOCLRvrb rvrb, int numChans, unsigned int _from_ir_ve
 /**
 ***************************************************************************************************
 *   graalFIRUpload
-* 
+*
 *   @brief
-*		Uploads a FIR filter in the plane format with samples of the __FLOAT__ type. 
+*		Uploads a FIR filter in the plane format with samples of the __FLOAT__ type.
 *		Layout:
 *		fir_sz samples of channel 0, fir_sz samples of channels 1, etc.
 *       # number of channels is defined in graalReverbSetNChannels (see).

@@ -133,9 +133,16 @@ void CompileAllKernels( ProjPlan * plan) {
 	CreateProgram2(plan, "Util_kernels", __UTIL_PROGRAM_INDEX__, "-cl-fp32-correctly-rounded-divide-sqrt");
 }
 
-int ReverbOCLInitialize(ProjPlan * plan, amdOCLRvrb *new_plan, const char * ocl_kernels_path, int init_flags,
-                                 amf::AMFComputePtr amf_compute_conv, amf::AMFComputePtr amf_compute_update) {
-int err = 0;
+int ReverbOCLInitialize(
+    ProjPlan * plan,
+    amdOCLRvrb * new_plan,
+    const char * ocl_kernels_path,
+    int init_flags,
+    const amf::AMFComputePtr & amf_compute_conv,
+    const amf::AMFComputePtr & amf_compute_update
+    )
+{
+    int err = 0;
 	err = OCLInit(plan, init_flags , amf_compute_conv, amf_compute_update);
 	plan->Stat = (StatisticsPerRun *)malloc(sizeof(StatisticsPerRun));
 	if (err || !plan->Stat)  {
@@ -160,8 +167,15 @@ int err = 0;
 	return err;
 }
 
-int ReverbOCLInitialize(ProjPlan * plan, amdOCLRvrb *new_plan, const char * ocl_kernels_path, int init_flags,
-	cl_command_queue OCLqueue_conv, cl_command_queue OCLqueue_update) {
+int ReverbOCLInitialize(
+    ProjPlan * plan,
+    amdOCLRvrb * new_plan,
+    const char * ocl_kernels_path,
+    int init_flags,
+	cl_command_queue OCLqueue_conv,
+    cl_command_queue OCLqueue_update
+    )
+{
 	int err = 0;
 	err = OCLInit(plan, init_flags, OCLqueue_conv, OCLqueue_update);
 	plan->Stat = (StatisticsPerRun *)malloc(sizeof(StatisticsPerRun));
@@ -184,10 +198,9 @@ int ReverbOCLInitialize(ProjPlan * plan, amdOCLRvrb *new_plan, const char * ocl_
 
 	// HERE we are setting global block counter to 0
 	SetRunCounter(plan, 0);
+
 	return err;
 }
-
-
 
 int ReverbOCLTerminateDeffered(ProjPlan * plan) {
 	int err = 0;

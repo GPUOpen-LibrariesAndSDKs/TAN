@@ -52,10 +52,11 @@ static HSA_OCL_ConfigS* OCLConfig = NULL;
 static amdAudShcheduler* AmdScheduler = NULL;
 typedef unsigned long DWORD;
 
+int OCLInit(ProjPlan *plan, uint init_flags, const amf::AMFComputePtr & amf_compute_conv, const amf::AMFComputePtr & amf_compute_update)
+{
+    int ret = 0;
 
-int OCLInit(ProjPlan *plan, uint init_flags,  amf::AMFComputePtr amf_compute_conv, amf::AMFComputePtr amf_compute_update) {
-int ret = 0;
-// TODO: mutex
+    // TODO: mutex
 	if (0 == OclCounter++ ) {
 		SetupHSAOpenCL(&OCLConfig, init_flags, (cl_context)amf_compute_conv->GetNativeContext(), (cl_command_queue)amf_compute_conv->GetNativeCommandQueue(), (cl_command_queue)amf_compute_update->GetNativeCommandQueue());
 

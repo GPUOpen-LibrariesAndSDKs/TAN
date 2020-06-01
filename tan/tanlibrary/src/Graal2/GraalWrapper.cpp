@@ -149,14 +149,15 @@ int GraalWrapper::process( __FLOAT__ ** input, __FLOAT__ ** output, cl_mem* cl_o
     return 0;
 }
 
-
 int GraalWrapper::ReverbDriverInit(graalHandle* new_plan, int block_size, int n_channels, int subchannels, int verification)
 {
     int err = 0;
     amdOCLRvrb plan;
 
-    err = graalInitialize(&plan, NULL, verification, m_amfComputeConv, m_amfComputeUpdate);
-	//err = graalInitialize(&plan, NULL, verification, m_pContextTAN->GetOpenCLConvQueue(), m_pContextTAN->GetOpenCLGeneralQueue());
+    err = m_amfComputeConv || m_amfComputeUpdate
+        ? graalInitialize(&plan, NULL, verification, m_amfComputeConv, m_amfComputeUpdate)
+        : graalInitialize(&plan, NULL, verification, m_pContextTAN->GetOpenCLConvQueue(), m_pContextTAN->GetOpenCLGeneralQueue())
+        ;
 
     // actually should reposrt the number
     err = graalReverbSetNChannels(plan, n_channels, subchannels, n_channels, subchannels);
@@ -168,8 +169,8 @@ int GraalWrapper::ReverbDriverInit(graalHandle* new_plan, int block_size, int n_
 
     return(err);
 }
-int
-GraalWrapper::updateConv(int numChans, unsigned int _ir_version, int* _channel_ids)
+
+int GraalWrapper::updateConv(int numChans, unsigned int _ir_version, int* _channel_ids)
 {
     int err = 0;
     if (m_oclIrBuff.getNumChannels() != 0)
