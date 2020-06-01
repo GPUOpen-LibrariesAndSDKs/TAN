@@ -520,10 +520,10 @@ int Audio3D::Init
             mMaxSamplesCount
             );
     }
-    
+
     //prepare AMF Factory
-    RETURN_IF_FAILED(g_AMFFactory.Init());
-    
+    //RETURN_IF_FAILED(g_AMFFactory.Init());
+
     // Allocate RT-Queues
     {
         mCmdQueue1 = mCmdQueue2 = mCmdQueue3 = nullptr;

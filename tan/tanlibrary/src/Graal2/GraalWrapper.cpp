@@ -161,8 +161,8 @@ int GraalWrapper::ReverbDriverInit(graalHandle* new_plan, int block_size, int n_
     // actually should reposrt the number
     err = graalReverbSetNChannels(plan, n_channels, subchannels, n_channels, subchannels);
 
-    err = graalReverbSetBlockSize(plan, 1024);
-    err = graalReverbSetBlockSize(plan, block_size);
+    //err = graalReverbSetBlockSize(plan, 1024);
+    err = graalReverbSetBlockSize(plan, block_size ? block_size : 1024);
 
     *new_plan = plan;
 
