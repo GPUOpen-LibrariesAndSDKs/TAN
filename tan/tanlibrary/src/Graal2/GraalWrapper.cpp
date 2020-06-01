@@ -29,7 +29,7 @@
 #include "amdFHT.h"
 #include <omp.h>
 
-void GraalWrapper::terminate() 
+void GraalWrapper::terminate()
 {
 	if (m_handle == 0) return;
 	graalTerminate(m_handle);
@@ -82,7 +82,7 @@ int GraalWrapper::Init(
     //    printf("Context associated with AMF compute devices different from the ones in the TAN context\n");
     //    return -2;
     //}
-    // Setting the falgs 
+    // Setting the falgs
     int init_flags = (  heterogen | FHT_2streams | fht | fft | fir);
     int ret =  ReverbDriverInit(&m_handle, buffer_size, n_max_channels, 1, init_flags);
     ret |= graalInit(m_handle, max_conv_kernel_size, n_max_channels, number_ir_buffer_sets);
@@ -155,9 +155,8 @@ int GraalWrapper::ReverbDriverInit(graalHandle* new_plan, int block_size, int n_
     int err = 0;
     amdOCLRvrb plan;
 
-    //err = graalInitialize(&plan, NULL, verification, m_amfComputeConv, m_amfComputeUpdate);
-	
-	err = graalInitialize(&plan, NULL, verification, m_pContextTAN->GetOpenCLConvQueue(), m_pContextTAN->GetOpenCLGeneralQueue());
+    err = graalInitialize(&plan, NULL, verification, m_amfComputeConv, m_amfComputeUpdate);
+	//err = graalInitialize(&plan, NULL, verification, m_pContextTAN->GetOpenCLConvQueue(), m_pContextTAN->GetOpenCLGeneralQueue());
 
     // actually should reposrt the number
     err = graalReverbSetNChannels(plan, n_channels, subchannels, n_channels, subchannels);
@@ -173,7 +172,7 @@ int
 GraalWrapper::updateConv(int numChans, unsigned int _ir_version, int* _channel_ids)
 {
     int err = 0;
-    if (m_oclIrBuff.getNumChannels() != 0) 
+    if (m_oclIrBuff.getNumChannels() != 0)
     {
         // If the OCL buffers are used by the user to send in the IRs, otherwise graalReverbSetupReverbKernelFromHostBuffers() is already called for host buffers
         err |= graalReverbSetupKernelFromContiguousOCLBuffer(m_handle, numChans, _channel_ids, _ir_version, m_oclIrBuff.getUnifiedClMemBuff(), m_oclIrBuff.getChannelSampleSize());
@@ -191,10 +190,10 @@ GraalWrapper::copyResponses(int numChans, unsigned int _from_ir_version, unsigne
     clFinish(queue);
     return err;
 }
-int 
+int
 GraalWrapper::OCLIRBuff::init(graalHandle handle, int init_flags, cl_context  context, int numChannels, int kernelSize)
 {
-    // create and initialize the OCL buffers. The buffers are created with a length potentially longer than user IR's to cover an even number of the longer partition size. 
+    // create and initialize the OCL buffers. The buffers are created with a length potentially longer than user IR's to cover an even number of the longer partition size.
     ProjPlan * plan = ReverbFromHandle(handle);
     queue = plan->OCLqueue[1];// General queue
     max_num_channels = numChannels;
@@ -220,10 +219,10 @@ GraalWrapper::OCLIRBuff::init(graalHandle handle, int init_flags, cl_context  co
 	m_initialized = true;
     return clErr;
 }
-int  
+int
 GraalWrapper::OCLIRBuff::copy(int _n_channels,
           const cl_mem * _conv_ptrs,  // arbitrary cl_mem ptrs
-          const int*  _conv_lens, 
+          const int*  _conv_lens,
           int* channel_ids)
 {
     int err = CL_SUCCESS;
