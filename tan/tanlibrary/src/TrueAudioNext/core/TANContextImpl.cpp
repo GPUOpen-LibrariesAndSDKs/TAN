@@ -150,8 +150,8 @@ TANContextImpl::TANContextImpl(void)
       m_oclGeneralDeviceId(0),
       m_oclConvContext(0),
       m_oclConvDeviceId(0),
-      m_oclGeneralQueue(nullptr),
-      m_oclConvQueue(nullptr),
+      //m_oclGeneralQueue(nullptr),
+      //m_oclConvQueue(nullptr),
       m_pContextGeneralAMF(nullptr),
       m_pContextConvolutionAMF(nullptr)
 {
@@ -193,21 +193,21 @@ AMF_RESULT AMF_STD_CALL TANContextImpl::Terminate()
     //m_oclGeneralContext = 0;
     //m_oclConvContext = 0;
 
-    if (m_oclGeneralQueue)
+    /*if (m_oclGeneralQueue)
     {
         printf("Release TANContext queue %llX\r\n", m_oclGeneralQueue);
         //clReleaseCommandQueue(m_oclGeneralQueue);
 		DBG_CLRELEASE(m_oclGeneralQueue,"m_oclGeneralQueue");
 		m_oclGeneralQueue = NULL;
     }
-    
+
     if (m_oclConvQueue)
     {
         printf("Release TANContext queue %llX", m_oclConvQueue);
         //clReleaseCommandQueue(m_oclConvQueue);
 		DBG_CLRELEASE(m_oclConvQueue,"m_oclConvQueue");
 		m_oclConvQueue = NULL;
-    }
+    }*/
 
     if (m_oclGeneralContext != 0)
     {
@@ -278,12 +278,12 @@ AMF_RESULT AMF_STD_CALL TANContextImpl::InitOpenCL(
                                              sizeof(cl_device_id)*deviceCount, devices, nullptr),
                             L"could not retrieve the device ids from context");
     cl_int error;
-    m_oclConvQueue = clCreateCommandQueue(pClContext, devices[0], NULL, &error);
+    auto oclConvQueue = clCreateCommandQueue(pClContext, devices[0], NULL, &error);
     //printf("Queue created %llX\r\n", m_oclConvQueue);
     AMF_RETURN_IF_FALSE(error == CL_SUCCESS, AMF_FAIL,
                         L"cannot create the conv command queue");
 
-    m_oclGeneralQueue = clCreateCommandQueue(pClContext, devices[0], NULL, &error);
+    auto oclGeneralQueue = clCreateCommandQueue(pClContext, devices[0], NULL, &error);
     //printf("Queue created %llX\r\n", m_oclGeneralQueue);
     AMF_RETURN_IF_FALSE(error == CL_SUCCESS, AMF_FAIL,
                         L"cannot create the general command queue");
@@ -296,8 +296,8 @@ AMF_RESULT AMF_STD_CALL TANContextImpl::InitOpenCL(
 
     delete [] devices;
 
-    AMF_RETURN_IF_FALSE(((NULL != m_oclGeneralQueue) && (NULL != m_oclConvQueue)), AMF_FAIL, L"Cannot create the queues");
-    InitOpenCL(m_oclGeneralQueue, m_oclConvQueue);
+    AMF_RETURN_IF_FALSE(((NULL != oclGeneralQueue) && (NULL != oclConvQueue)), AMF_FAIL, L"Cannot create the queues");
+    InitOpenCL(oclGeneralQueue, oclConvQueue);
 
     return AMF_OK;
 }
@@ -336,40 +336,42 @@ cl_context AMF_STD_CALL TANContextImpl::GetOpenCLContext()
 //-------------------------------------------------------------------------------------------------
 cl_command_queue AMF_STD_CALL TANContextImpl::GetOpenCLGeneralQueue()
 {
-    return m_oclGeneralQueue;
+    return m_pComputeGeneral ? cl_command_queue(m_pComputeGeneral->GetNativeCommandQueue()) : nullptr;//m_oclGeneralQueue;
 }
 //-------------------------------------------------------------------------------------------------
 cl_command_queue AMF_STD_CALL TANContextImpl::GetOpenCLConvQueue()
 {
-    return m_oclConvQueue;
+    return m_pComputeConvolution ? cl_command_queue(m_pComputeConvolution->GetNativeCommandQueue()) : nullptr;//m_oclConvQueue;
 }
 
 //-------------------------------------------------------------------------------------------------
-AMF_RESULT amf::TANContextImpl::InitOpenCLInt(cl_command_queue pQueue, QueueType queueType)
+AMF_RESULT amf::TANContextImpl::InitOpenCLInt(cl_command_queue queue, QueueType queueType)
 {
-    if (!pQueue)
-        return AMF_OK;
+    if (!queue)
+    {
+        return AMF_INVALID_ARG;
+    }
 
-    AMFContextPtr& pAMFContext = (queueType == eConvQueue) 
-        ? m_pContextConvolutionAMF 
+    AMFContextPtr& pAMFContext = (queueType == eConvQueue)
+        ? m_pContextConvolutionAMF
         : m_pContextGeneralAMF;
-    cl_context& clContext = (queueType == eConvQueue) 
-        ? m_oclConvContext 
+    cl_context& clContext = (queueType == eConvQueue)
+        ? m_oclConvContext
         : m_oclGeneralContext;
-    cl_device_id& device = (queueType == eConvQueue) 
-        ? m_oclConvDeviceId 
+    cl_device_id& device = (queueType == eConvQueue)
+        ? m_oclConvDeviceId
         : m_oclGeneralDeviceId;
-    cl_command_queue& queue = (queueType == eConvQueue) 
-        ? m_oclConvQueue 
-        : m_oclGeneralQueue;
-    
-    AMFComputePtr& pCompute = (queueType == eConvQueue) 
-        ? m_pComputeConvolution 
+    //cl_command_queue& queue = (queueType == eConvQueue)
+    //    ? m_oclConvQueue
+    //    : m_oclGeneralQueue;
+
+    AMFComputePtr& pCompute = (queueType == eConvQueue)
+        ? m_pComputeConvolution
         : m_pComputeGeneral;
 
 	//CLQUEUE_REFCOUNT(pQueue);
 
-	queue = pQueue;
+	//queue = pQueue;
 
     clGetCommandQueueInfo(queue, CL_QUEUE_DEVICE, sizeof(device), &device, NULL);
     cl_device_type clDeviceType = CL_DEVICE_TYPE_GPU;
@@ -391,10 +393,11 @@ AMF_RESULT amf::TANContextImpl::InitOpenCLInt(cl_command_queue pQueue, QueueType
         AMF_RETURN_IF_FALSE(pAMFCompute != NULL, AMF_FAIL, L"Could not get the AMFCompute.");
         pCompute = pAMFCompute;
 	}
-	else {
-		clRetainCommandQueue(pQueue);
+	else
+    {
+        clRetainCommandQueue(queue);
 	}
-	CLQUEUE_REFCOUNT(pQueue);
+	CLQUEUE_REFCOUNT(queue);
 
     return AMF_OK;
 }

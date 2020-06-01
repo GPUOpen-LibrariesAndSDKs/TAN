@@ -75,8 +75,8 @@ namespace amf
     private:
         cl_context                  m_oclGeneralContext;
         cl_context                  m_oclConvContext;
-        cl_command_queue			m_oclGeneralQueue;
-        cl_command_queue			m_oclConvQueue;
+        //cl_command_queue			m_oclGeneralQueue;
+        //cl_command_queue			m_oclConvQueue;
         cl_device_id                m_oclGeneralDeviceId;
         cl_device_id                m_oclConvDeviceId;
 
@@ -86,8 +86,6 @@ namespace amf
         AMFComputePtr               m_pComputeConvolution;
         AMFComputeDevicePtr         m_pGeneralDeviceAMF;
         AMFComputeDevicePtr         m_pConvolutionDeviceAMF;
-
-
 
         bool m_clfftInitialized;
         static amf_long m_clfftReferences; // Only one instance of the library can exist at a time.
