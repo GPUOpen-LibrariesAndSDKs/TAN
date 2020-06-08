@@ -72,8 +72,8 @@ if(WIN32)
   add_custom_command(
     TARGET TALibVRTest
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioVR_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TALibVRTest>
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioNext_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TALibVRTest>
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${GPUUtilities_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TALibVRTest>
+    COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:TrueAudioNext>" $<TARGET_FILE_DIR:TALibVRTest>
+    COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:TrueAudioVR>" $<TARGET_FILE_DIR:TALibVRTest>
+    COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:GPUUtilities>" $<TARGET_FILE_DIR:TALibVRTest>
     )
 endif()

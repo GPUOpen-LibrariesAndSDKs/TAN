@@ -71,6 +71,6 @@ target_link_libraries(TAlibTestDynamicChannelConvolution GPUUtilities)
 add_custom_command(
   TARGET TAlibTestDynamicChannelConvolution
   POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioNext_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TAlibTestDynamicChannelConvolution>
-  COMMAND ${CMAKE_COMMAND} -E copy_directory "${GPUUtilities_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TAlibTestDynamicChannelConvolution>
+  COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:TrueAudioNext>" $<TARGET_FILE_DIR:TAlibTestDynamicChannelConvolution>
+  COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:GPUUtilities>" $<TARGET_FILE_DIR:TAlibTestDynamicChannelConvolution>
   )

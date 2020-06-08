@@ -73,7 +73,7 @@ target_link_libraries(TALibDopplerTest GPUUtilities)
 add_custom_command(
   TARGET TALibDopplerTest
   POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioVR_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TALibDopplerTest>
-  COMMAND ${CMAKE_COMMAND} -E copy_directory "${TrueAudioNext_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TALibDopplerTest>
-  COMMAND ${CMAKE_COMMAND} -E copy_directory "${GPUUtilities_BINARY_DIR}/$<CONFIGURATION>" $<TARGET_FILE_DIR:TALibDopplerTest>
+  COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:TrueAudioNext>" $<TARGET_FILE_DIR:TALibDopplerTest>
+  COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:TrueAudioVR>" $<TARGET_FILE_DIR:TALibDopplerTest>
+  COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:GPUUtilities>" $<TARGET_FILE_DIR:TALibDopplerTest>
   )
