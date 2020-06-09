@@ -22,7 +22,7 @@ include(../../../../tanlibrary/proj/cmake/utils/OpenCL.cmake)
 # name
 project(AmbisonicVRDecoder DESCRIPTION "AmbisonicVRDecoder")
 
-include_directories(../../../../../amf)
+include_directories(${AMF_HOME})
 include_directories(../../../../../tan)
 include_directories(../../../../common)
 

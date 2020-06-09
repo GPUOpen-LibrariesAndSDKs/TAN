@@ -22,7 +22,7 @@ include(../../../../tanlibrary/proj/cmake/utils/OpenCL.cmake)
 # name
 project(TAlibTestDynamicChannelConvolution DESCRIPTION "TAlibTestDynamicChannelConvolution")
 
-include_directories(../../../../../amf)
+include_directories(${AMF_HOME})
 include_directories(../../../../../tan)
 
 include_directories(../../../../common)

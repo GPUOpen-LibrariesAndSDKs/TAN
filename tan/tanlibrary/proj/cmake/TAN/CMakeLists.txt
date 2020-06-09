@@ -84,7 +84,7 @@ if(IPP_DIR AND IS_DIRECTORY ${IPP_DIR})
   link_directories(${IPP_DIR}/lib/intel64_win)
 endif()
 
-include_directories(../../../../../amf)
+include_directories(${AMF_HOME})
 include_directories(../../../..)
 
 if(OpenMP_FOUND AND OMP_INCLUDE_DIR)

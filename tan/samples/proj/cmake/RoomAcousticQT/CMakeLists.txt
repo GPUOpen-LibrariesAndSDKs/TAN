@@ -74,7 +74,7 @@ if(IPP_DIR AND IS_DIRECTORY ${IPP_DIR})
   link_directories(${IPP_DIR}/lib/intel64_win)
 endif()
 
-include_directories(../../../../../amf)
+include_directories(${AMF_HOME})
 include_directories(../../../../../tan)
 include_directories(../../../src/common)
 include_directories(../../../../common)
@@ -242,13 +242,13 @@ if(WIN32)
   add_custom_command(
     TARGET RoomAcousticsQT
     POST_BUILD
-    
+
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${TAN_ROOT}/tan/tanlibrary/src/fftw-3.3.5-dll64/libfftw3f-3.dll $<TARGET_FILE_DIR:RoomAcousticsQT>
-    
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Qt5::QWindowsIntegrationPlugin> "$<TARGET_FILE_DIR:RoomAcousticsQT>/platforms/qwindows.dll"    
+
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Qt5::QWindowsIntegrationPlugin> "$<TARGET_FILE_DIR:RoomAcousticsQT>/platforms/qwindows.dll"
     )
 endif()
-  
+
 add_custom_command(
   TARGET RoomAcousticsQT
   POST_BUILD

@@ -31,7 +31,7 @@ if(WIN32)
     # name
     project(RoomAcoustics DESCRIPTION "RoomAcoustics")
 
-    include_directories(../../../../../amf)
+    include_directories(${AMF_HOME})
     include_directories(../../../../../tan)
     include_directories(../../../src/common)
     include_directories(../../../../common)
@@ -102,7 +102,7 @@ if(WIN32)
       ../../../src/common/maxlimits.h
       ../../../src/common/SimpleVRaudio.h
       ../../../src/common/WASAPIPlayer.h
-      
+
       ../../../src/RoomAcoustics/Resource.h
       ../../../src/RoomAcoustics/RoomAcoustics.h
       ../../../src/RoomAcoustics/RoomAcousticsDlg.h

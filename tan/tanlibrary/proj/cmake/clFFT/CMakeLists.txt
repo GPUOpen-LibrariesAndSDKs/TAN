@@ -9,7 +9,7 @@ enable_language(CXX)
 
 include(../../../../tanlibrary/proj/cmake/utils/OpenCL.cmake)
 
-include_directories(../../../../../amf)
+include_directories(${AMF_HOME})
 include_directories(../../../../..)
 include_directories(../../../../common)
 
@@ -86,7 +86,7 @@ if(NOT WIN32)
   if(CMAKE_BUILD_TYPE MATCHES "Debug" OR CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
     target_compile_options(clFFT-master PUBLIC -g)
   endif()
-  
+
   if(NOT APPLE)
     target_compile_options(clFFT-master PUBLIC -Wpsabi)
   endif()

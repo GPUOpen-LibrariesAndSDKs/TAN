@@ -71,7 +71,7 @@ ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)
 ADD_DEFINITIONS(-DTAN_SDK_EXPORTS)
 
-include_directories(../../../../../amf)
+include_directories(${AMF_HOME})
 include_directories(../../../..)
 include_directories(../../../../common)
 

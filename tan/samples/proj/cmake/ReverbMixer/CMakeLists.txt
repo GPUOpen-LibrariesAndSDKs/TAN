@@ -55,7 +55,7 @@ if(IPP_DIR AND IS_DIRECTORY ${IPP_DIR})
 endif()
 
 include_directories(../../../../common)
-include_directories(../../../../../amf)
+include_directories(${AMF_HOME})
 include_directories(../../../../../tan)
 include_directories(../../../src/common)
 
@@ -183,8 +183,8 @@ if(WIN32)
     TARGET ReverbMixer
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${TAN_ROOT}/tan/tanlibrary/src/fftw-3.3.5-dll64/libfftw3f-3.dll $<TARGET_FILE_DIR:ReverbMixer>
-    
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Qt5::QWindowsIntegrationPlugin> "$<TARGET_FILE_DIR:ReverbMixer>/platforms/qwindows.dll"        
+
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Qt5::QWindowsIntegrationPlugin> "$<TARGET_FILE_DIR:ReverbMixer>/platforms/qwindows.dll"
     )
 endif()
 

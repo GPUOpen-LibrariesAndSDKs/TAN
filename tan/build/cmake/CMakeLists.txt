@@ -28,6 +28,20 @@ else()
   message("Release build type is set")
 endif()
 
+# prepare compilation params
+if(AMF_CORE_STATIC)
+  message("AMF will be built as a static library")
+
+  ADD_DEFINITIONS(-DAMF_CORE_STATIC)
+endif()
+
+if(AMF_HOME)
+  message("AMF_HOME is set to ${AMF_HOME}")
+else()
+  set(AMF_HOME "../../../../../amf")
+  message("AMF_HOME is set to the default value: ${AMF_HOME}")
+endif()
+
 # name
 project(TAN DESCRIPTION "TAN")
 

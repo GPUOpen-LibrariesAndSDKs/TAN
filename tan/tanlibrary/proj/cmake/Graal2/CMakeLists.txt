@@ -52,7 +52,7 @@ include(../../../../tanlibrary/proj/cmake/utils/OpenCL.cmake)
 # cl kernel preprocessor
 include(../../../../samples/proj/cmake/CLKernelPreprocessor/CLKernelPreprocessor.cmake)
 
-include_directories(../../../../../amf)
+include_directories(${AMF_HOME})
 include_directories(../../../..)
 include_directories(../../../../common)
 

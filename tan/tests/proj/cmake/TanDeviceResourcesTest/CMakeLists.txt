@@ -30,7 +30,7 @@ project(TanDeviceResourcesTest DESCRIPTION "TanDeviceResourcesTest")
   ADD_DEFINITIONS(-D_UNICODE)
 #endif()
 
-include_directories(../../../../../amf)
+include_directories(${AMF_HOME})
 include_directories(../../../../../tan)
 
 # sources

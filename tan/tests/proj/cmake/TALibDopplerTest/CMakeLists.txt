@@ -29,7 +29,7 @@ ADD_DEFINITIONS(-D_LIB)
 ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)
 
-include_directories(../../../../../amf)
+include_directories(${AMF_HOME})
 include_directories(../../../../../tan)
 
 if(IPP_DIR AND IS_DIRECTORY ${IPP_DIR})

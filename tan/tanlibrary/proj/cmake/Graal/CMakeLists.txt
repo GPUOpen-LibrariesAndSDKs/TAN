@@ -15,7 +15,7 @@ include(../../../../samples/proj/cmake/CLKernelPreprocessor/CLKernelPreprocessor
 # library name
 project(Graal)
 
-include_directories(../../../../../amf)
+include_directories(${AMF_HOME})
 include_directories(../../../..)
 include_directories(../../../../common)
 
