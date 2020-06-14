@@ -25,9 +25,8 @@
 #define __FLOAT__              float
 #define __FLOAT2__             float2
 
-
 void FHTIteration_gcs(__local __FLOAT__ * data,
-	const __global __FLOAT__ * ang,	
+	const __global __FLOAT__ * ang,
 	int n,
 	int n2,
 	int k ) {
@@ -96,7 +95,7 @@ void FHTIteration_gcs(__local __FLOAT__ * data,
 //
 /////////////////////////////////////////////////////
 
-__kernel 
+__kernel
 void amdFHT4096(__global const __FLOAT__ * in,
 				__global __FLOAT__ * out,
 				__global const short * gbitreverse,
@@ -105,7 +104,7 @@ void amdFHT4096(__global const __FLOAT__ * in,
 				__FLOAT__ scaling,
 				int frame_ln,
 				int chnl_stride
-				) 
+				)
 {
 	int lcl_id = get_local_id(0);
 	int grp_id = get_group_id(0);
@@ -121,7 +120,7 @@ void amdFHT4096(__global const __FLOAT__ * in,
 
 // transform
     int n=1;
-    int n2=N/2; 
+    int n2=N/2;
 	for(int log2_n = 0, log2_n2 = LOG2_N - 1; log2_n < LOG2_N; log2_n++, log2_n2--)
     {
 		n = (1 << log2_n);
@@ -142,10 +141,10 @@ void amdFHT4096(__global const __FLOAT__ * in,
 		printf("IR2048 FHT: %f %f %f %f\n", data[0], data[1], data[2], data[3]);
 	}
 */
-} 
+}
 
 
-__kernel 
+__kernel
 void amdFHT4096FromQ(__global const __FLOAT__ * in,
 				__global __FLOAT__ * out,
 				__global const short * gbitreverse,
@@ -156,7 +155,7 @@ void amdFHT4096FromQ(__global const __FLOAT__ * in,
 				int que_ln,
 				int frame_ln,
 				int current_bin
-				) 
+				)
 {
 	int lcl_id = get_local_id(0);
     int chnl = channels_map[get_group_id(1)];
@@ -188,7 +187,7 @@ void amdFHT4096FromQ(__global const __FLOAT__ * in,
 
 // transform
     int n=1;
-    int n2=N/2; 
+    int n2=N/2;
 	for(int log2_n = 0, log2_n2 = LOG2_N - 1; log2_n < LOG2_N; log2_n++, log2_n2--)
     {
 		n = (1 << log2_n);
@@ -209,9 +208,9 @@ void amdFHT4096FromQ(__global const __FLOAT__ * in,
 		printf("FHT2: %f %f %f %f\n", data[0], data[1], data[2], data[3]);
 	}
 */
-} 
+}
 
-__kernel 
+__kernel
 void amdFHT4096FromS(__global const __FLOAT__ * in,
 				__global __FLOAT__ * out,
 				__global const short * gbitreverse,
@@ -221,7 +220,7 @@ void amdFHT4096FromS(__global const __FLOAT__ * in,
 				int chnl_stride,
 				int frame_ln,
 				int current_bin
-				) 
+				)
 {
 	int lcl_id = get_local_id(0);
     int chnl = channels_map[get_group_id(1)];
@@ -240,7 +239,7 @@ void amdFHT4096FromS(__global const __FLOAT__ * in,
 
 // transform
     int n=1;
-    int n2=N/2; 
+    int n2=N/2;
 	for(int log2_n = 0, log2_n2 = LOG2_N - 1; log2_n < LOG2_N; log2_n++, log2_n2--)
     {
 		n = (1 << log2_n);
@@ -261,7 +260,7 @@ void amdFHT4096FromS(__global const __FLOAT__ * in,
 		printf("InvFHT2: %f %f %f %f\n", out[0], out[1], out[2], out[3]);
 	}
 */
-} 
+}
 
 __kernel
 void amdFHT4096FromSXFade(__global const __FLOAT__ * in,
@@ -272,7 +271,7 @@ void amdFHT4096FromSXFade(__global const __FLOAT__ * in,
                      __FLOAT__ scale,
                      int chnl_stride,
                      int frame_ln,
-                     int current_bin, 
+                     int current_bin,
                      int xfade_span
 )
 {
@@ -334,7 +333,7 @@ void FHTransformLoop(__local __FLOAT__  *data, __global const __FLOAT__ * gsinco
 // transform
 	int lcl_id = get_local_id(0);
     int n=1;
-    int n2=N/2; 
+    int n2=N/2;
 	for(int log2_n = 0, log2_n2 = LOG2_N - 1; log2_n < LOG2_N; log2_n++, log2_n2--)
     {
 		n = (1 << log2_n);
@@ -354,7 +353,7 @@ void FHTransformLoop(__local __FLOAT__  *data, __global const __FLOAT__ * gsinco
 //
 /////////////////////////////////////////////////////
 
-__kernel 
+__kernel
 void amdFHT8192(__global const __FLOAT__ * in,
 				__global __FLOAT__ * out,
 				__global const short * gbitreverse,
@@ -363,7 +362,7 @@ void amdFHT8192(__global const __FLOAT__ * in,
 				__FLOAT__ scaling,
 				int frame_ln,
 				int chnl_stride
-				) 
+				)
 {
 	int lcl_id = get_local_id(0);
 	int grp_id = get_group_id(0);
@@ -382,7 +381,7 @@ void amdFHT8192(__global const __FLOAT__ * in,
 		out[i + grp_id * frame_ln + chnl_stride * chnl] = data[i];
 	}
 
-} 
+}
 
 // Currently in/out i the same buffer
 // care has to be taken when try to parallelize in a future.
@@ -460,7 +459,7 @@ void amdFHT8192FromQ(__global const __FLOAT__ * in,
     */
 }
 
-__kernel 
+__kernel
 void amdFHT8192FromS(__global const __FLOAT__ * in,
 				__global __FLOAT__ * out,
 				__global const short * gbitreverse,
@@ -470,7 +469,7 @@ void amdFHT8192FromS(__global const __FLOAT__ * in,
 				int chnl_stride,
 				int frame_ln,
 				int current_bin
-				) 
+				)
 {
 	int lcl_id = get_local_id(0);
     int chnl = channels_map[get_group_id(1)];
@@ -490,9 +489,7 @@ void amdFHT8192FromS(__global const __FLOAT__ * in,
 	for( int i = lcl_id; i < N/2; i+= __GROUP_SZ__) {
 		out[i + (frame_ln/2)  * chnl] = (data[i] * scale * (__FLOAT__)0.5);
 	}
-
-} 
-
+}
 
 __kernel
 void amdFHT8192FromSXFade(__global const __FLOAT__ * in,
@@ -503,7 +500,7 @@ void amdFHT8192FromSXFade(__global const __FLOAT__ * in,
                      __FLOAT__ scale,
                      int chnl_stride,
                      int frame_ln,
-                     int current_bin, 
+                     int current_bin,
                      int xfade_span
 )
 {
@@ -512,7 +509,6 @@ void amdFHT8192FromSXFade(__global const __FLOAT__ * in,
     int chnl_off = chnl_stride * chnl;
 
     __local __FLOAT__ data[N];
-
 
     for (int i = lcl_id; i < N; i += __GROUP_SZ__)
     {
@@ -531,5 +527,166 @@ void amdFHT8192FromSXFade(__global const __FLOAT__ * in,
         float tempOut = (data[i] * scale * (__FLOAT__)0.5);
         out[i + (frame_ln / 2)  * chnl] = tempOut*fadeInCoeff + out[i + (frame_ln / 2)  * chnl] * fadeOutCoeff;
     }
+}
 
+//
+//16384
+//
+
+#undef __GROUP_SZ__
+#undef N
+#undef LOG2_N
+#define __GROUP_SZ__ 256
+#define N 16384
+#define LOG2_N 14
+
+void FHTransformLoop2(__local __FLOAT__  *data, __global const __FLOAT__ * gsincos)
+{
+}
+
+/////////////////////////////////////////////////////
+//
+//
+/////////////////////////////////////////////////////
+
+__kernel
+void amdFHT16384(__global const __FLOAT__ * in,
+				__global __FLOAT__ * out,
+				__global const short * gbitreverse,
+				__global const __FLOAT__ * gsincos,
+                __global const int* channels_map,
+				__FLOAT__ scaling,
+				int frame_ln,
+				int chnl_stride
+				)
+{
+}
+
+// Currently in/out i the same buffer
+// care has to be taken when try to parallelize in a future.
+// need to write into diff buffer
+
+__kernel
+void amdFHT16384FromQ(__global const __FLOAT__ * in,
+                     __global __FLOAT__ * out,
+                     __global const short * gbitreverse,
+                     __global const __FLOAT__ * gsincos,
+                     __global const int* channels_map,
+                     __FLOAT__ scale,
+                     int chnl_stride,
+                     int que_ln,
+                     int frame_ln,
+                     int current_bin
+                    )
+{
+}
+
+__kernel
+void amdFHT16384FromS(__global const __FLOAT__ * in,
+				__global __FLOAT__ * out,
+				__global const short * gbitreverse,
+				__global const __FLOAT__ * gsincos,
+                __global const int* channels_map,
+				__FLOAT__ scale,
+				int chnl_stride,
+				int frame_ln,
+				int current_bin
+				)
+{
+}
+
+__kernel
+void amdFHT16384FromSXFade(__global const __FLOAT__ * in,
+                     __global __FLOAT__ * out,
+                     __global const short * gbitreverse,
+                     __global const __FLOAT__ * gsincos,
+                     __global const int* channels_map,
+                     __FLOAT__ scale,
+                     int chnl_stride,
+                     int frame_ln,
+                     int current_bin,
+                     int xfade_span
+                    )
+{
+}
+
+//
+//32768
+//
+
+#undef __GROUP_SZ__
+#undef N
+#undef LOG2_N
+#define __GROUP_SZ__ 256
+#define N 32768
+#define LOG2_N 15
+
+void FHTransformLoop3(__local __FLOAT__  *data, __global const __FLOAT__ * gsincos)
+{
+}
+
+/////////////////////////////////////////////////////
+//
+//
+/////////////////////////////////////////////////////
+
+__kernel
+void amdFHT32768(__global const __FLOAT__ * in,
+				__global __FLOAT__ * out,
+				__global const short * gbitreverse,
+				__global const __FLOAT__ * gsincos,
+                __global const int* channels_map,
+				__FLOAT__ scaling,
+				int frame_ln,
+				int chnl_stride
+				)
+{
+}
+
+// Currently in/out i the same buffer
+// care has to be taken when try to parallelize in a future.
+// need to write into diff buffer
+
+__kernel
+void amdFHT32768FromQ(__global const __FLOAT__ * in,
+                     __global __FLOAT__ * out,
+                     __global const short * gbitreverse,
+                     __global const __FLOAT__ * gsincos,
+                     __global const int* channels_map,
+                     __FLOAT__ scale,
+                     int chnl_stride,
+                     int que_ln,
+                     int frame_ln,
+                     int current_bin
+                    )
+{
+}
+
+__kernel
+void amdFHT32768FromS(__global const __FLOAT__ * in,
+				__global __FLOAT__ * out,
+				__global const short * gbitreverse,
+				__global const __FLOAT__ * gsincos,
+                __global const int* channels_map,
+				__FLOAT__ scale,
+				int chnl_stride,
+				int frame_ln,
+				int current_bin
+				)
+{
+}
+
+__kernel
+void amdFHT32768FromSXFade(__global const __FLOAT__ * in,
+                     __global __FLOAT__ * out,
+                     __global const short * gbitreverse,
+                     __global const __FLOAT__ * gsincos,
+                     __global const int* channels_map,
+                     __FLOAT__ scale,
+                     int chnl_stride,
+                     int frame_ln,
+                     int current_bin,
+                     int xfade_span
+                    )
+{
 }
