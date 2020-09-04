@@ -17,6 +17,7 @@ private slots:
 	void on_actionLoad_Config_File_triggered();
 	void on_actionSave_Config_File_triggered();
 	void on_actionAbout_triggered();
+	void on_actionASIO_triggered();
 	void on_actionExport_Response_triggered();
 	void on_AddSoundSourceButton_clicked();
 	void on_RemoveSoundSourceButton_clicked();
@@ -59,6 +60,16 @@ private slots:
 	void on_RB_RTQ4Room_clicked();
 
 	void on_PB_RunDemo_clicked();
+	void on_ASIO_device0();
+	void on_ASIO_device1();
+	void on_ASIO_device2();
+	void on_ASIO_device3();
+	void on_ASIO_device4();
+	void on_ASIO_device5();
+	void on_ASIO_device6();
+	void on_ASIO_device7();
+	void on_ASIO_device8();
+	void on_ASIO_device9();
 
 	void table_selection_changed(int index);
 	void update_sound_position(int index, float x, float y, float z);
@@ -69,6 +80,7 @@ private slots:
 	void update_listener_orientation_top_view(float yaw);
 	void update_instance_sound_sources();
 	void update_convMethod(bool gpu);
+
 public:
 	RoomAcousticQTConfig(QWidget *parent = 0);
 	~RoomAcousticQTConfig();
@@ -134,6 +146,8 @@ private:
 
 	QTimer *mTimer = nullptr;
 	bool mLockUpdate = false;
+
+	void on_ASIO_device(int id);
 };
 
 #endif // ROOMACCOUSTICNEW_H

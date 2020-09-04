@@ -215,6 +215,10 @@ namespace amf
         AMFCriticalSection          m_sectUpdate;
         AMFCriticalSection          m_sectProcess;
 
+		//hack
+		CRITICAL_SECTION CriticalSection;
+
+
         //cl_mem           m_pUpdateInputOCL;
         //cl_mem           m_pInputsOCL;
         //cl_mem           m_pOutputsOCL;
@@ -256,7 +260,8 @@ namespace amf
         AMF_RESULT allocateBuffers();
         AMF_RESULT deallocateBuffers();
         AMF_RESULT AMF_FAST_CALL Crossfade(
-            TANSampleBuffer pBufferOutput, amf_size numOfSamplesToProcess);
+            TANSampleBuffer pBufferOutput, amf_size numOfSamplesToProcess, int curFadeSample,
+			int fadeLength);
 
         typedef struct _ovlAddFilterState {
             float **m_Filter;
@@ -267,7 +272,8 @@ namespace amf
 
 		int m_currentDataPartition;
 		int m_dataRowLength;
-		int m_DelayedUpdate;
+		bool m_DelayedUpdate;
+		int m_curCrossFadeSample;
 		float **m_FilterTD;
 
 		//const int m_PartitionPad = 8; 
@@ -290,6 +296,7 @@ namespace amf
 		int m_2ndBufCurrentSubBuf;  // 0 -> m_2ndBufSizeMultiple - 1
 		float **m_NUTailAccumulator;   // store complex multiply accumulate data calculated in ovlNUPProcessTail
 		float **m_NUTailSaved;   // save last complex multiply accumulate results
+		bool m_CrossFading;
 		typedef struct _ovlNonUniformPartitionFilterState {
 			float **m_Filter;
 			float **m_DataPartitions;
@@ -299,6 +306,7 @@ namespace amf
 			float **m_internalDataPartitions;
 			float **m_SubPartitions;
 			float **m_workBuffer;
+
 		} ovlNonUniformPartitionFilterState;
 
         typedef struct _tdFilterState {

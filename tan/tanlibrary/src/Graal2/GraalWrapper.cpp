@@ -265,5 +265,6 @@ GraalWrapper::OCLIRBuff::clearBuffer()
 {
     cl_float zero = 0;
     int err = clEnqueueFillBuffer(queue, unified_conv_ptr, &zero, sizeof(cl_float), 0, unifiedBufferSize, 0, NULL, NULL);
-    return err;
+	clFinish(queue); //hack
+	return err;
 }

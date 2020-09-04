@@ -44,6 +44,18 @@
 	#include "../common/PortPlayer.h"
 #endif
 
+#ifdef USE_ASIO
+#include "AsioPlayer.h"
+extern ASIOCallbacks asioCallbacks;
+extern void bufferSwitch(long index, ASIOBool processNow);
+extern DriverInfo asioDriverInfo;
+extern ASIOError create_asio_buffers(DriverInfo *asioDriverInfo);
+extern long init_asio_static_data(DriverInfo *asioDriverInfo);
+extern void sampleRateChanged(ASIOSampleRate sRate);
+extern long asioMessages(long selector, long value, void* message, double* opt);
+extern ASIOTime *bufferSwitchTimeInfo(ASIOTime *timeInfo, long index, ASIOBool processNow);
+extern AsioDrivers* asioDrivers;
+#endif
 #include <immintrin.h>
 #include <cmath>
 #include <cstring>
@@ -135,6 +147,21 @@ void transRotMtx::transform(float &X, float &Y, float &Z)
 }
 
 
+#ifdef USE_ASIO
+	Audio3D *g_pAudio3D;
+
+//void processAsioAudio1Chan(int16_t *inputBuffers, int16_t *outputBuffers, int nInputs, int nOutputs, int bufSize) {
+//	g_pAudio3D->ProcessNextBlock1ch(outputBuffers, inputBuffers, bufSize);
+//}
+
+void processAsioAudio(int16_t **inputBuffers, int16_t **outputBuffers, int nInputs, int nOutputs, int bufSize) {
+	g_pAudio3D->ProcessNextBlock(outputBuffers, inputBuffers, bufSize);
+	
+}
+
+#endif
+
+
 unsigned Audio3D::processThreadProc(void * ptr)
 {
     Audio3D *pAudio3D = static_cast<Audio3D*>(ptr);
@@ -149,13 +176,23 @@ unsigned Audio3D::updateThreadProc(void * ptr)
     return pAudio3D->UpdateProc();
 }
 
-Audio3D::Audio3D():
-    m_pTAVR(nullptr),
-    mProcessThread(true),
-    mStop(false),
-    m_headingOffset(0.),
-    m_headingCCW(true)
+Audio3D::Audio3D() :
+	m_pTAVR(nullptr),
+	mProcessThread(true),
+	mStop(false),
+	m_headingOffset(0.),
+	m_headingCCW(true),
+	mplayerType("PortAudio")
 {
+#ifdef USE_ASIO
+	g_pAudio3D = this;
+	for (int i = 0; i < 2; i++) {
+		outFifos[i] = NULL;
+		inFifos[i] = NULL;
+	}
+	outsamplesLeft = NULL;
+	outsamplesRight = NULL;
+#endif
 }
 
 Audio3D::~Audio3D()
@@ -235,12 +272,18 @@ int Audio3D::Close()
 	 ************************************************************************************************************************/
 
     if (mCmdQueue1 != NULL){
+		clFlush(mCmdQueue1);
+		clFinish(mCmdQueue1);
 		DBG_CLRELEASE(mCmdQueue1,"mCmdQueue1");
     }
-    if (mCmdQueue2 != NULL){
+    if (mCmdQueue2 != NULL && mCmdQueue2 != mCmdQueue3){
+		clFlush(mCmdQueue2);
+		clFinish(mCmdQueue2);
 		DBG_CLRELEASE(mCmdQueue2,"mCmdQueue2");
 	}
     if (mCmdQueue3 != NULL ){
+		clFlush(mCmdQueue3);
+		clFinish(mCmdQueue3);
 		DBG_CLRELEASE(mCmdQueue3,"mCmdQueue3");
 	}
     
@@ -251,6 +294,19 @@ int Audio3D::Close()
 
     mWavFiles.resize(0);
 
+#if USE_ASIO
+	for (int i = 0; i < 2; i++) {
+		if (outFifos[i] != NULL) {
+			delete outFifos[i];
+			outFifos[i] = NULL;
+		}
+		if (inFifos[i] != NULL) {
+			delete inFifos[i];
+			inFifos[i] = NULL;
+		}
+	}
+#endif
+
     return 0;
 }
 
@@ -259,190 +315,212 @@ int Audio3D::Init
 	const std::string &     dllPath,
 	const RoomDefinition &  roomDef,
 
-    const std::vector<std::string> &
-                            inFiles,
+	const std::vector<std::string> &
+	inFiles,
 
-    bool                    useMicSource,
-    bool                    trackHeadPos,
+	bool                    useMicSource,
+	bool                    trackHeadPos,
 
 	int                     fftLen,
 	int                     bufferSizeInSamples,
 
-    bool                    useGPU_Conv,
-    bool                    useGPU_ConvQueue,
-    int                     devIdx_Conv,
+	bool                    useGPU_Conv,
+	bool                    useGPU_ConvQueue,
+	int                     devIdx_Conv,
 
-//#ifdef RTQ_ENABLED
+	//#ifdef RTQ_ENABLED
 	bool                    useHPr_Conv,
-    bool                    useRTQ_Conv,
-    int                     cuRes_Conv,
-//#endif
+	bool                    useRTQ_Conv,
+	int                     cuRes_Conv,
+	//#endif
 
-    bool                    useGPU_IRGen,
-    bool                    useGPU_IRGenQueue,
-    int                     devIdx_IRGen,
+	bool                    useGPU_IRGen,
+	bool                    useGPU_IRGenQueue,
+	int                     devIdx_IRGen,
 
-//#ifdef RTQ_ENABLED
+	//#ifdef RTQ_ENABLED
 	bool                    useHPr_IRGen,
-    bool                    useRTQ_IRGen,
-    int                     cuRes_IRGen,
-//#endif
+	bool                    useRTQ_IRGen,
+	int                     cuRes_IRGen,
+	//#endif
 
-    amf::TAN_CONVOLUTION_METHOD
-                            convMethod,
+	amf::TAN_CONVOLUTION_METHOD
+	convMethod,
 
-    const std::string &     playerType
+	const std::string &     playerType
 )
 {
-    if(useGPU_ConvQueue && !useGPU_Conv)
-    {
-        std::cerr
-            << "Error: GPU queues must be used only with OpenCL Convolution processing!"
-            << std::endl;
 
-        return -1;
-    }
+	if (useGPU_ConvQueue && !useGPU_Conv)
+	{
+		std::cerr
+			<< "Error: GPU queues must be used only with OpenCL Convolution processing!"
+			<< std::endl;
 
-    if(useGPU_IRGenQueue && !useGPU_IRGen)
-    {
-        std::cerr
-            << "Error: GPU queues must be used only with OpenCL Convolution processing!"
-            << std::endl;
+		return -1;
+	}
 
-        return -1;
-    }
+	if (useGPU_IRGenQueue && !useGPU_IRGen)
+	{
+		std::cerr
+			<< "Error: GPU queues must be used only with OpenCL Convolution processing!"
+			<< std::endl;
 
-    m_useOCLOutputPipeline = useGPU_Conv && useGPU_IRGen;
-    //m_useOCLOutputPipeline = useGPU_Conv || useGPU_IRGen;
-    
-    mSrc1EnableMic = useMicSource;
-    mSrc1TrackHeadPos = trackHeadPos;
+		return -1;
+	}
 
-    mBufferSizeInSamples = bufferSizeInSamples;
-    mBufferSizeInBytes = mBufferSizeInSamples * STEREO_CHANNELS_COUNT * sizeof(int16_t);
+	m_useOCLOutputPipeline = useGPU_Conv && useGPU_IRGen;
+	//m_useOCLOutputPipeline = useGPU_Conv || useGPU_IRGen;
 
-    mWavFiles.reserve(inFiles.size());
+	mSrc1EnableMic = useMicSource;
+	mSrc1TrackHeadPos = trackHeadPos;
 
-    for(const auto& fileName: inFiles)
-    {
-        WavContent content;
+	mBufferSizeInSamples = bufferSizeInSamples;
+	mBufferSizeInBytes = mBufferSizeInSamples * STEREO_CHANNELS_COUNT * sizeof(int16_t);
 
-        if(content.ReadWaveFile(fileName))
-        {
-            if(content.SamplesPerSecond != FILTER_SAMPLE_RATE)
-            {
-                std::cerr
-                    << "Error: file " << fileName << " has an unsupported frequency! Currently only "
-                    << FILTER_SAMPLE_RATE << " frequency is supported!"
-                    << std::endl;
+	mWavFiles.reserve(inFiles.size());
 
-                return -1;
-            }
+	for (const auto& fileName : inFiles)
+	{
+		WavContent content;
 
-            if(content.BitsPerSample != 16)
-            {
-                std::cerr
-                    << "Error: file " << fileName << " has an unsupported bits per sample count. Currently only "
-                    << 16 << " bits is supported!"
-                    << std::endl;
+		if (content.ReadWaveFile(fileName))
+		{
+			if (content.SamplesPerSecond != FILTER_SAMPLE_RATE)
+			{
+				std::cerr
+					<< "Error: file " << fileName << " has an unsupported frequency! Currently only "
+					<< FILTER_SAMPLE_RATE << " frequency is supported!"
+					<< std::endl;
 
-                return -1;
-            }
+				return -1;
+			}
 
-            if(content.ChannelsCount != 2)
-            {
-                //std::cerr
-                //    << "Error: file " << fileName << " is not a stereo file. Currently only stereo files are supported!"
-                //    << std::endl;
+			if (content.BitsPerSample != 16)
+			{
+				std::cerr
+					<< "Error: file " << fileName << " has an unsupported bits per sample count. Currently only "
+					<< 16 << " bits is supported!"
+					<< std::endl;
 
-                //return -1;
+				return -1;
+			}
+
+			if (content.ChannelsCount != 2)
+			{
+				//std::cerr
+				//    << "Error: file " << fileName << " is not a stereo file. Currently only stereo files are supported!"
+				//    << std::endl;
+
+				//return -1;
 				content.Convert16bMonoTo16BitStereo();//Convert2Stereo16Bit();
-            }
+			}
 
-            if(content.SamplesCount < mBufferSizeInSamples)
-            {
-                std::cerr
-                    << "Error: file " << fileName << " are too short."
-                    << std::endl;
+			if (content.SamplesCount < mBufferSizeInSamples)
+			{
+				std::cerr
+					<< "Error: file " << fileName << " are too short."
+					<< std::endl;
 
-                return -1;
-            }
+				return -1;
+			}
 
-            //check that samples have compatible formats
-            //becouse convertions are not yet implemented
-            if(mWavFiles.size())
-            {
-                if(!mWavFiles[0].IsSameFormat(content))
-                {
-                    std::cerr << "Error: file " << fileName << " has a diffrent format with opened files" << std::endl;
+			//check that samples have compatible formats
+			//becouse convertions are not yet implemented
+			if (mWavFiles.size())
+			{
+				if (!mWavFiles[0].IsSameFormat(content))
+				{
+					std::cerr << "Error: file " << fileName << " has a diffrent format with opened files" << std::endl;
 
-                    return -1;
-                }
-            }
+					return -1;
+				}
+			}
 
-            mWavFiles.push_back(content);
-        }
-        else
-        {
-            std::cerr << "Error: could not load WAV data from file " << fileName << std::endl;
+			mWavFiles.push_back(content);
+		}
+		else
+		{
+			std::cerr << "Error: could not load WAV data from file " << fileName << std::endl;
 
-            return -1;
-        }
-    }
+			return -1;
+		}
+	}
 
-    if(!mWavFiles.size())
-    {
-        std::cerr << "Error: no files opened to play" << std::endl;
+	if (!mWavFiles.size())
+	{
+		std::cerr << "Error: no files opened to play" << std::endl;
 
-        return -1;
-    }
+		return -1;
+	}
 
-    //initialize hardware
-    mPlayer.reset(
+#ifdef USE_ASIO
+
+	if (playerType == "ASIO") {
+		for (int i = 0; i < 2; i++) {
+			outFifos[i] = new FifoBuffer(4*bufferSizeInSamples);
+			inFifos[i] = new FifoBuffer(32 * bufferSizeInSamples);
+		}
+
+		//char silence[4096];
+		//memset(silence, 0, 4096);
+		//inFifos[0]->store(silence, 4096);
+
+		outsamplesLeft = new short[bufferSizeInSamples];
+		outsamplesRight = new short[bufferSizeInSamples];
+	}
+#endif
+
+	mplayerType = playerType.c_str();
+	mplayerType = playerType;
+	//initialize hardware
+	mPlayer.reset(
 #if defined(__MACOSX) || defined(__APPLE__)
-        static_cast<IWavPlayer *>(new PortPlayer())
+		static_cast<IWavPlayer *>(new PortPlayer())
 #else
 
 #ifdef ENABLE_PORTAUDIO
-        playerType == "PortAudio"
-            ? static_cast<IWavPlayer *>(new PortPlayer())
-            :
+		playerType == "PortAudio"
+		? static_cast<IWavPlayer *>(new PortPlayer())
+		:
 #ifdef _WIN32
-                static_cast<IWavPlayer *>(new WASAPIPlayer())
+		static_cast<IWavPlayer *>(new WASAPIPlayer())
 #elif !defined(__MACOSX) && !defined(__APPLE__)
-                static_cast<IWavPlayer *>(new AlsaPlayer())
+		static_cast<IWavPlayer *>(new AlsaPlayer())
 #endif
 
 #else
 
 #ifdef _WIN32
-        new WASAPIPlayer()
+		new WASAPIPlayer()
 #elif !defined(__MACOSX) && !defined(__APPLE__)
-        new AlsaPlayer()
+		new AlsaPlayer()
 #endif
 
 #endif
 
 #endif
-        );
+	);
 
-    //assume that all opened files has the same format
-    //and we have at least one opened file
-    auto openStatus = mPlayer->Init(
-        mWavFiles[0].ChannelsCount,
-        mWavFiles[0].BitsPerSample,
-        mWavFiles[0].SamplesPerSecond,
+	if (playerType != "ASIO") {
+		//assume that all opened files has the same format
+		//and we have at least one opened file
+		auto openStatus = mPlayer->Init(
+			mWavFiles[0].ChannelsCount,
+			mWavFiles[0].BitsPerSample,
+			mWavFiles[0].SamplesPerSecond,
 
-        mWavFiles.size() > 0,
-        useMicSource
-        );
+			mWavFiles.size() > 0,
+			useMicSource
+		);
 
-    if(PlayerError::OK != openStatus)
-    {
-        std::cerr << "Error: could not initialize player " << std::endl;
+		if (PlayerError::OK != openStatus)
+		{
+			std::cerr << "Error: could not initialize player " << std::endl;
 
-        return -1;
-    }
+			return -1;
+		}
+	}
 
     /* # fft buffer length must be power of 2: */
     m_fftLen = 1;
@@ -530,13 +608,13 @@ int Audio3D::Init
         //CL convolution on GPU
         if(useGPU_Conv && useGPU_ConvQueue)
         {
- //   #ifdef RTQ_ENABLED
 
-    #define QUEUE_MEDIUM_PRIORITY                   0x00010000
+	// definitions for accessing driver RTQ features through AMF 
+	#define QUEUE_MEDIUM_PRIORITY                   0x00010000
+	#define QUEUE_REAL_TIME_COMPUTE_UNITS           0x00020000
 
-    #define QUEUE_REAL_TIME_COMPUTE_UNITS           0x00020000
-            if (useHPr_Conv){
-                flagsQ1 = QUEUE_MEDIUM_PRIORITY;
+			if (useHPr_Conv){
+                flagsQ1 = QUEUE_MEDIUM_PRIORITY | cuRes_Conv;
             }
 
     else if (useRTQ_Conv){
@@ -544,13 +622,12 @@ int Audio3D::Init
             }
 
             if (useHPr_IRGen){
-                flagsQ2 = QUEUE_MEDIUM_PRIORITY;
+                flagsQ2 = QUEUE_MEDIUM_PRIORITY | cuRes_IRGen;
             }
 
             else if (useRTQ_IRGen){
                 flagsQ2 = QUEUE_REAL_TIME_COMPUTE_UNITS | cuRes_IRGen;
             }
-//    #endif // RTQ_ENABLED
 
 			// Retain/release counts must match. 
 			 // Each component that is initialized with a clQueue should increment the ref count (clRetain) in init, and release on terminate.
@@ -1124,6 +1201,138 @@ int Audio3D::Process(int16_t *pOut, int16_t *pChan[MAX_SOURCES], uint32_t sample
     return 0;
 }
 
+#if 0
+int Audio3D::ProcessNextBlock1ch(int16_t * pOut, int16_t *pRec, uint32_t sampleCount) {
+	static int total = 0;
+	char *pD = (char *)pOut;
+	char *pW = (char *)pWaves[0];
+	for (int i = 0; i < sampleCount; i++) {
+		pD[0] = 0;
+		pD[1] = pW[0];
+		pD[2] = pW[1];
+		//pD[0] = pW[1];
+		pD += 3;
+		pW += 4;
+	}
+
+	total += sampleCount;
+	if (total > 480000) {
+		total = 0;
+		pWaves[0] = pWaveStarts[0];
+	}
+	pWaves[0] += sampleCount * 2;
+
+	return sampleCount;
+}
+#endif
+
+int Audio3D::ProcessNextBlock(int16_t ** pOut, int16_t **pRec, uint32_t sampleCount) {
+	static int total = 0;
+	amf_size numSamplesProcessed = 0;
+#ifdef USE_ASIO
+	inFifos[0]->store((char *)pRec[0], sampleCount * 2 * sizeof(int16_t));
+
+	mBufferSizeInBytes = mBufferSizeInSamples *(sizeof(int16_t) * STEREO_CHANNELS_COUNT);
+
+	int len = outFifos[0]->fifoLength()/sizeof(short);
+	if (len <= sampleCount) {
+
+		// Read from the files
+		for (int idx = 0; idx < mWavFiles.size(); idx++) {
+			int16_t *pWavSrc = pWaves[idx];
+			if (mSrc1EnableMic && idx == 0 && inFifos[0]->fifoLength() > mBufferSizeInSamples * 4) {
+				inFifos[0]->retrieve((char *)pRec[0], mBufferSizeInSamples * 4);
+				pWavSrc = pRec[0];
+			}
+
+			for (int chan = 0; chan < 2; chan++) {
+				// The way sources in inputFloatBufs are ordered is: Even indexed elements for left channels, odd indexed ones for right,
+				// this ordering matches with the way impulse responses are generated and indexed to be convolved with the sources.
+				RETURN_IF_FAILED(
+					m_spConverter->Convert(
+						pWavSrc + chan,
+						2,
+						mBufferSizeInSamples,
+						mInputFloatBufs[idx * 2 + chan],
+						1,
+						1.f
+					)
+				);
+			}
+		}
+
+		RETURN_IF_FAILED(m_spConvolution->Process(mInputFloatBufs, mOutputFloatBufs, mBufferSizeInSamples,
+			nullptr, &numSamplesProcessed));
+
+
+		float * outputFloatBufLeft[MAX_SOURCES];
+		float * outputFloatBufRight[MAX_SOURCES];
+
+		for (int src = 0; src < MAX_SOURCES; src++)
+		{
+			outputFloatBufLeft[src] = mOutputFloatBufs[src * 2];// Even indexed channels for left ear input
+			outputFloatBufRight[src] = mOutputFloatBufs[src * 2 + 1];// Odd indexed channels for right ear input
+			///outputFloatBufLeft[src] = mInputFloatBufs[src * 2];// Even indexed channels for left ear input
+			///outputFloatBufRight[src] = mInputFloatBufs[src * 2 + 1];// Odd indexed channels for right ear input
+		}
+
+		AMF_RESULT ret(AMF_OK);
+
+		ret = m_spMixer->Mix(outputFloatBufLeft, mOutputMixFloatBufs[0]);
+		RETURN_IF_FALSE(ret == AMF_OK);
+
+		ret = m_spMixer->Mix(outputFloatBufRight, mOutputMixFloatBufs[1]);
+		RETURN_IF_FALSE(ret == AMF_OK);
+
+		ret = m_spConverter->Convert(mOutputMixFloatBufs[0], 1, mBufferSizeInSamples, outsamplesLeft, 1, 1.f);
+		RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED);
+
+		ret = m_spConverter->Convert(mOutputMixFloatBufs[1], 1, mBufferSizeInSamples, outsamplesRight, 1, 1.f);
+		RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED);
+
+		// stereo interleaved for RoomAcousticsRun.wav
+		ret = m_spConverter->Convert(mOutputMixFloatBufs[0], 1, mBufferSizeInSamples, mProcessedStereo, 2, 1.f);
+		RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED);
+		ret = m_spConverter->Convert(mOutputMixFloatBufs[1], 1, mBufferSizeInSamples, mProcessedStereo + 1, 2, 1.f);
+		RETURN_IF_FALSE(ret == AMF_OK || ret == AMF_TAN_CLIPPING_WAS_REQUIRED);
+		if (mProcessedStereo - &mStereoProcessedBuffer.front() + (mBufferSizeInBytes / sizeof(int16_t)) > mMaxSamplesCount)
+		{
+			mProcessedStereo = &mStereoProcessedBuffer.front();
+		}
+		else
+		{
+			mProcessedStereo += (mBufferSizeInBytes / sizeof(int16_t));
+		}
+
+		//
+		outFifos[0]->store((char *)outsamplesLeft, mBufferSizeInSamples * sizeof(short));
+		outFifos[1]->store((char *)outsamplesRight, mBufferSizeInSamples * sizeof(short));
+
+		for (int fileIndex = 0; fileIndex < mWavFiles.size(); ++fileIndex)
+		{
+			waveBytesPlayed[fileIndex] += mBufferSizeInBytes;
+
+			if (waveBytesPlayed[fileIndex] + mBufferSizeInBytes < waveSizesInBytes[fileIndex])
+			{
+				pWaves[fileIndex] += (mBufferSizeInBytes / sizeof(int16_t));
+			}
+			else
+			{
+				//play wav again
+				pWaves[fileIndex] = pWaveStarts[fileIndex];
+				waveBytesPlayed[fileIndex] = 0;
+			}
+		}
+	}
+	len = outFifos[0]->fifoLength();
+
+	outFifos[0]->retrieve((char *)pOut[0], sampleCount * sizeof(short));
+	outFifos[1]->retrieve((char *)pOut[1], sampleCount * sizeof(short));
+#endif
+	return (int)numSamplesProcessed;
+}
+
+
 int Audio3D::ProcessProc()
 {
     //uint32_t bytesRecorded(0);
@@ -1137,11 +1346,11 @@ int Audio3D::ProcessProc()
     // Fifo recordFifo;
     //recordFifo.Reset(STEREO_CHANNELS_COUNT * FILTER_SAMPLE_RATE * mWavFiles[0].GetSampleSizeInBytes());
 
-    int16_t *pWaves[MAX_SOURCES] = {nullptr};
-    int16_t *pWaveStarts[MAX_SOURCES] = {nullptr};
+    //int16_t *pWaves[MAX_SOURCES] = {nullptr};
+    //int16_t *pWaveStarts[MAX_SOURCES] = {nullptr};
 
-    uint32_t waveSizesInBytes[MAX_SOURCES] = {0};
-    uint32_t waveBytesPlayed[MAX_SOURCES] = {0};
+    //uint32_t waveSizesInBytes[MAX_SOURCES] = {0};
+    //uint32_t waveBytesPlayed[MAX_SOURCES] = {0};
 
     auto buffers2Play = mMaxSamplesCount / mBufferSizeInSamples; //at least 1 block
     uint32_t buffersPlayed(0);
@@ -1165,6 +1374,93 @@ int Audio3D::ProcessProc()
 
     double previousTimerValue(0.0);
     bool firstFrame(true);
+
+#ifdef USE_ASIO
+	int err = 0;
+	//extern void bufferSwitch(long index, ASIOBool processNow);
+	extern bool asioStop;
+	mProcessedStereo = &mStereoProcessedBuffer.front();
+	if (mplayerType == "ASIO") {
+		ASIODriverInfo driverInfo;
+		if (ASIOInit(&driverInfo) == ASE_OK)
+		{
+			printf("asioVersion:   %d\n"
+				"driverVersion: %d\n"
+				"Name:          %s\n"
+				"ErrorMessage:  %s\n",
+				driverInfo.asioVersion, driverInfo.driverVersion,
+				driverInfo.name, driverInfo.errorMessage);
+
+			if (init_asio_static_data(&asioDriverInfo) == 0)
+			{
+				// set up the asioCallback structure and create the ASIO data buffer
+				asioCallbacks.bufferSwitch = &bufferSwitch;
+				asioCallbacks.sampleRateDidChange = &sampleRateChanged;
+				asioCallbacks.asioMessage = &asioMessages;
+				asioCallbacks.bufferSwitchTimeInfo = &bufferSwitchTimeInfo;
+				if (create_asio_buffers(&asioDriverInfo) == ASE_OK)
+				{
+					if (ASIOStart() == ASE_OK) {
+						fprintf(stdout, "\nASIO Driver started succefully.\n\n");
+						while (!mStop) //asioDriverInfo.stopped)
+						{
+							std::this_thread::sleep_for(std::chrono::milliseconds(100));
+							fprintf(stdout, "%d ms / %d ms / %d samples", asioDriverInfo.sysRefTime, (long)(asioDriverInfo.nanoSeconds / 1000000.0), (long)asioDriverInfo.samples);
+
+							// create a more readable time code format (the quick and dirty way)
+							double remainder = asioDriverInfo.tcSamples;
+							long hours = (long)(remainder / (asioDriverInfo.sampleRate * 3600));
+							remainder -= hours * asioDriverInfo.sampleRate * 3600;
+							long minutes = (long)(remainder / (asioDriverInfo.sampleRate * 60));
+							remainder -= minutes * asioDriverInfo.sampleRate * 60;
+							long seconds = (long)(remainder / asioDriverInfo.sampleRate);
+							remainder -= seconds * asioDriverInfo.sampleRate;
+							fprintf(stdout, " / TC: %2.2d:%2.2d:%2.2d:%5.5d", (long)hours, (long)minutes, (long)seconds, (long)remainder);
+
+							fprintf(stdout, "     \r");
+#if !MAC
+							fflush(stdout);
+#endif
+						}
+
+						if((err = ASIOStop()) != ASE_OK)
+							printf("ASIOStop error %d",err);
+					}
+					if((err =ASIODisposeBuffers()) != ASE_OK)
+						printf("ASIODisposeBuffers error %d", err);
+				}
+			}
+			//if ((err = ASIOExit()) != ASE_OK)
+			//	printf("ASIOExit error %d", err);
+		}
+		//asioDrivers->removeCurrentDriver();
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+	if(!WriteWaveFileS(
+		"RoomAcousticsRun.wav",
+		FILTER_SAMPLE_RATE,
+		2,
+		16,
+		//mWavFiles[0].SamplesCount, //why not a max?
+		mMaxSamplesCount,
+		&mStereoProcessedBuffer.front()
+		))
+	{
+		puts("unable to write RoomAcousticsRun.wav");
+	}
+	else
+	{
+		puts("wrote output to RoomAcousticsRun.wav");
+	}
+
+
+		mRunning = false;
+		asioStop = true;
+		return 0;
+	}
+#endif
+
 
     while(!mStop)
     {
@@ -1233,7 +1529,7 @@ int Audio3D::ProcessProc()
         //continue;
         std::this_thread::sleep_for(std::chrono::milliseconds(0));
 
-        //memcpy(processed, &outputBuffer.front(), bytes2Play);
+        memcpy(processed, &outputBuffer.front(), bytes2Play);
 
         uint32_t bytesTotalPlayed(0);
         uint8_t *outputBufferData = (uint8_t *)&outputBuffer.front();
@@ -1315,7 +1611,7 @@ int Audio3D::ProcessProc()
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    /*
+    
     if(!WriteWaveFileS(
         "RoomAcousticsRun.wav",
         FILTER_SAMPLE_RATE,
@@ -1331,7 +1627,7 @@ int Audio3D::ProcessProc()
     else
     {
         puts("wrote output to RoomAcousticsRun.wav");
-    }*/
+    }
 
     mRunning = false;
 

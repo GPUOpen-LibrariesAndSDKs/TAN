@@ -36,6 +36,79 @@
 
 #include <iostream>
 #include <cstring>
+#ifdef USE_ASIO
+#include "asiosys.h"
+#include "asio.h"
+#include "asiodrivers.h" 
+#endif
+
+
+#ifdef USE_ASIO
+#define MAX_DRIVERS 10L
+#define ASIO_DRIVER_NAME    "Realtek ASIO"
+extern AsioDrivers* asioDrivers;
+extern bool loadAsioDriver(char *name);
+char *driverList[MAX_DRIVERS];
+long nDrivers = 0;
+QAction *ASIOActions[MAX_DRIVERS];
+
+long getASIOdriverList(char **list) {
+	for (int i = 0; i < MAX_DRIVERS; i++) {
+		memset(list[i], 0, 256);
+	}
+	AsioDrivers *AD = new AsioDrivers();
+	int n = (AD->getDriverNames(list, MAX_DRIVERS));
+	delete AD;
+	return n;
+}
+#endif
+
+void RoomAcousticQTConfig::on_ASIO_device(int id) {
+#ifdef USE_ASIO
+	loadAsioDriver(driverList[id]);
+#endif
+}
+
+void RoomAcousticQTConfig::on_ASIO_device0()
+{
+	on_ASIO_device(0);
+}
+void RoomAcousticQTConfig::on_ASIO_device1()
+{
+	on_ASIO_device(1);
+}
+void RoomAcousticQTConfig::on_ASIO_device2()
+{
+	on_ASIO_device(2);
+}
+void RoomAcousticQTConfig::on_ASIO_device3()
+{
+	on_ASIO_device(4);
+}
+void RoomAcousticQTConfig::on_ASIO_device4()
+{
+	on_ASIO_device(4);
+}
+void RoomAcousticQTConfig::on_ASIO_device5()
+{
+	on_ASIO_device(5);
+}
+void RoomAcousticQTConfig::on_ASIO_device6()
+{
+	on_ASIO_device(6);
+}
+void RoomAcousticQTConfig::on_ASIO_device7()
+{
+	on_ASIO_device(7);
+}
+void RoomAcousticQTConfig::on_ASIO_device8()
+{
+	on_ASIO_device(8);
+}
+void RoomAcousticQTConfig::on_ASIO_device9()
+{
+	on_ASIO_device(9);
+}
 
 RoomAcousticQTConfig::RoomAcousticQTConfig(QWidget *parent): 
     QMainWindow(parent)
@@ -106,12 +179,47 @@ RoomAcousticQTConfig::RoomAcousticQTConfig(QWidget *parent):
 	ConfigUi.PlayerType->addItem(QString::fromUtf8("PortAudio"));
 #endif
 
+#ifdef USE_ASIO
+	ConfigUi.PlayerType->addItem(QString::fromUtf8("ASIO"));
+
+	for (int i = 0; i < MAX_DRIVERS; i++) {
+		driverList[i] = new char[256];
+	}
+	
+	nDrivers = getASIOdriverList(driverList);
+	for (int i = 0; i < nDrivers; i++) {
+		printf("ASIO driver%d: %s\n", i, driverList[i]);
+	}
+
+	memset(ASIOActions, 0, sizeof(ASIOActions));
+
+	for (int i = 0; i < nDrivers; i++) {
+		ASIOActions[i] = ConfigUi.menuASIO->addAction(tr(driverList[i]));
+		ASIOActions[i]->setCheckable(true);
+	}
+	connect(ASIOActions[0], SIGNAL(triggered()), this, SLOT(on_ASIO_device0()));
+	connect(ASIOActions[1], SIGNAL(triggered()), this, SLOT(on_ASIO_device1()));
+	connect(ASIOActions[2], SIGNAL(triggered()), this, SLOT(on_ASIO_device2()));
+	connect(ASIOActions[3], SIGNAL(triggered()), this, SLOT(on_ASIO_device3()));
+	connect(ASIOActions[4], SIGNAL(triggered()), this, SLOT(on_ASIO_device4()));
+	connect(ASIOActions[5], SIGNAL(triggered()), this, SLOT(on_ASIO_device5()));
+	connect(ASIOActions[6], SIGNAL(triggered()), this, SLOT(on_ASIO_device6()));
+	connect(ASIOActions[7], SIGNAL(triggered()), this, SLOT(on_ASIO_device7()));
+	connect(ASIOActions[8], SIGNAL(triggered()), this, SLOT(on_ASIO_device8()));
+	connect(ASIOActions[9], SIGNAL(triggered()), this, SLOT(on_ASIO_device9()));
+
+#endif
+
 	table_selection_changed(-1);
 }
 
 RoomAcousticQTConfig::~RoomAcousticQTConfig()
 {
-
+#ifdef USE_ASIO
+	for (int i = 0; i < MAX_DRIVERS; i++) {
+		delete driverList[i];
+	}
+#endif
 }
 
 void RoomAcousticQTConfig::Init()
@@ -177,29 +285,30 @@ void RoomAcousticQTConfig::updateSelectedSoundSource()
 			ConfigUi.CB_UseMicroPhone->setEnabled(false);
 			ConfigUi.CB_UseMicroPhone->setChecked(false);
 		}
+		if (m_iCurrentSelectedSource >= 0 && m_iCurrentSelectedSource < MAX_SOURCES) {
+			ConfigUi.CB_SoundSourceEnable->setChecked(m_RoomAcousticInstance.mSoundSourceEnable[m_iCurrentSelectedSource]);
+			ConfigUi.CB_SoundSourceEnable->setEnabled(true);
 
-		ConfigUi.CB_SoundSourceEnable->setChecked(m_RoomAcousticInstance.mSoundSourceEnable[m_iCurrentSelectedSource]);
-		ConfigUi.CB_SoundSourceEnable->setEnabled(true);
+			ConfigUi.CB_TrackHead->setChecked(m_RoomAcousticInstance.mSrcTrackHead[m_iCurrentSelectedSource]);
+			ConfigUi.CB_TrackHead->setEnabled(true);
 
-		ConfigUi.CB_TrackHead->setChecked(m_RoomAcousticInstance.mSrcTrackHead[m_iCurrentSelectedSource]);
-		ConfigUi.CB_TrackHead->setEnabled(true);
-		
-		update_sound_position(
-			m_iCurrentSelectedSource,
-			m_RoomAcousticInstance.m_SoundSources[m_iCurrentSelectedSource].speakerX,
-			m_RoomAcousticInstance.m_SoundSources[m_iCurrentSelectedSource].speakerY,
-			m_RoomAcousticInstance.m_SoundSources[m_iCurrentSelectedSource].speakerZ
+			update_sound_position(
+				m_iCurrentSelectedSource,
+				m_RoomAcousticInstance.m_SoundSources[m_iCurrentSelectedSource].speakerX,
+				m_RoomAcousticInstance.m_SoundSources[m_iCurrentSelectedSource].speakerY,
+				m_RoomAcousticInstance.m_SoundSources[m_iCurrentSelectedSource].speakerZ
 			);
-		ConfigUi.SB_SoundPositionX->setEnabled(true);
-		ConfigUi.SB_SoundPositionY->setEnabled(true);
-		ConfigUi.SB_SoundPositionZ->setEnabled(true);
+			ConfigUi.SB_SoundPositionX->setEnabled(true);
+			ConfigUi.SB_SoundPositionY->setEnabled(true);
+			ConfigUi.SB_SoundPositionZ->setEnabled(true);
 
-		ConfigUi.RemoveSoundSourceButton->setEnabled(true);
-		
-		ConfigUi.SoundConfigurationGroup->setEnabled(true);
-		ConfigUi.SoundSourcePositionGroup->setEnabled(
-			!m_RoomAcousticInstance.mSrcTrackHead[m_iCurrentSelectedSource]
+			ConfigUi.RemoveSoundSourceButton->setEnabled(true);
+
+			ConfigUi.SoundConfigurationGroup->setEnabled(true);
+			ConfigUi.SoundSourcePositionGroup->setEnabled(
+				!m_RoomAcousticInstance.mSrcTrackHead[m_iCurrentSelectedSource]
 			);
+		}
 	}
 	else
 	{
@@ -352,6 +461,7 @@ void RoomAcousticQTConfig::updateConvolutionFields()
 	
 	//convolution method
 	{
+		bool bGPU = false;
 		if
 		(
 			m_RoomAcousticInstance.mConvolutionOverCL
@@ -360,15 +470,17 @@ void RoomAcousticQTConfig::updateConvolutionFields()
 		)
 		{
 			update_convMethod(true);
+			bGPU  = true;
 			//todo: set index manually, enum could be changed in future!
 		}
 		else
 		{
 			update_convMethod(false);
-//			ConfigUi.CB_ConvMethod->setCurrentIndex(0);
 		}
-		//ConfigUi.CB_ConvMethod->setCurrentIndex(m_RoomAcousticInstance.m_eConvolutionMethod);
 		ConfigUi.CB_ConvMethod->setCurrentIndex(0);
+		int idx = m_RoomAcousticInstance.getConvMethodIndex(m_RoomAcousticInstance.m_eConvolutionMethod, bGPU);
+		ConfigUi.CB_ConvMethod->setCurrentIndex(idx);
+
 	}
 
 	ConfigUi.CB_ConvolutionDevice->setCurrentIndex(
@@ -532,6 +644,20 @@ void RoomAcousticQTConfig::storeRoomFields()
 	    ? 2
 		: ( ConfigUi.RB_MPr4Room->isChecked() ? 1 : 0);
 	m_RoomAcousticInstance.mRoomCUCount = ConfigUi.SB_RoomCU->value();
+	m_RoomAcousticInstance.m_exModeRoom = C_MODEL;
+
+	if (m_RoomAcousticInstance.mRoomOverGPU) {
+		m_RoomAcousticInstance.m_exModeRoom = OCL_GPU;
+	}
+
+	switch (m_RoomAcousticInstance.mRoomPriority) {
+		case 1:
+			m_RoomAcousticInstance.m_exModeRoom = OCL_GPU_RTQ2;
+		break;
+		case 2:
+			m_RoomAcousticInstance.m_exModeRoom = OCL_GPU_RTQ1;
+		break;
+	}
 #else
     m_RoomAcousticInstance.mRoomPriority = 0;
 	m_RoomAcousticInstance.mRoomCUCount = 0;
@@ -550,18 +676,18 @@ void RoomAcousticQTConfig::storeConvolutionFields()
 	m_RoomAcousticInstance.m_iConvolutionLength = ConfigUi.SB_ConvolutionLength->value();
 
 	auto currentIndex(ConfigUi.CB_ConvolutionDevice->currentIndex());
-	
+
 	m_RoomAcousticInstance.mConvolutionOverCL = currentIndex > 0;
 
 	bool gpuReset = false;
-	
-	if(m_RoomAcousticInstance.mConvolutionOverCL)
+
+	if (m_RoomAcousticInstance.mConvolutionOverCL)
 	{
 		--currentIndex; //exclude first software item
 
-		if(currentIndex < m_RoomAcousticInstance.mCPUDevicesCount)
+		if (currentIndex < m_RoomAcousticInstance.mCPUDevicesCount)
 		{
-			if(m_RoomAcousticInstance.mConvolutionOverGPU)
+			if (m_RoomAcousticInstance.mConvolutionOverGPU)
 			{
 				gpuReset = true;
 			}
@@ -583,20 +709,34 @@ void RoomAcousticQTConfig::storeConvolutionFields()
 		m_RoomAcousticInstance.mConvolutionDeviceIndex = 0;
 	}
 
-	if(gpuReset)
+	if (gpuReset)
 	{
 		m_RoomAcousticInstance.m_eConvolutionMethod = TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD;
 	}
-	else 
+	else
 	{
 		m_RoomAcousticInstance.m_eConvolutionMethod = m_RoomAcousticInstance.getConvMethodFlag(ConfigUi.CB_ConvMethod->currentText().toStdString());
 	}
 
 #ifdef RTQ_ENABLED
-	m_RoomAcousticInstance.mConvolutionPriority = ConfigUi.RB_RTQ4Conv->isChecked() 
-	    ? 2
-		: ( ConfigUi.RB_MPr4Conv->isChecked() ? 1 : 0);
+	m_RoomAcousticInstance.mConvolutionPriority = ConfigUi.RB_RTQ4Conv->isChecked()
+		? 2
+		: (ConfigUi.RB_MPr4Conv->isChecked() ? 1 : 0);
 	m_RoomAcousticInstance.mConvolutionCUCount = ConfigUi.SB_ConvCU->value();
+	m_RoomAcousticInstance.m_exModeConv = C_MODEL;
+
+	if (m_RoomAcousticInstance.mConvolutionOverGPU) {
+		m_RoomAcousticInstance.m_exModeConv = OCL_GPU;
+	}
+
+	switch (m_RoomAcousticInstance.mConvolutionPriority) {
+		case 1:
+			m_RoomAcousticInstance.m_exModeConv = OCL_GPU_RTQ2;
+			break;
+		case 2:
+			m_RoomAcousticInstance.m_exModeConv = OCL_GPU_RTQ1;
+		break;
+	}
 #else
     m_RoomAcousticInstance.mConvolutionPriority = 0;
 	m_RoomAcousticInstance.mConvolutionCUCount = 0;
@@ -722,6 +862,8 @@ void RoomAcousticQTConfig::updateRoomGraphic()
 
 void RoomAcousticQTConfig::updateSoundSourceGraphics(int index)
 {
+	if (index < 0)
+		return;
 	if (m_RoomAcousticInstance.mWavFileNames[index].length())
 	{
 		m_RoomAcousticGraphic->update_sound_source_position(
@@ -919,6 +1061,16 @@ void RoomAcousticQTConfig::on_actionAbout_triggered()
 	info.exec();
 }
 
+void RoomAcousticQTConfig::on_actionASIO_triggered()
+{
+#ifdef USE_ASIO
+	ASIOStop();
+	ASIOControlPanel();
+	ASIOStart();
+#endif
+	
+}
+
 void RoomAcousticQTConfig::on_actionExport_Response_triggered()
 {
 	QTExportResponse newWindow(nullptr, Qt::Dialog);
@@ -998,7 +1150,9 @@ void RoomAcousticQTConfig::on_CB_TrackHead_stateChanged(int state)
 	updateSoundsourceNames();
 	updateSelectedSoundSource();
 
-	m_RoomAcousticGraphic->m_pSoundSource[m_iCurrentSelectedSource]->setTrackHead(state ? true : false);
+	if (m_iCurrentSelectedSource >= 0 && m_iCurrentSelectedSource < MAX_SOURCES) {
+		m_RoomAcousticGraphic->m_pSoundSource[m_iCurrentSelectedSource]->setTrackHead(state ? true : false);
+	}
 }
 
 void RoomAcousticQTConfig::on_CB_AutoSpin_stateChanged(int stage)
@@ -1269,7 +1423,7 @@ void RoomAcousticQTConfig::on_CB_ConvMethod_currentIndexChanged(int index)
 	}
 
 	storeConvolutionFields();
-	//updateConvolutionFields();
+	updateConvolutionFields();
 }
 
 void RoomAcousticQTConfig::on_RB_DEF4Room_clicked()

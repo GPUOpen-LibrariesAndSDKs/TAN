@@ -528,8 +528,7 @@ void RoomAcousticQT::loadConfiguration(const std::string& xmlfilename)
 										{ "withRTQ1", &useRTQ1_4Room, 'i' },
 										{ "withRTQ2", &useRTQ2_4Room, 'i' },
 										{ "withOCLCPU", &useOCLCPU_4Room, 'i' },
-										{ "withCus", &temp, 'i' }
-		//{ "withCus", &m_iRoomCUCount, 'i' }
+										{ "withCus", &mRoomCUCount, 'i' }
 	};
 
 	element roomElems[3] = {
@@ -551,7 +550,7 @@ void RoomAcousticQT::loadConfiguration(const std::string& xmlfilename)
 		{ "useRTQ2", &useRTQ2_4Conv, 'i' },
 		{ "useOCLCPU", &useOCLCPU_4Conv, 'i' },
 		//{ "cuCount", &m_iConvolutionCUCount, 'i' },
-		{ "cuCount", &temp, 'i' },
+		{ "cuCount", &mConvolutionCUCount, 'i' },
 		{ "method", &m_eConvolutionMethod, 'i' }
 	};
 	struct element convElems[1] = {
@@ -616,24 +615,61 @@ void RoomAcousticQT::loadConfiguration(const std::string& xmlfilename)
 	fclose(fpLoadFile);
 
 	//// Apply Parsed Room config to instance
-	//if (useCMODEL_4Room) m_exModeRoom = C_MODEL;
-	//if (useOCLGPU_4Room) m_exModeRoom = OCL_GPU;
-	//if (useMPr_4Room) m_exModeRoom = OCL_GPU_MPQ;
-	//if (useRTQ1_4Room) m_exModeRoom = OCL_GPU_RTQ1;
-	//if (useRTQ2_4Room) m_exModeRoom = OCL_GPU_RTQ2;
-	//if (useOCLCPU_4Room) m_exModeRoom = OCL_CPU;
+	if (useCMODEL_4Room) {
+		m_exModeRoom = C_MODEL;
+		mRoomOverCL = false;
+		mRoomOverGPU = false;
+	}
+	else {
+		mRoomOverCL = true;
+		mRoomOverGPU = true;
+	}
+		m_exModeRoom = C_MODEL;
+		mRoomPriority = 0;
+	if (useOCLGPU_4Room) m_exModeRoom = OCL_GPU;
+	if (useMPr_4Room) m_exModeRoom = OCL_GPU_MPQ;
+	if (useRTQ1_4Room) {
+		m_exModeRoom = OCL_GPU_RTQ1;
+		mRoomPriority = 2;
+	}
+	if (useRTQ2_4Room) {
+		m_exModeRoom = OCL_GPU_RTQ2;
+		mRoomPriority = 1;
+	}
+	if (useOCLCPU_4Room) m_exModeRoom = OCL_CPU;
 
-	//// Apply Parsed Convolution config to instance
-	//if (useCMODEL_4Conv) m_exModeConv = C_MODEL;
-	//if (useOCLGPU_4Conv) m_exModeConv = OCL_GPU;
-	//if (useMPr_4Conv) m_exModeConv = OCL_GPU_MPQ;
-	//if (useRTQ1_4Conv) m_exModeConv = OCL_GPU_RTQ1;
-	//if (useRTQ2_4Conv) m_exModeConv = OCL_GPU_RTQ2;
-	//if (useOCLCPU_4Conv) m_exModeConv = OCL_CPU;
+	// Apply Parsed Convolution config to instance
+	if (useCMODEL_4Conv) {
+		m_exModeConv = C_MODEL;
+		mConvolutionOverCL = false;
+		mConvolutionOverGPU = false;
+	}
+	else {
+		mConvolutionOverCL = true;
+		mConvolutionOverGPU = true;
+	}
 
-	//// Apply Parsed Mix Down config to instance
-	//if (useCPU_4Mix) m_exModeMix = C_MODEL;
-	//if (useGPU_4Mix) m_exModeMix = OCL_GPU;
+	mConvolutionPriority = 0;
+	if (useOCLGPU_4Conv) m_exModeConv = OCL_GPU;
+	if (useMPr_4Conv) m_exModeConv = OCL_GPU_MPQ;
+
+	if (useRTQ1_4Conv) {
+		m_exModeConv = OCL_GPU_RTQ1;
+		mConvolutionPriority = 2;
+	}
+	if (useRTQ2_4Conv) {
+		m_exModeConv = OCL_GPU_RTQ2;
+		mConvolutionPriority = 1;
+	}
+	if (useOCLCPU_4Conv) {
+		m_exModeConv = OCL_CPU;
+	}
+
+	// Apply Parsed Mix Down config to instance
+	if (useCPU_4Mix) m_exModeMix = C_MODEL;
+	if (useGPU_4Mix) m_exModeMix = OCL_GPU;
+
+
 
 	for (unsigned int i = 0; i < attributes_list.size(); i++)
 	{
@@ -716,13 +752,13 @@ void RoomAcousticQT::saveConfiguraiton(const std::string& xmlfilename)
 
 	fprintf(fpSaveFile, " <rendering nSources=\"%d\" withCMODEL=\"%d\" withOCLGPU=\"%d\" withMPr=\"%d\" withRTQ1=\"%d\" withRTQ2=\"%d\" withOCLCPU=\"%d\" withCus=\"%d\"/>\n",
 		m_iNumOfWavFile,
-		0, //(m_exModeRoom == C_MODEL),
-		0, //(m_exModeRoom == OCL_GPU),
-		0, //(m_exModeRoom == OCL_GPU_MPQ),
-		0, //(m_exModeRoom == OCL_GPU_RTQ1),
-		0, //(m_exModeRoom == OCL_GPU_RTQ2),
-		0, //(m_exModeRoom == OCL_CPU),
-		0//m_iRoomCUCount
+		(m_exModeRoom == C_MODEL),
+		(m_exModeRoom == OCL_GPU),
+		(m_exModeRoom == OCL_GPU_MPQ),
+		(m_exModeRoom == OCL_GPU_RTQ1),
+		(m_exModeRoom == OCL_GPU_RTQ2),
+		(m_exModeRoom == OCL_CPU),
+		mRoomCUCount
 	);
 
 	fputs(" </Room>\n", fpSaveFile);
@@ -731,21 +767,21 @@ void RoomAcousticQT::saveConfiguraiton(const std::string& xmlfilename)
 	fprintf(fpSaveFile, " <configuration length=\"%d\" buffersize =\"%d\" useCMODEL=\"%d\" useOCLGPU=\"%d\" useMPr=\"%d\" useRTQ1=\"%d\" useRTQ2=\"%d\" useOCLCPU=\"%d\" cuCount=\"%d\" method=\"%d\"/>\n",
 		m_iConvolutionLength,
 		m_iBufferSize,
-		0,//(m_exModeConv == C_MODEL),
-		0,//(m_exModeConv == OCL_GPU),
-		0,//(m_exModeConv == OCL_GPU_MPQ),
-		0, //(m_exModeConv == OCL_GPU_RTQ1),
-		0, //(m_exModeConv == OCL_GPU_RTQ2),
-		0, //(m_exModeConv == OCL_CPU),
-		0,//m_iConvolutionCUCount,
+		(m_exModeConv == C_MODEL),
+		(m_exModeConv == OCL_GPU),
+		(m_exModeConv == OCL_GPU_MPQ),
+		(m_exModeConv == OCL_GPU_RTQ1),
+		(m_exModeConv == OCL_GPU_RTQ2),
+		(m_exModeConv == OCL_CPU),
+		mConvolutionCUCount,
 		m_eConvolutionMethod
 	);
 
 	fputs("</Convolution>\n", fpSaveFile);
 	fputs("<Mix>\n", fpSaveFile);
 	fprintf(fpSaveFile, " <configuration useCPUMix=\"%d\" useGPUMix=\"%d\"/>\n",
-		0,//(m_exModeMix == C_MODEL),
-		0//(m_exModeMix == OCL_GPU)
+		(m_exModeMix == C_MODEL),
+		(m_exModeMix == OCL_GPU)
 	);
 	fputs("</Mix>\n", fpSaveFile);
 	fputs("</RoomAcoustics>\n", fpSaveFile);
@@ -882,6 +918,39 @@ amf::TAN_CONVOLUTION_METHOD RoomAcousticQT::getConvMethodFlag(const std::string&
 		return TAN_CONVOLUTION_METHOD_FHT_NONUNIFORM_PARTITIONED;
 
 	return TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD;
+}
+
+ // Convert a convolution method's enum to menu index
+int RoomAcousticQT::getConvMethodIndex(amf::TAN_CONVOLUTION_METHOD method, bool bGPU) {
+	int index = 0;
+	if (bGPU) {
+		switch (method) {
+			case TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD:
+				index = 0;
+				break;
+			case TAN_CONVOLUTION_METHOD_FHT_UNIFORM_HEAD_TAIL:
+				index = 1;
+				break;
+			case TAN_CONVOLUTION_METHOD_FHT_NONUNIFORM_PARTITIONED:
+				index = 2;
+				break;
+		}
+	}
+	else {
+		switch (method) {
+		case TAN_CONVOLUTION_METHOD_FFT_OVERLAP_ADD:
+			index = 0;
+			break;
+		case TAN_CONVOLUTION_METHOD_FFT_PARTITIONED_UNIFORM:
+			index = 1;
+			break;
+		case TAN_CONVOLUTION_METHOD_FFT_PARTITIONED_NONUNIFORM:
+			index = 2;
+			break;
+		}
+
+	}
+	return index;
 }
 
 void RoomAcousticQT::updateAllSoundSourcesPosition()

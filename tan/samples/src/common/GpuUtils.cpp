@@ -216,6 +216,8 @@ int listCpuDeviceNamesWrapper(char *devNames[], unsigned int count) {
 AMF_RESULT CreateCommandQueuesVIAamf(int deviceIndex, int32_t flag1, cl_command_queue* pcmdQueue1, int32_t flag2, cl_command_queue* pcmdQueue2, int amfDeviceType = AMF_CONTEXT_DEVICE_TYPE_GPU)
 {
     bool AllIsOK = true;
+	//hack uncomment to test non AMF queue creation
+	//return AMF_NOT_INITIALIZED;
 
 	if (pcmdQueue1 == NULL || pcmdQueue2 == NULL) {
 		return AMF_INVALID_ARG;
@@ -280,18 +282,19 @@ AMF_RESULT CreateCommandQueuesVIAamf(int deviceIndex, int32_t flag1, cl_command_
                             pDeviceAMF->SetProperty(AMFQUEPROPERTY, Param);
                             amf::AMFComputePtr AMFDevice;
                             pDeviceAMF->CreateCompute(&ComputeFlag, &AMFDevice);
-                            if (nullptr != AMFDevice)
-                            {
-                                tempQueue = static_cast<cl_command_queue>(AMFDevice->GetNativeCommandQueue());
-                            }
-                            if (NULL == tempQueue)
-                            {
-                                fprintf(stdout, "createQueue failed to create cmdQueue1 \n");
-                                AllIsOK = false;
-                            }
-                            clRetainCommandQueue(tempQueue);
-							CLQUEUE_REFCOUNT(tempQueue);
-                            *pcmdQueue1 = tempQueue;
+							if (nullptr != AMFDevice)
+							{
+								tempQueue = static_cast<cl_command_queue>(AMFDevice->GetNativeCommandQueue());
+
+								if (NULL == tempQueue)
+								{
+									fprintf(stdout, "createQueue failed to create cmdQueue1 \n");
+									AllIsOK = false;
+								}
+								clRetainCommandQueue(tempQueue);
+								CLQUEUE_REFCOUNT(tempQueue);
+								*pcmdQueue1 = tempQueue;
+							}
                         }
 
                         if (NULL != pcmdQueue2)
@@ -312,20 +315,20 @@ AMF_RESULT CreateCommandQueuesVIAamf(int deviceIndex, int32_t flag1, cl_command_
                             pDeviceAMF->SetProperty(AMFQUEPROPERTY, Param);
                             amf::AMFComputePtr AMFDevice;
                             pDeviceAMF->CreateCompute(&ComputeFlag, &AMFDevice);
-                            if (nullptr != AMFDevice)
-                            {
-                                tempQueue = static_cast<cl_command_queue>(AMFDevice->GetNativeCommandQueue());
-                            }
-                            if (NULL == tempQueue)
-                            {
-                                fprintf(stdout, "createQueue failed to create cmdQueue2 \n");
-                                AllIsOK = false;
-                            }
-                            clRetainCommandQueue(tempQueue);
-							CLQUEUE_REFCOUNT(tempQueue);
-                            *pcmdQueue2 = tempQueue;
+							if (nullptr != AMFDevice)
+							{
+								tempQueue = static_cast<cl_command_queue>(AMFDevice->GetNativeCommandQueue());
+								
+								if (NULL == tempQueue)
+								{
+									fprintf(stdout, "createQueue failed to create cmdQueue2 \n");
+									AllIsOK = false;
+								}
+								clRetainCommandQueue(tempQueue);
+								CLQUEUE_REFCOUNT(tempQueue);
+								*pcmdQueue2 = tempQueue;
+							}
                         }
-
                     }
                 }
                 else
@@ -337,6 +340,7 @@ AMF_RESULT CreateCommandQueuesVIAamf(int deviceIndex, int32_t flag1, cl_command_
         }
         pContextAMF.Release();
         g_AMFFactory.Terminate();
+
     }
     else
     {
@@ -428,12 +432,48 @@ bool CreateCommandQueuesWithCUcount(int deviceIndex, cl_command_queue* pcmdQueue
     return err;
 }
 
+// definitions for accessing driver RTQ features through AMF 
+#define QUEUE_MEDIUM_PRIORITY                   0x00010000
+#define QUEUE_REAL_TIME_COMPUTE_UNITS           0x00020000
+
+// definitions for accessing driver RTQ features through AMD OpenCL extensions
+#define CL_DEVICE_MAX_REAL_TIME_COMPUTE_QUEUES_AMD  0x404D
+#define CL_DEVICE_MAX_REAL_TIME_COMPUTE_UNITS_AMD   0x404E
+#define CL_QUEUE_REAL_TIME_COMPUTE_UNITS_AMD        0x404f
+#define CL_QUEUE_MEDIUM_PRIORITY                    0x4050
 
 bool CreateCommandQueuesVIAocl(int deviceIndex, int32_t flag1, cl_command_queue* pcmdQueue1, int32_t flag2, cl_command_queue* pcmdQueue2, cl_device_type clDeviceType)
 {
     bool AllIsOK = true;
 
-    #ifdef _WIN32
+	int cuNumQ1 = 0;
+	int cuNumQ2 = 0;
+	int QTypeQ1 = 0;
+	int QTypeQ2 = 0;
+
+ #ifdef _WIN32
+	if (QUEUE_REAL_TIME_COMPUTE_UNITS == (flag1 & QUEUE_REAL_TIME_COMPUTE_UNITS))
+	{
+		QTypeQ1 = CL_QUEUE_REAL_TIME_COMPUTE_UNITS_AMD;
+		cuNumQ1 = flag1 & 0x0FFFF;
+	}
+ 	if (QUEUE_MEDIUM_PRIORITY == (flag1 & QUEUE_MEDIUM_PRIORITY))
+	{
+		QTypeQ1 = CL_QUEUE_MEDIUM_PRIORITY;
+		cuNumQ1 = flag1 & 0x0FFFF;
+	}
+
+	if (QUEUE_REAL_TIME_COMPUTE_UNITS == (flag2 & QUEUE_REAL_TIME_COMPUTE_UNITS))
+	{
+		QTypeQ2 = CL_QUEUE_REAL_TIME_COMPUTE_UNITS_AMD;
+		cuNumQ2 = flag2 & 0x0FFFF;
+	}
+	if (QUEUE_MEDIUM_PRIORITY == (flag2 & QUEUE_MEDIUM_PRIORITY))
+	{
+		QTypeQ2 = CL_QUEUE_MEDIUM_PRIORITY;
+		cuNumQ2 = flag2 & 0x0FFFF;
+	}
+
     HMODULE GPUUtilitiesDll = NULL;
     GPUUtilitiesDll = LoadLibraryA("GPUUtilities.dll");
     if (NULL == GPUUtilitiesDll)
@@ -450,7 +490,7 @@ bool CreateCommandQueuesVIAocl(int deviceIndex, int32_t flag1, cl_command_queue*
     createQueue = (createQueueType)GetProcAddress(GPUUtilitiesDll, "createQueue");
     if (NULL == createQueue)
         return false;
-    #endif
+#endif
 
     cl_context clContext = NULL;
     cl_device_id clDevice = NULL;
@@ -465,7 +505,7 @@ bool CreateCommandQueuesVIAocl(int deviceIndex, int32_t flag1, cl_command_queue*
 
     if (NULL != pcmdQueue1)
     {//user requested one queue
-        cl_command_queue tempQueue = createQueue(clContext, clDevice, 0, 0);
+        cl_command_queue tempQueue = createQueue(clContext, clDevice, QTypeQ1, cuNumQ1);
         if (NULL == tempQueue)
         {
             fprintf(stdout, "createQueue failed to create cmdQueue1 \n");
@@ -476,7 +516,7 @@ bool CreateCommandQueuesVIAocl(int deviceIndex, int32_t flag1, cl_command_queue*
 
     if (NULL != pcmdQueue2)
     {//user requested second queue
-        cl_command_queue tempQueue = createQueue(clContext, clDevice, 0, 0);
+        cl_command_queue tempQueue = createQueue(clContext, clDevice, QTypeQ2, cuNumQ2);
         if (NULL == tempQueue)
         {
             fprintf(stdout, "createQueue failed to create cmdQueue2 \n");
@@ -526,7 +566,7 @@ bool CreateGpuCommandQueues(int deviceIndex, int32_t flag1, cl_command_queue* pc
     switch (CreateCommandQueuesVIAamf(deviceIndex, flag1, pcmdQueue1, flag2, pcmdQueue2, AMF_CONTEXT_DEVICE_TYPE_GPU))
     {
     case AMF_NOT_INITIALIZED:
-        bResult = CreateCommandQueuesVIAocl(deviceIndex, 0, pcmdQueue1, 0, pcmdQueue2, CL_DEVICE_TYPE_GPU);
+        bResult = CreateCommandQueuesVIAocl(deviceIndex, flag1, pcmdQueue1, flag2, pcmdQueue2, CL_DEVICE_TYPE_GPU);
         break;
     default:
         ;

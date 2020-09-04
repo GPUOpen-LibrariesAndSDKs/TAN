@@ -391,7 +391,7 @@ int getDeviceAndContext(int devIdx, cl_context *pContext, cl_device_id *pDevice,
     return error;
 }
 
-
+ 
 cl_command_queue createQueue(cl_context context, cl_device_id device, int flag, int var )
 {
     cl_int error = 0;
@@ -399,11 +399,10 @@ cl_command_queue createQueue(cl_context context, cl_device_id device, int flag, 
 
     // Create a command queue
 #if CL_TARGET_OPENCL_VERSION >= 200
-nnn
     if (flag != 0)
     {
         // use clCreateCommandQueueWithProperties to pass custom queue properties to driver:
-        const cl_queue_properties cprops[] = {
+        const cl_queue_properties cprops[8] = {
             CL_QUEUE_PROPERTIES,
             0,
             static_cast<cl_queue_properties>(std::uint64_t(flag)),
@@ -414,12 +413,12 @@ nnn
         cmdQueue = clCreateCommandQueueWithProperties(context, device, cprops, &error);
     }
     else
-#else
+#endif
     {
         // OpenCL 1.2
         cmdQueue = clCreateCommandQueue(context, device, NULL, &error);
     }
-#endif
+
 
     printf("\r\nOpenCL queue created: 0x%llX, error code: %d\r\n", cmdQueue, error);
 

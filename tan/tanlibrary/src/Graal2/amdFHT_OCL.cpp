@@ -140,8 +140,19 @@ int ReverbOCLSetupFHT(ProjPlan * plan, int numChans, int* _channel_ids, unsigned
 
 	uint init_flags = SchedGetInitFlags(GetScheduler(plan));
 
-    cl_command_queue queue = plan->OCLqueue[1];// general queue// GetOCLQueue(plan);
-    err |= CopyToDevice2(queue, &fht_plan->updateChannelMap, _channel_ids, fht_plan->updateChannelMap.len, 0, false);
+	//hack orig  cl_command_queue queue = plan->OCLqueue[1];// general queue// GetOCLQueue(plan);
+	//hack this makes startup loud cl_command_queue queue = plan->OCLqueue[0];// general queue// GetOCLQueue(plan); //hack
+	//clFinish(plan->OCLqueue[1]);
+	//
+	//cl_command_queue queue = plan->OCLqueue[0];
+	//cl_command_queue queue2 = plan->OCLqueue[1];
+
+	cl_command_queue queue = plan->OCLqueue[1];
+
+	err |= CopyToDevice2(queue, &fht_plan->updateChannelMap, _channel_ids, fht_plan->updateChannelMap.len, 0, false);
+	//hack err |= CopyToDevice2(queue2, &fht_plan->updateChannelMap, _channel_ids, fht_plan->updateChannelMap.len, 0, false);
+	//clFinish(queue2);
+
 	 {
 
 // IR1
@@ -269,6 +280,7 @@ int ReverbOCLSetupFHT(ProjPlan * plan, int numChans, int* _channel_ids, unsigned
 	}
 
 #endif    
+	clFinish(queue); //hack
 	return err;
 }
 

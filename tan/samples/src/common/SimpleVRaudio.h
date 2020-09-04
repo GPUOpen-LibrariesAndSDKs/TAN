@@ -42,6 +42,12 @@
 #include <vector>
 #include <array>
 
+#ifdef USE_ASIO
+#include "asiosys.h"
+#include "asio.h"
+#include "asiodrivers.h" 
+#endif
+
 // rotation, translation matrix
 class transRotMtx{
 private:
@@ -115,6 +121,8 @@ public:
 
 	// Stop audio engine:
     bool Stop();
+	int ProcessNextBlock(int16_t **pOut, int16_t **pRec, uint32_t sampleCount);
+	//int ProcessNextBlock1ch(int16_t *pOut, int16_t *pRec, uint32_t sampleCount);
 
 protected:
     static bool useIntrinsics;
@@ -125,9 +133,10 @@ protected:
     PrioritizedThread mProcessThread;
     PrioritizedThread mUpdateThread;
 
+    int Process(int16_t * pOut, int16_t * pChan[MAX_SOURCES], uint32_t sampleCount);
+
     int ProcessProc();
     int UpdateProc();
-    int Process(int16_t * pOut, int16_t * pChan[MAX_SOURCES], uint32_t sampleCount);
 
     bool mRunning = false;
     bool mUpdated = false;
@@ -135,6 +144,21 @@ protected:
     bool mUpdateParams = true;
     bool m_useOCLOutputPipeline;
 
+	int16_t *pWaves[MAX_SOURCES] = { nullptr };
+	int16_t *pWaveStarts[MAX_SOURCES] = { nullptr };
+
+	uint32_t waveSizesInBytes[MAX_SOURCES] = { 0 };
+	uint32_t waveBytesPlayed[MAX_SOURCES] = { 0 };
+
+
+#ifdef USE_ASIO
+	FifoBuffer *outFifos[2];
+	FifoBuffer *inFifos[2];
+	short *outsamplesLeft, *outsamplesRight;
+
+#endif
+
+	std::string      mplayerType;
     std::unique_ptr<IWavPlayer> mPlayer; //todo: dynamic creation of choosen player
 	std::vector<WavContent>     mWavFiles;
 
@@ -142,6 +166,7 @@ protected:
 
     uint32_t                    mMaxSamplesCount = 0;
     std::vector<int16_t>        mStereoProcessedBuffer;
+	int16_t *mProcessedStereo;
 
 	TANContextPtr mTANConvolutionContext;
 	TANContextPtr mTANRoomContext;
@@ -248,3 +273,16 @@ public:
 	AmdTrueAudioVR* getAMDTrueAudioVR();
 	TANConverterPtr getTANConverter();
 };
+
+#ifndef CLQUEUE_REFCOUNT
+#ifdef _DEBUG
+#define CLQUEUE_REFCOUNT( clqueue ) { \
+		cl_uint refcount = 0; \
+		clGetCommandQueueInfo(clqueue, CL_QUEUE_REFERENCE_COUNT, sizeof(refcount), &refcount, NULL); \
+		printf("\nFILE:%s line:%d Queue %llX ref count: %d\r\n", __FILE__ , __LINE__, clqueue, refcount); \
+}
+#else
+#define CLQUEUE_REFCOUNT( clqueue ) { \
+}
+#endif
+#endif

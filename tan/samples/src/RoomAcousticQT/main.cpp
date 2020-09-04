@@ -37,5 +37,10 @@ int main(int argc, char *argv[])
 	RoomAcousticQTConfig configWindow;
 	configWindow.Init();
 
+#ifdef USE_ASIO
+	long err = 0;
+	if ((err = ASIOExit()) != ASE_OK)
+		printf("ASIOExit error %d", err);
+#endif
 	return application.exec();
 }

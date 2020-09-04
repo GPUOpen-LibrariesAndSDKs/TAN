@@ -308,6 +308,7 @@ void cpuHeterogenouosProcessing(ProjPlan * plan, int numChans, int init_flags)
 int ReverbOCLMoveKernelIntoFHTPipeline2(ProjPlan * plan, int numChans, int* channel_ids, unsigned int _ir_version, int init_flags) {
 int err = 0;
 // load a kernel into the GPU pipeline
+clFinish(plan->OCLqueue[0]);
 
 		if ( init_flags & __INIT_FLAG_2STREAMS__ ) {
 // GPU IR setup for 2 streams
@@ -453,11 +454,13 @@ __FLOAT__ *stream_data = NULL;
 	int que_index =  (last_counter) % plan->in_que_ln;
 	int curr_stream = 0;
     auto queue = GetOCLQueue(plan);//conv queue
+
 // input data is a queue of input blocks realized as acyclic array per each sub-channel
 	stream_data = (__FLOAT__ *)in_out_plan->stream_in[curr_stream].sys_map;
 
 	for (int j = 0; j < numChans; j++) {
 #ifdef _WIN32
+//#if 0
         int chId = channel_ids[j];
         __FLOAT__ * block_ptr = stream_data + plan->frame_ln * (que_index + plan->in_que_ln * chId);
 		memcpy(block_ptr, input[j], numSamples * sizeof(__FLOAT__));
@@ -471,6 +474,7 @@ __FLOAT__ *stream_data = NULL;
         if (plan->frame_ln > numSamples)
         {
 #ifdef _WIN32
+//#if 0
             memset((block_ptr + numSamples), 0, (plan->frame_ln - numSamples) * sizeof(__FLOAT__));
 #else
             // Replacing memory mapping with explicit memory OCL write 

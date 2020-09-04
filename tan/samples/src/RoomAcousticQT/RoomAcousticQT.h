@@ -100,6 +100,7 @@ public:
 	std::vector<std::string> getCPUConvMethod() const;							// Get the name of the supported CPU convolution method
 	std::vector<std::string> getGPUConvMethod() const;							// Get the name of the supported GPU convolution method
 	amf::TAN_CONVOLUTION_METHOD getConvMethodFlag(const std::string& _name);	// Convert a convolution method's name in to internal flag that can be used in runtime
+	int getConvMethodIndex(amf::TAN_CONVOLUTION_METHOD method, bool bGPU);	    // Convert a convolution method's enum to menu index
 	/*Run time - these function should be used only when engine is running*/
 	void updateAllSoundSourcesPosition();										// update all the sound source position
 	void updateSoundSourcePosition(int index);									// update the sound source position
@@ -169,6 +170,7 @@ public:
 	int mConvolutionDeviceIndex = 0;
 	int mConvolutionPriority = 0;
 	int mConvolutionCUCount = 0;
+	int m_exModeConv = 0;
 
 	/*Room*/
 	bool mRoomOverCL = false;
@@ -176,6 +178,10 @@ public:
 	int mRoomDeviceIndex = 0;
 	int mRoomPriority = 0;
 	int mRoomCUCount = 0;
+	int m_exModeRoom = 0;
+
+	//Mix down
+	int m_exModeMix = 0;
 
 	std::string mPlayerName;
 

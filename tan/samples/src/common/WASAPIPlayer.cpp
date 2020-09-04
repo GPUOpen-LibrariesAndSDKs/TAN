@@ -225,15 +225,17 @@ uint32_t WASAPIPlayer::Play(uint8_t * buffer2Play, uint32_t sizeInBytes, bool mu
 	HRESULT hr;
     
 	UINT paddingFrames = 0;
+	UINT nSamples = sizeInBytes / GetSampleSizeInBytes();
+
     hr = mAudioClient->GetCurrentPadding(&paddingFrames);
 	if(FAILED(hr))
 	{
 		return 0;
 	}
 
-	UINT availableFreeBufferSizeInFrames = sizeInBytes / GetSampleSizeInBytes() - paddingFrames;
+	UINT availableFreeBufferSizeInFrames = nSamples - paddingFrames;
 
-	UINT frames2Copy = min(availableFreeBufferSizeInFrames, sizeInBytes / GetSampleSizeInBytes());
+	UINT frames2Copy = min(availableFreeBufferSizeInFrames, nSamples);
 
 	BYTE *buffer = nullptr;
 	hr = mRenderClient->GetBuffer(frames2Copy, &buffer);

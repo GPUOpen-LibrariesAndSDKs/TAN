@@ -90,13 +90,23 @@ include_directories(../../../../../tan)
 include_directories(../../../src/common)
 include_directories(../../../../common)
 
+if(IS_DIRECTORY ${ASIO_DIR})
+#enable ASIO audio driver support
+ADD_DEFINITIONS(-DUSE_ASIO)
+include_directories(../../../../../thirdparty/asiosdk/common)
+include_directories(../../../../../thirdparty/asiosdk/host)
+include_directories(../../../../../thirdparty/asiosdk/host/pc)
+endif()
+
+
+
 include_directories(../../../src/RoomAcousticQT/QTObject)
 
 if(WIN32)
 ADD_DEFINITIONS(-DRTQ_ENABLED)
 endif()
 
-ADD_DEFINITIONS(-D_DEBUG)
+#ADD_DEFINITIONS(-D_DEBUG)
 
 if(CMAKE_BUILD_TYPE EQUAL "Debug")
     ADD_DEFINITIONS(-D_DEBUG)
@@ -170,6 +180,15 @@ if(PortAudio_DIR)
   list(APPEND SOURCE_EXE ../../../src/common/PortPlayer.cpp)
   list(APPEND HEADER_EXE ../../../src/common/PortPlayer.h)
   message("PortAudio support injected to project")
+endif()
+
+if(IS_DIRECTORY ${ASIO_DIR})
+  list(APPEND SOURCE_EXE  ../../../../../thirdparty/asiosdk/common/asio.cpp)
+  list(APPEND SOURCE_EXE  ../../../../../thirdparty/asiosdk/host/asiodrivers.cpp)
+  list(APPEND SOURCE_EXE ../../../../../thirdparty/asiosdk/host/pc/asiolist.cpp)
+  list(APPEND SOURCE_EXE ../../../src/common/AsioPlayer.cpp)
+  list(APPEND HEADER_EXE ../../../src/common/AsioPlayer.h)
+  message("AsioAudio support injected to project")
 endif()
 
 set(

@@ -31,19 +31,32 @@ bool CreateCpuCommandQueues(int deviceIndex, int32_t flag1, cl_command_queue* pc
 
 bool CreateCommandQueuesWithCUcount(int deviceIndex,cl_command_queue* pcmdQueue1, cl_command_queue* pcmdQueue2, int Q1CUcount, int Q2CUcount);
 
-#ifndef CLQUEUE_REFCOUNT
-#define CLQUEUE_REFCOUNT( clqueue ) { \
-		cl_uint refcount = 0; \
-		clGetCommandQueueInfo(clqueue, CL_QUEUE_REFERENCE_COUNT, sizeof(refcount), &refcount, NULL); \
-		printf("\nFILE:%s line:%d Queue %llX ref count: %d\r\n", __FILE__ , __LINE__, clqueue, refcount); \
-}
-#endif
 
 #ifndef DBG_CLRELEASE
+#ifdef _DEBUG
 #define DBG_CLRELEASE( clqueue, qname ) { \
 		cl_uint refcount = 0; \
 		clReleaseCommandQueue(clqueue); \
 		clGetCommandQueueInfo(clqueue, CL_QUEUE_REFERENCE_COUNT, sizeof(refcount), &refcount, NULL); \
 		printf("\nFILE:%s line:%d %s %llX ref count: %d\r\n", __FILE__ , __LINE__,qname, clqueue, refcount); \
 }
+#else
+#define DBG_CLRELEASE( clqueue, qname ) { \
+		clReleaseCommandQueue(clqueue); \
+}
 #endif
+#endif
+
+#ifndef DBG_CLRELEASE
+//hack #ifdef _DEBUG
+#define DBG_CLRELEASE( clqueue, qname ) { \
+		cl_uint refcount = 0; \
+		clReleaseCommandQueue(clqueue); \
+		clGetCommandQueueInfo(clqueue, CL_QUEUE_REFERENCE_COUNT, sizeof(refcount), &refcount, NULL); \
+		printf("\nFILE:%s line:%d %s %llX ref count: %d\r\n", __FILE__ , __LINE__,qname, clqueue, refcount); \
+}
+//hack #else
+//#define DBG_CLRELEASE
+//hack #endif
+#endif
+

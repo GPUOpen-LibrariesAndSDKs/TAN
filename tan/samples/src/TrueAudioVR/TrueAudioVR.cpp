@@ -41,22 +41,35 @@
 #include <sstream>
 #include <cmath>
 
+
 #ifndef CLQUEUE_REFCOUNT
+#ifdef _DEBUG
 #define CLQUEUE_REFCOUNT( clqueue ) { \
 		cl_uint refcount = 0; \
 		clGetCommandQueueInfo(clqueue, CL_QUEUE_REFERENCE_COUNT, sizeof(refcount), &refcount, NULL); \
 		printf("\nFILE:%s line:%d Queue %llX ref count: %d\r\n", __FILE__ , __LINE__, clqueue, refcount); \
 }
+#else
+#define CLQUEUE_REFCOUNT( clqueue ) { \
+}
+#endif
 #endif
 
 #ifndef DBG_CLRELEASE
+#ifdef _DEBUG
 #define DBG_CLRELEASE( clqueue, qname ) { \
 		cl_uint refcount = 0; \
 		clReleaseCommandQueue(clqueue); \
 		clGetCommandQueueInfo(clqueue, CL_QUEUE_REFERENCE_COUNT, sizeof(refcount), &refcount, NULL); \
 		printf("\nFILE:%s line:%d %s %llX ref count: %d\r\n", __FILE__ , __LINE__,qname, clqueue, refcount); \
 }
+#else
+#define DBG_CLRELEASE( clqueue, qname ) { \
+		clReleaseCommandQueue(clqueue); \
+}
 #endif
+#endif
+
 
 //const InstructionSet::InstructionSet_Internal InstructionSet::CPU_Rep;
 bool AmdTrueAudioVR::useIntrinsics = true; // InstructionSet::AVX() && InstructionSet::FMA();
