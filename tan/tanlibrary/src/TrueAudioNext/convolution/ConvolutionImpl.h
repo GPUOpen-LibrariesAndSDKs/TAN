@@ -216,7 +216,7 @@ namespace amf
         AMFCriticalSection          m_sectProcess;
 
 		//hack
-		CRITICAL_SECTION CriticalSection;
+		//CRITICAL_SECTION CriticalSection;
 
 
         //cl_mem           m_pUpdateInputOCL;

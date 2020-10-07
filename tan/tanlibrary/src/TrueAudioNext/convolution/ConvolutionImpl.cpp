@@ -36,6 +36,11 @@
 
 #include <CL/cl.h>
 #include <tuple>
+#include <time.h>
+#include <thread>
+#include <chrono>
+#include <stdio.h>
+
 
 #define AMF_FACILITY L"TANConvolutionImpl"
 
@@ -147,8 +152,8 @@ TANConvolutionImpl::TANConvolutionImpl(TANContext *pContextTAN)
 
 
 	//HACK  Initialize the critical section one time only.
-	InitializeCriticalSectionAndSpinCount(&CriticalSection,
-		0x00000400);
+	//InitializeCriticalSectionAndSpinCount(&CriticalSection,
+	//	0x00000400);
 
 	// Release resources used by the critical section object.
 	//DeleteCriticalSection(&CriticalSection);
@@ -305,7 +310,12 @@ AMF_RESULT  AMF_STD_CALL TANConvolutionImpl::Terminate()
     //tID = GetThreadId((HANDLE)m_updThread.getNativeThreadHandle());
     m_xFadeStarted.SetEvent();
 
-    AMFLock lock(&m_sect);
+    AMFLock lock(&m_sect); 
+	//hack
+	//AMFLock lock1(&m_sectAccum);
+	//AMFLock lock2(&m_sectUpdate);
+	//AMFLock lock3(&m_sectProcess);
+	m_initialized = false;
 
 	deallocateBuffers();
     m_updThread.RequestStop();
@@ -357,7 +367,7 @@ AMF_RESULT  AMF_STD_CALL    TANConvolutionImpl::UpdateResponseTD(
     AMF_RESULT res = AMF_OK;
 
     // process
-	Sleep(100); //HACK
+	//Sleep(100); //HACK
 
 	//EnterCriticalSection(&CriticalSection);
 
@@ -413,7 +423,8 @@ AMF_RESULT  AMF_STD_CALL TANConvolutionImpl::UpdateResponseTD(
 	//	if (m_DelayedUpdate > 0)
 	//		return AMF_OK;
 		while (m_DelayedUpdate > 0) {
-			Sleep(5);
+			//Sleep(5);
+			std::this_thread::sleep_for(std::chrono::milliseconds(5));
 	}
 
 
