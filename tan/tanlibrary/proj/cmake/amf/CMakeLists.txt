@@ -47,6 +47,8 @@ endif()
 
 if(AMF_CORE_STATIC)
   list(APPEND SOURCE_LIB ${AMF_HOME}/public/src/core/FactoryImpl.cpp)
+  list(APPEND SOURCE_LIB ${AMF_HOME}/public/src/core/DebugImpl.cpp)
+  list(APPEND SOURCE_LIB ${AMF_HOME}/public/src/core/TraceImpl.cpp)
 endif()
 
 set(
